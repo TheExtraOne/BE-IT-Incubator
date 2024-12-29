@@ -32,7 +32,6 @@ const server = http.createServer(async (request, response) => {
   }
 
   // if (request?.method === "GET" && request.url !== "/favicon.ico") requestCount++;
-  // response.write(` Hello BE! Request count ${requestCount}`);
 
   response.end();
 });

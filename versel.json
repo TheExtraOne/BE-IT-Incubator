@@ -3,15 +3,14 @@
     "name": "videos",
     "builds": [
       {
-        "src": "scr/index.ts",
-        "use": "@vercel/node",
-        "config": { "includeFiles": ["dist/**"] }
+        "src": "src/index.ts",
+        "use": "@vercel/node"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "scr/index.ts"
+        "dest": "src/index.ts"
       }
     ]
   }

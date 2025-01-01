@@ -56,19 +56,18 @@ const videoController = {
             res.status(settings_1.STATUS.BAD_REQUEST_400).json(errors);
             return;
         }
-        // TODO: refactor
-        result.title = newTitle || result.title;
-        result.author = newAuthor || result.author;
-        result.canBeDownloaded = newCanBeDownloadedFlag !== null && newCanBeDownloadedFlag !== void 0 ? newCanBeDownloadedFlag : result.canBeDownloaded;
-        result.minAgeRestriction =
-            typeof newMinAgeRestriction !== "undefined"
+        Object.assign(result, {
+            title: newTitle,
+            author: newAuthor,
+            canBeDownloaded: newCanBeDownloadedFlag !== null && newCanBeDownloadedFlag !== void 0 ? newCanBeDownloadedFlag : result.canBeDownloaded,
+            minAgeRestriction: typeof newMinAgeRestriction !== "undefined"
                 ? newMinAgeRestriction
-                : result.minAgeRestriction;
-        result.availableResolutions =
-            typeof newAvailableResolutions !== "undefined"
+                : result.minAgeRestriction,
+            availableResolutions: typeof newAvailableResolutions !== "undefined"
                 ? newAvailableResolutions
-                : result.availableResolutions;
-        result.publicationDate = newPublicationDate || result.publicationDate;
+                : result.availableResolutions,
+            publicationDate: newPublicationDate !== null && newPublicationDate !== void 0 ? newPublicationDate : result.publicationDate,
+        });
         res.sendStatus(settings_1.STATUS.NO_CONTENT_204);
     },
     deleteVideo: (req, res) => {

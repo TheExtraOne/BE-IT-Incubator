@@ -103,19 +103,20 @@ const videoController = {
       return;
     }
 
-    // TODO: refactor
-    result.title = newTitle || result.title;
-    result.author = newAuthor || result.author;
-    result.canBeDownloaded = newCanBeDownloadedFlag ?? result.canBeDownloaded;
-    result.minAgeRestriction =
-      typeof newMinAgeRestriction !== "undefined"
-        ? newMinAgeRestriction
-        : result.minAgeRestriction;
-    result.availableResolutions =
-      typeof newAvailableResolutions !== "undefined"
-        ? newAvailableResolutions
-        : result.availableResolutions;
-    result.publicationDate = newPublicationDate || result.publicationDate;
+    Object.assign(result, {
+      title: newTitle,
+      author: newAuthor,
+      canBeDownloaded: newCanBeDownloadedFlag ?? result.canBeDownloaded,
+      minAgeRestriction:
+        typeof newMinAgeRestriction !== "undefined"
+          ? newMinAgeRestriction
+          : result.minAgeRestriction,
+      availableResolutions:
+        typeof newAvailableResolutions !== "undefined"
+          ? newAvailableResolutions
+          : result.availableResolutions,
+      publicationDate: newPublicationDate ?? result.publicationDate,
+    });
 
     res.sendStatus(STATUS.NO_CONTENT_204);
   },

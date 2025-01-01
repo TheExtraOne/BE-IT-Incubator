@@ -26,17 +26,17 @@ describe("/videos", () => {
   beforeEach(async () => setDB());
 
   it("should get an empty array if the db is empty", async () => {
-    const res = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
+    const { body } = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([]);
+    expect(body).toEqual([]);
   });
 
   it("should get an array with results if the db is not empty", async () => {
     setDB(mockDb);
 
-    const res = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
+    const { body } = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
 
-    expect(res.body.length).toBe(1);
+    expect(body.length).toBe(1);
   });
 
   it("should return 404 for the course if the db is empty or the id is not matching", async () => {
@@ -46,11 +46,11 @@ describe("/videos", () => {
   it("should return an entity if the id is matching and the db is not empty", async () => {
     setDB(mockDb);
 
-    const res = await req
+    const { body } = await req
       .get(`${SETTINGS.PATH.VIDEOS}/${id}`)
       .expect(STATUS.OK_200);
 
-    expect(res.body).toEqual(mockDb.videos[0]);
+    expect(body).toEqual(mockDb.videos[0]);
   });
 
   it("should not create the entity  and return an error if the input data is incorrect", async () => {
@@ -132,34 +132,37 @@ describe("/videos", () => {
   });
 
   it("should create an entity if the input data is correct", async () => {
-    const body: TVideoCreateInputModel = {
+    const bodyReq: TVideoCreateInputModel = {
       title: "Smoke on the water",
       author: "Deep Purple",
     };
-    await req.post(SETTINGS.PATH.VIDEOS).send(body).expect(STATUS.CREATED_201);
+    await req
+      .post(SETTINGS.PATH.VIDEOS)
+      .send(bodyReq)
+      .expect(STATUS.CREATED_201);
 
-    const res = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
-    expect(res.body.length).toBe(1);
-    expect(res.body[0].title).toBe(body.title);
+    const { body } = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
+    expect(body.length).toBe(1);
+    expect(body[0].title).toBe(bodyReq.title);
   });
 
   it("should not update the entity and return 404 if the id is not matching", async () => {
-    const body: TVideoUpdateModel = {
+    const bodyReq: TVideoUpdateModel = {
       title: "Smoke on the water",
       author: "Deep Purple",
     };
 
     await req
       .put(`${SETTINGS.PATH.VIDEOS}/${id}`)
-      .send(body)
+      .send(bodyReq)
       .expect(STATUS.NOT_FOUND_404);
 
-    const res = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
-    expect(res.body.length).toBe(0);
+    const { body } = await req.get(SETTINGS.PATH.VIDEOS).expect(STATUS.OK_200);
+    expect(body.length).toBe(0);
   });
 
   it("should not update the entity and return 400 if the input data is incorrect", async () => {
-    const body: TVideoUpdateModel = {
+    const bodyReq: TVideoUpdateModel = {
       title: "Smoke on the water",
       author: "",
     };
@@ -167,17 +170,17 @@ describe("/videos", () => {
 
     await req
       .put(`${SETTINGS.PATH.VIDEOS}/${id}`)
-      .send(body)
+      .send(bodyReq)
       .expect(STATUS.BAD_REQUEST_400);
 
-    const res = await req
+    const { body } = await req
       .get(`${SETTINGS.PATH.VIDEOS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body.title).toBe(mockDb.videos[0].title);
+    expect(body.title).toBe(mockDb.videos[0].title);
   });
 
   it("should update the entity and return 204 if the input data is correct", async () => {
-    const body: TVideoUpdateModel = {
+    const bodyReq: TVideoUpdateModel = {
       title: "Smoke on the water",
       author: "Deep Purple",
     };
@@ -185,13 +188,13 @@ describe("/videos", () => {
 
     await req
       .put(`${SETTINGS.PATH.VIDEOS}/${id}`)
-      .send(body)
+      .send(bodyReq)
       .expect(STATUS.NO_CONTENT_204);
 
-    const res = await req
+    const { body } = await req
       .get(`${SETTINGS.PATH.VIDEOS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body.title).toBe(body.title);
+    expect(body.title).toBe(bodyReq.title);
   });
 
   it("should not delete the entity and return 404 if the id is not matching", async () => {

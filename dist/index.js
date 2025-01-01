@@ -5,4 +5,3 @@ const settings_1 = require("./settings");
 app_1.app.listen(settings_1.SETTINGS.PORT, () => {
     console.log("...server started in port " + settings_1.SETTINGS.PORT);
 });
-// module.exports = app;

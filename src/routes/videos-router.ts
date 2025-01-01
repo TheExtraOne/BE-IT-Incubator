@@ -49,6 +49,9 @@ const videoController = {
       return;
     }
 
+    const createdAt = new Date();
+    const day = 60 * 60 * 24 * 1000;
+
     const newInputModel = {
       title,
       author,
@@ -56,8 +59,8 @@ const videoController = {
       minAgeRestriction: null,
       availableResolutions,
       id: Date.now() + Math.random(),
-      createdAt: new Date().toISOString(),
-      publicationDate: new Date(new Date().getDate() + 1).toISOString(),
+      createdAt: createdAt.toISOString(),
+      publicationDate: new Date(createdAt.getTime() + day).toISOString(),
     };
 
     db.videos = [...db.videos, newInputModel];

@@ -5,4 +5,4 @@ app.listen(SETTINGS.PORT, () => {
   console.log("...server started in port " + SETTINGS.PORT);
 });
 
-module.exports = app;
+// module.exports = app;

@@ -1,0 +1,17 @@
+{
+    "version": 2,
+    "name": "videos",
+    "builds": [
+      {
+        "src": "scr/index.ts",
+        "use": "@vercel/node",
+        "config": { "includeFiles": ["dist/**"] }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "scr/index.ts"
+      }
+    ]
+  }

@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
-import { db } from "../db/db";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -10,20 +9,23 @@ import { TVideoCreateInputModel } from "../models/VideoCreateModel";
 import { TVideoUpdateModel } from "../models/VideoUpdateModel";
 import { TVideoViewModel } from "../models/VideoViewModel";
 import { TPathParamsVideoModel } from "../models/PathParamsVideoModel";
-import { TApiErrorResult } from "../validation/field-validation";
-import { fieldValidator } from "../validation/field-validation";
+import { videosRepository } from "../repositories/videos-repositories";
 
 export const videosRouter = Router({});
 
 const videoController = {
-  getVideos: (_req: Request, res: Response<TVideoViewModel[]>) => {
-    res.status(STATUS.OK_200).json(db.videos);
+  getVideos: (req: Request, res: Response<TVideoViewModel[]>) => {
+    const foundVideos = videosRepository.findVideos(
+      req.query?.title?.toString()
+    );
+
+    res.status(STATUS.OK_200).json(foundVideos);
   },
   getVideo: (
     req: TRequestWithParams<TPathParamsVideoModel>,
     res: Response<TVideoViewModel>
   ) => {
-    const result = db.videos.find((video) => video?.id === +req.params.id);
+    const result = videosRepository.findVideoById(+req.params.id);
 
     result
       ? res.status(STATUS.OK_200).json(result)
@@ -34,43 +36,24 @@ const videoController = {
     res: Response
   ) => {
     const { title, author, availableResolutions = null } = req.body;
-
-    const errors: TApiErrorResult = {
-      errorsMessages: [],
-    };
-    errors.errorsMessages.push(
-      ...fieldValidator.validateTitle(title),
-      ...fieldValidator.validateAuthor(author),
-      ...fieldValidator.validateAvailableResolutions(availableResolutions)
-    );
+    const { errors, newVideo } = videosRepository.createVideo({
+      title,
+      author,
+      availableResolutions,
+    });
 
     if (errors.errorsMessages.length) {
       res.status(STATUS.BAD_REQUEST_400).json(errors);
       return;
     }
 
-    const createdAt = new Date();
-    const day = 60 * 60 * 24 * 1000;
-
-    const newInputModel = {
-      title,
-      author,
-      canBeDownloaded: false,
-      minAgeRestriction: null,
-      availableResolutions,
-      id: Date.now() + Math.random(),
-      createdAt: createdAt.toISOString(),
-      publicationDate: new Date(createdAt.getTime() + day).toISOString(),
-    };
-
-    db.videos = [...db.videos, newInputModel];
-    res.status(STATUS.CREATED_201).json(newInputModel);
+    res.status(STATUS.CREATED_201).json(newVideo);
   },
   updateVideo: (
     req: TRequestWithParamsAndBody<TPathParamsVideoModel, TVideoUpdateModel>,
     res: Response
   ) => {
-    const result = db.videos.find((video) => video?.id === +req.params.id);
+    const result = videosRepository.findVideoById(+req.params.id);
 
     if (!result) {
       res.sendStatus(STATUS.NOT_FOUND_404);
@@ -78,61 +61,37 @@ const videoController = {
     }
 
     const {
-      title: newTitle,
-      author: newAuthor,
-      canBeDownloaded: newCanBeDownloadedFlag,
-      minAgeRestriction: newMinAgeRestriction,
-      availableResolutions: newAvailableResolutions,
-      publicationDate: newPublicationDate,
+      title,
+      author,
+      canBeDownloaded,
+      minAgeRestriction,
+      availableResolutions,
+      publicationDate,
     } = req.body;
 
-    const errors: TApiErrorResult = {
-      errorsMessages: [],
-    };
-    errors.errorsMessages.push(
-      ...fieldValidator.validateTitle(newTitle),
-      ...fieldValidator.validateAuthor(newAuthor),
-      ...fieldValidator.validateCanBeDownloadedFlag(newCanBeDownloadedFlag),
-      ...fieldValidator.validateMinAgeRestriction(newMinAgeRestriction),
-      ...fieldValidator.validateAvailableResolutions(newAvailableResolutions),
-      ...fieldValidator.validatePublicationDate(newPublicationDate)
-    );
-
-    if (errors.errorsMessages.length) {
-      res.status(STATUS.BAD_REQUEST_400).json(errors);
-      return;
-    }
-
-    Object.assign(result, {
-      title: newTitle,
-      author: newAuthor,
-      canBeDownloaded: newCanBeDownloadedFlag ?? result.canBeDownloaded,
-      minAgeRestriction:
-        typeof newMinAgeRestriction !== "undefined"
-          ? newMinAgeRestriction
-          : result.minAgeRestriction,
-      availableResolutions:
-        typeof newAvailableResolutions !== "undefined"
-          ? newAvailableResolutions
-          : result.availableResolutions,
-      publicationDate: newPublicationDate ?? result.publicationDate,
+    const { errors, isSuccessful } = videosRepository.updateVideoById({
+      id: +req.params.id,
+      title,
+      author,
+      canBeDownloaded,
+      minAgeRestriction,
+      availableResolutions,
+      publicationDate,
     });
 
-    res.sendStatus(STATUS.NO_CONTENT_204);
+    isSuccessful
+      ? res.sendStatus(STATUS.NO_CONTENT_204)
+      : res.status(STATUS.BAD_REQUEST_400).json(errors);
   },
   deleteVideo: (
     req: TRequestWithParams<TPathParamsVideoModel>,
     res: Response
   ) => {
-    const result = db.videos.filter((video) => video?.id !== +req.params.id);
+    const { isSuccessful } = videosRepository.deleteVideo(+req.params.id);
 
-    if (result.length === db.videos.length) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
-      return;
-    }
-
-    db.videos = result;
-    res.sendStatus(STATUS.NO_CONTENT_204);
+    isSuccessful
+      ? res.sendStatus(STATUS.NO_CONTENT_204)
+      : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 };
 

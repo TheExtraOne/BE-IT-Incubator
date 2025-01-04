@@ -60,9 +60,13 @@ const postsController = {
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  deletePost: (req: Request, res: Response) => {
-    // TODO
-    res.sendStatus(STATUS.NO_CONTENT_204);
+  deletePost: (
+    req: TRequestWithParams<TPathParamsPostModel>,
+    res: Response
+  ) => {
+    const { success } = postsRepository.deletePostById(req.params.id);
+
+    res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },
 };
 

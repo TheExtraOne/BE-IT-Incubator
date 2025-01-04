@@ -17,6 +17,8 @@ const postsRepository = {
         }
       : null;
   },
+  getPostIndexById: (id: string) =>
+    db.posts.findIndex((post) => post.id === id),
   createPost: (
     title: string,
     shortDescription: string,
@@ -38,7 +40,6 @@ const postsRepository = {
 
     return newPost;
   },
-
   updatePostById: (
     id: string,
     title: string,
@@ -46,7 +47,7 @@ const postsRepository = {
     content: string,
     blogId: string
   ) => {
-    const postIndex = db.posts.findIndex((post) => post.id === id);
+    const postIndex = postsRepository.getPostIndexById(id);
     if (postIndex < 0) return { success: false };
 
     db.posts[postIndex] = {
@@ -57,6 +58,14 @@ const postsRepository = {
       blogId,
     };
 
+    return { success: true };
+  },
+  deletePostById: (id: string) => {
+    const postIndex = postsRepository.getPostIndexById(id);
+    if (postIndex < 0) return { success: false };
+
+    const newPosts = db.posts.filter((post) => post.id !== id);
+    db.posts = newPosts;
     return { success: true };
   },
 };

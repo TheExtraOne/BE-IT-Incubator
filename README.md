@@ -1,4 +1,4 @@
-# blogger platform
+# Blogger platform
 
 Detailed Documentation can be found in Swagger
 
@@ -22,6 +22,11 @@ The `src` directory contains the core components of our application:
     yarn watch
     yarn dev
 
+## Testing
+
+    yarn jest
+    yarn jest filePath
+
 ## TODO
 
 - [+] Add DB, type, model
@@ -37,7 +42,7 @@ The `src` directory contains the core components of our application:
 - [+] Cover with tests
 - [+] Add validation for PUT
 - [+] Cover with tests
-- Add DELETE methods, types, models
-- Cover with tests
-- Add validation for DELETE
-- Cover with tests
+- [+] Add DELETE methods, types, models
+- [+] Cover with tests
+- [+] Add validation for DELETE
+- [+] Cover with tests

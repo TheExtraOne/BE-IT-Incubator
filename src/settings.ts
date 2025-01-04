@@ -1,0 +1,21 @@
+import { config } from "dotenv";
+config();
+
+export const SETTINGS = {
+  ADMIN: process.env.ADMIN || "admin:qwerty",
+  PORT: process.env.PORT || 3003,
+  PATH: {
+    BLOGS: "/blogs",
+    POSTS: "/posts",
+    TESTING: "/testing",
+  },
+};
+
+export const STATUS = {
+  OK_200: 200,
+  CREATED_201: 201,
+  NO_CONTENT_204: 204,
+  BAD_REQUEST_400: 400,
+  NOT_FOUND_404: 404,
+  UNAUTHORIZED_401: 401,
+};

@@ -3,6 +3,7 @@ import cors from "cors";
 import { SETTINGS, STATUS } from "./settings";
 import blogsRouter from "./controllers/blogs";
 import postsRouter from "./controllers/posts";
+import testingRouter from "./controllers/testing";
 
 const app = express();
 app.use(express.json());
@@ -14,5 +15,6 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);
 app.use(SETTINGS.PATH.POSTS, postsRouter);
+app.use(SETTINGS.PATH.TESTING, testingRouter);
 
 export default app;

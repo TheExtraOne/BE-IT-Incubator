@@ -17,13 +17,18 @@ const blogsRouter = Router({});
 
 const blogsController = {
   getBlogs: async (_req: Request, res: Response) => {
-    const blogs:TBlogViewModel[] = await blogsRepository.getAllBlogs();
+    const blogs: TBlogViewModel[] = await blogsRepository.getAllBlogs();
 
     res.status(STATUS.OK_200).json(blogs);
   },
 
-  getBlog: async (req: TRequestWithParams<TPathParamsBlogModel>, res: Response) => {
-    const blog:TBlogViewModel | null = await blogsRepository.getBlogById(req.params.id);
+  getBlog: async (
+    req: TRequestWithParams<TPathParamsBlogModel>,
+    res: Response
+  ) => {
+    const blog: TBlogViewModel | null = await blogsRepository.getBlogById(
+      req.params.id
+    );
 
     blog
       ? res.status(STATUS.OK_200).json(blog)
@@ -32,17 +37,21 @@ const blogsController = {
 
   createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog:TBlogViewModel = await  blogsRepository.createBlog(name, description, websiteUrl);
+    const newBlog: TBlogViewModel = await blogsRepository.createBlog(
+      name,
+      description,
+      websiteUrl
+    );
 
     res.status(STATUS.CREATED_201).json(newBlog);
   },
 
-  updateBlog: async(
+  updateBlog: async (
     req: TRequestWithParamsAndBody<TPathParamsBlogModel, TBlogInputModel>,
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const success  = await blogsRepository.updateBlogById(
+    const success = await blogsRepository.updateBlogById(
       req.params.id,
       name,
       description,
@@ -52,11 +61,11 @@ const blogsController = {
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },
 
-  deleteBlog:async (
+  deleteBlog: async (
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
-    const success  = await blogsRepository.deleteBlogById(req.params.id);
+    const success = await blogsRepository.deleteBlogById(req.params.id);
 
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },

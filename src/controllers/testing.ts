@@ -5,8 +5,8 @@ import testingRepository from "../repository/testing-repository";
 const testingRouter = Router({});
 
 const testingController = {
-  deleteAll: (_req: Request, res: Response) => {
-    testingRepository.deleteAllData();
+  deleteAll: async (_req: Request, res: Response) => {
+    await testingRepository.deleteAllData();
 
     res.sendStatus(STATUS.NO_CONTENT_204);
   },

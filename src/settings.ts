@@ -9,6 +9,10 @@ export const SETTINGS = {
     POSTS: "/posts",
     TESTING: "/testing",
   },
+  DB_NAME: "blogs_and_posts",
+  BLOG_COLLECTION_NAME: "blogs",
+  POST_COLLECTION_NAME: "posts",
+  MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
 };
 
 export const STATUS = {

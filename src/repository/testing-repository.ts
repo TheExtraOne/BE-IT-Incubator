@@ -1,9 +1,9 @@
-import db from "../db/db";
+import { blogCollection, postCollection } from "./db";
 
 const testingRepository = {
-  deleteAllData: () => {
-    db.posts = [];
-    db.blogs = [];
+  deleteAllData: async (): Promise<void> => {
+    await blogCollection.deleteMany({});
+    await postCollection.deleteMany({});
   },
 };
 

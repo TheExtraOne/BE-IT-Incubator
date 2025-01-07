@@ -1,6 +1,6 @@
 import app from "../../../src/app";
 import { agent } from "supertest";
-import { resetPostsDB } from "../../../src/db/db";
+import { resetPostsDB } from "../../../src/db-in-memory/db-in-memory";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { mockPosts } from "../helpers";
 

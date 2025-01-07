@@ -1,6 +1,6 @@
 # Blogger platform
 
-Detailed Documentation can be found in Swagger
+Detailed Documentation can be found in Swagger. A simple REST API for blogs and posts, based on Node.js(express) and MongoDB
 
 ## Environment variables
 
@@ -29,20 +29,9 @@ The `src` directory contains the core components of our application:
 
 ## TODO
 
-- [+] Add DB, type, model
-- [+] Add GET methods, types, models
-- [+] Cover with tests
-- [+] Add Auth
-- [+] Add POST methods, types, models
-- [+] Cover with tests
-- [+] Add validation for POST
-- [+] Add error handlers
-- [+] Cover with tests
-- [+] Add PUT methods, types, models
-- [+] Cover with tests
-- [+] Add validation for PUT
-- [+] Cover with tests
-- [+] Add DELETE methods, types, models
-- [+] Cover with tests
-- [+] Add validation for DELETE
-- [+] Cover with tests
+- [+] Refactor DAC (repository) in async way
+- [+] Refactor Presentational layer (controllers) in async way
+- [+] Add mapping
+- [-] Update tests
+- [+] Handle testing repository
+- [+] Add new fields according to swagger

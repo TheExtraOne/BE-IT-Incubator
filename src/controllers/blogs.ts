@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
-import blogsRepository from "../repository/blogs-repository";
+import blogsRepository from "../repository/blogs-db-repository";
 import TPathParamsBlogModel from "../models/PathParamsBlogModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
@@ -11,37 +11,38 @@ import {
 import TBlogInputModel from "../models/BlogInputModel";
 import blogInputValidator from "../middleware/blog-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
+import TBlogViewModel from "../models/BlogViewModel";
 
 const blogsRouter = Router({});
 
 const blogsController = {
-  getBlogs: (_req: Request, res: Response) => {
-    const blogs = blogsRepository.getAllBlogs();
+  getBlogs: async (_req: Request, res: Response) => {
+    const blogs:TBlogViewModel[] = await blogsRepository.getAllBlogs();
 
     res.status(STATUS.OK_200).json(blogs);
   },
 
-  getBlog: (req: TRequestWithParams<TPathParamsBlogModel>, res: Response) => {
-    const blog = blogsRepository.getBlogById(req.params.id);
+  getBlog: async (req: TRequestWithParams<TPathParamsBlogModel>, res: Response) => {
+    const blog:TBlogViewModel | null = await blogsRepository.getBlogById(req.params.id);
 
     blog
       ? res.status(STATUS.OK_200).json(blog)
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  createBlog: (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
+  createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog = blogsRepository.createBlog(name, description, websiteUrl);
+    const newBlog:TBlogViewModel = await  blogsRepository.createBlog(name, description, websiteUrl);
 
     res.status(STATUS.CREATED_201).json(newBlog);
   },
 
-  updateBlog: (
+  updateBlog: async(
     req: TRequestWithParamsAndBody<TPathParamsBlogModel, TBlogInputModel>,
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const { success } = blogsRepository.updateBlogById(
+    const success  = await blogsRepository.updateBlogById(
       req.params.id,
       name,
       description,
@@ -51,11 +52,11 @@ const blogsController = {
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },
 
-  deleteBlog: (
+  deleteBlog:async (
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
-    const { success } = blogsRepository.deleteBlogById(req.params.id);
+    const success  = await blogsRepository.deleteBlogById(req.params.id);
 
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },

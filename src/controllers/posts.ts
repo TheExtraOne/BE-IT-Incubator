@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
-import postsRepository from "../repository/posts-repository";
+import postsRepository from "../repository/posts-db-repository";
 import TPathParamsPostModel from "../models/PathParamsPostModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
@@ -11,28 +11,29 @@ import {
 import TPostInputModel from "../models/PostInputModel";
 import postsInputValidator from "../middleware/post-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
+import TPostViewModel from "../models/PostViewModel";
 
 const postsRouter = Router({});
 
 const postsController = {
-  getPosts: (_req: Request, res: Response) => {
-    const posts = postsRepository.getAllPosts();
+  getPosts: async (_req: Request, res: Response) => {
+    const posts:TPostViewModel[] = await postsRepository.getAllPosts();
 
     res.status(STATUS.OK_200).json(posts);
   },
 
-  getPost: (req: TRequestWithParams<TPathParamsPostModel>, res: Response) => {
-    const post = postsRepository.getPostById(req.params.id);
+  getPost: async(req: TRequestWithParams<TPathParamsPostModel>, res: Response) => {
+    const post:TPostViewModel | null = await postsRepository.getPostById(req.params.id);
 
     post
       ? res.status(STATUS.OK_200).json(post)
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  createPost: (req: TRequestWithBody<TPostInputModel>, res: Response) => {
+  createPost: async(req: TRequestWithBody<TPostInputModel>, res: Response) => {
     const { title, shortDescription, content, blogId } = req.body;
 
-    const newPost = postsRepository.createPost(
+    const newPost:TPostViewModel | null = await postsRepository.createPost(
       title,
       shortDescription,
       content,
@@ -42,12 +43,12 @@ const postsController = {
     res.status(STATUS.CREATED_201).json(newPost);
   },
 
-  updatePost: (
+  updatePost: async(
     req: TRequestWithParamsAndBody<TPathParamsPostModel, TPostInputModel>,
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const { success } = postsRepository.updatePostById(
+    const success = await postsRepository.updatePostById(
       req.params.id,
       title,
       shortDescription,
@@ -60,11 +61,11 @@ const postsController = {
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  deletePost: (
+  deletePost: async(
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const { success } = postsRepository.deletePostById(req.params.id);
+    const success = await postsRepository.deletePostById(req.params.id);
 
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },

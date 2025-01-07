@@ -23,6 +23,10 @@ type TPostViewModel = {
    * name of the blog to which the post belongs
    */
   blogName: string;
+  /**
+   * Date of creating in ISO format
+   */
+  createdAt: string;
 };
 
 export default TPostViewModel;

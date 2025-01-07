@@ -1,6 +1,6 @@
 import app from "../../../src/app";
 import { agent } from "supertest";
-import { resetBlogsDB, resetPostsDB } from "../../../src/db/db";
+import { resetBlogsDB, resetPostsDB } from "../../../src/db-in-memory/db-in-memory";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { mockBlogs, userCredentials } from "../helpers";
 import TPostInputModel from "../../../src/models/PostInputModel";

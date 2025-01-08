@@ -51,6 +51,6 @@ export const mockPosts = [
 ];
 
 export const userCredentials = {
-  correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN)}`,
+  correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN_CREDENTIALS)}`,
   incorrect: `Basic ${getEncodedCredentials("babyBlossom:sup!r_secure")}`,
 };

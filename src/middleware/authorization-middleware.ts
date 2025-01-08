@@ -9,7 +9,9 @@ const authorizationMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const encodedCredentials = `Basic ${getEncodedCredentials(SETTINGS.ADMIN)}`;
+  const encodedCredentials = `Basic ${getEncodedCredentials(
+    SETTINGS.ADMIN_CREDENTIALS
+  )}`;
   const userEncodedCredentials = req.headers.authorization;
 
   if (

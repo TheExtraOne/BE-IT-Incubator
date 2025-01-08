@@ -1,41 +1,37 @@
-import TPostViewModel from "../models/PostViewModel";
 import { postCollection, blogCollection } from "./db";
+import TPostDbViewModel from "./models/PostDbViewModel";
+import TPostRepViewModel from "./models/PostRepViewModel";
+
+const mapPost = (post: TPostDbViewModel): TPostRepViewModel => ({
+  id: post.id,
+  title: post.title,
+  shortDescription: post.shortDescription,
+  content: post.content,
+  blogId: post.blogId,
+  blogName: post.blogName,
+  createdAt: post.createdAt,
+});
+
+const mapPosts = (posts: TPostDbViewModel[]): TPostRepViewModel[] =>
+  posts.map(mapPost);
 
 const postsRepository = {
-  getAllPosts: async (): Promise<TPostViewModel[]> => {
+  getAllPosts: async (): Promise<TPostRepViewModel[]> => {
     const posts = await postCollection.find({}).toArray();
 
-    return posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: post.blogId,
-      blogName: post.blogName,
-      createdAt: post.createdAt,
-    }));
+    return mapPosts(posts);
   },
-  getPostById: async (id: string): Promise<TPostViewModel | null> => {
+  getPostById: async (id: string): Promise<TPostRepViewModel | null> => {
     const post = await postCollection.findOne({ id });
 
-    return post
-      ? {
-          id: post.id,
-          title: post.title,
-          shortDescription: post.shortDescription,
-          content: post.content,
-          blogId: post.blogId,
-          blogName: post.blogName,
-          createdAt: post.createdAt,
-        }
-      : null;
+    return post ? mapPost(post) : null;
   },
   createPost: async (
     title: string,
     shortDescription: string,
     content: string,
     blogId: string
-  ): Promise<TPostViewModel | null> => {
+  ): Promise<TPostRepViewModel | null> => {
     const blog = await blogCollection.findOne({ id: blogId });
     if (!blog) return null;
 
@@ -48,18 +44,9 @@ const postsRepository = {
       blogName: blog.name,
       createdAt: new Date().toISOString(),
     };
-
     await postCollection.insertOne(newPost);
 
-    return {
-      id: newPost.id,
-      title,
-      shortDescription,
-      content,
-      blogId,
-      blogName: newPost.blogName,
-      createdAt: newPost.createdAt,
-    };
+    return mapPost(newPost);
   },
   updatePostById: async (
     id: string,

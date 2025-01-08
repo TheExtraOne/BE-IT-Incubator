@@ -1,17 +1,17 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
 import blogsRepository from "../repository/blogs-db-repository";
-import TPathParamsBlogModel from "../models/PathParamsBlogModel";
+import TPathParamsBlogModel from "./models/PathParamsBlogModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithParamsAndBody,
 } from "../types";
-import TBlogInputModel from "../models/BlogInputModel";
+import TBlogInputModel from "./models/BlogInputModel";
 import blogInputValidator from "../middleware/blog-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
-import TBlogViewModel from "../models/BlogViewModel";
+import TBlogViewModel from "./models/BlogViewModel";
 
 const blogsRouter = Router({});
 

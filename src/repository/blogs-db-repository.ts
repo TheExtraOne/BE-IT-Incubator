@@ -1,39 +1,36 @@
 import { blogCollection } from "./db";
-import TBlogViewModel from "../models/BlogViewModel";
+import TBlogDbViewModel from "./models/BlogDbViewModel";
+import TBlogRepViewModel from "./models/BlogRepViewModel";
+
+const mapBlog = (blog: TBlogDbViewModel): TBlogRepViewModel => ({
+  id: blog.id,
+  name: blog.name,
+  description: blog.description,
+  websiteUrl: blog.websiteUrl,
+  createdAt: blog.createdAt,
+  isMembership: blog.isMembership,
+});
+
+const mapBlogs = (blogs: TBlogDbViewModel[]): TBlogRepViewModel[] =>
+  blogs.map(mapBlog);
 
 const blogsRepository = {
-  getAllBlogs: async (): Promise<TBlogViewModel[]> => {
+  getAllBlogs: async (): Promise<TBlogRepViewModel[]> => {
     const blogs = await blogCollection.find({}).toArray();
 
-    return blogs.map((blog) => ({
-      id: blog.id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership,
-    }));
+    return mapBlogs(blogs);
   },
-  getBlogById: async (id: string): Promise<TBlogViewModel | null> => {
-    const blog: TBlogViewModel | null = await blogCollection.findOne({ id });
+  getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {
+    const blog: TBlogRepViewModel | null = await blogCollection.findOne({ id });
 
-    return blog
-      ? {
-          id: blog.id,
-          name: blog.name,
-          description: blog.description,
-          websiteUrl: blog.websiteUrl,
-          createdAt: blog.createdAt,
-          isMembership: blog.isMembership,
-        }
-      : null;
+    return blog ? mapBlog(blog) : null;
   },
   createBlog: async (
     name: string,
     description: string,
     websiteUrl: string
-  ): Promise<TBlogViewModel> => {
-    const newBlog = {
+  ): Promise<TBlogRepViewModel> => {
+    const newBlog: TBlogRepViewModel = {
       id: `${Date.now() + Math.random()}`,
       name,
       description,
@@ -43,14 +40,7 @@ const blogsRepository = {
     };
     await blogCollection.insertOne(newBlog);
 
-    return {
-      id: newBlog.id,
-      name,
-      description,
-      websiteUrl,
-      createdAt: newBlog.createdAt,
-      isMembership: newBlog.isMembership,
-    };
+    return mapBlog(newBlog);
   },
   updateBlogById: async (
     id: string,

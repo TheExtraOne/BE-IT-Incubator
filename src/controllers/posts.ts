@@ -1,17 +1,17 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
 import postsRepository from "../repository/posts-db-repository";
-import TPathParamsPostModel from "../models/PathParamsPostModel";
+import TPathParamsPostModel from "./models/PathParamsPostModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithParamsAndBody,
 } from "../types";
-import TPostInputModel from "../models/PostInputModel";
+import TPostInputModel from "./models/PostInputModel";
 import postsInputValidator from "../middleware/post-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
-import TPostViewModel from "../models/PostViewModel";
+import TPostViewModel from "./models/PostViewModel";
 
 const postsRouter = Router({});
 

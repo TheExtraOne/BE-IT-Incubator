@@ -35,11 +35,11 @@ const postsInputValidator = {
     .trim()
     .notEmpty()
     .withMessage("BlogId is a required field")
-    .custom((value) => {
-      const isBlogExist = !!blogsRepository.getBlogById(value);
+    .custom(async (value) => {
+      const isBlogExist = await blogsRepository.getBlogById(value);
 
       if (!isBlogExist) throw new Error("BlogId does not exist");
-      return isBlogExist;
+      return !!isBlogExist;
     }),
 };
 

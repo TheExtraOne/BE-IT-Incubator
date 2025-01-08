@@ -31,6 +31,7 @@ The `src` directory contains the core components of our application:
 
 - [+] Refactor DAC (repository) in async way
 - [+] Refactor Presentational layer (controllers) in async way
+- [+] Add mongo DB
 - [+] Add mapping
 - [-] Update tests
 - [+] Handle testing repository

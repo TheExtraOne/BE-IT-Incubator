@@ -3,20 +3,23 @@ import { SETTINGS } from "../settings";
 import TBlogDbViewModel from "./models/BlogDbViewModel";
 import TPostDbViewModel from "./models/PostDbViewModel";
 
-// Get an access to DB
-const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL);
+export let blogCollection: Collection<TBlogDbViewModel>;
+export let postCollection: Collection<TPostDbViewModel>;
 
-export const db: Db = client.db(SETTINGS.DB_NAME);
+// export const connectToDb = async (url:string, dbName: string) => {
+export const connectToDb = async () => {
+  const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL);
+  const db: Db = client.db(SETTINGS.DB_NAME);
 
-export const blogCollection: Collection<TBlogDbViewModel> =
-  db.collection<TBlogDbViewModel>(SETTINGS.BLOG_COLLECTION_NAME);
-export const postCollection: Collection<TPostDbViewModel> =
-  db.collection<TPostDbViewModel>(SETTINGS.POST_COLLECTION_NAME);
+  blogCollection = db.collection<TBlogDbViewModel>(
+    SETTINGS.BLOG_COLLECTION_NAME
+  );
+  postCollection = db.collection<TPostDbViewModel>(
+    SETTINGS.POST_COLLECTION_NAME
+  );
 
-export const runDb = async () => {
   try {
     await client.connect();
-    await client.db("products").command({ ping: 1 });
     console.log("Successful connected to db");
   } catch (e) {
     console.log(`Can not connect to db. ${e}`);

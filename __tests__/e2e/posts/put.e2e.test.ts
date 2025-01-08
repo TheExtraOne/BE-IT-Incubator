@@ -1,12 +1,15 @@
 import app from "../../../src/app";
 import { agent } from "supertest";
-import { resetBlogsDB, resetPostsDB } from "../../../src/db-in-memory/db-in-memory";
+import {
+  resetBlogsDB,
+  resetPostsDB,
+} from "../../../src/db-in-memory/db-in-memory";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { mockBlogs, mockPosts, userCredentials } from "../helpers";
 import TPostInputModel from "../../../src/models/PostInputModel";
 
 const req = agent(app);
-const correctBodyParams: TPostInputModel = {
+const correctBlogBodyParams: TPostInputModel = {
   title: "Chain",
   shortDescription: "Design pattern",
   content:
@@ -24,14 +27,14 @@ describe("PUT /posts", () => {
   it("should return 401 if user is not authorized (authorized no headers)", async () => {
     await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -40,14 +43,14 @@ describe("PUT /posts", () => {
     await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .set({ Authorization: userCredentials.incorrect })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -57,21 +60,21 @@ describe("PUT /posts", () => {
     await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts.length + 1}`)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.NOT_FOUND_404);
 
     const res = await req
       .get(`${SETTINGS.PATH.POSTS}/${mockBlogs[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   // Title validation
   it("should return 400 and error if title is not string", async () => {
-    const bodyParams = { ...correctBodyParams, title: null };
+    const bodyParams = { ...correctBlogBodyParams, title: null };
 
     const { body } = await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
@@ -87,13 +90,13 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if title is empty string", async () => {
-    const bodyParams = { ...correctBodyParams, title: "" };
+    const bodyParams = { ...correctBlogBodyParams, title: "" };
 
     const { body } = await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
@@ -111,13 +114,13 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if title is too long", async () => {
-    const bodyParams = { ...correctBodyParams, title: "Title".repeat(100) };
+    const bodyParams = { ...correctBlogBodyParams, title: "Title".repeat(100) };
 
     const { body } = await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
@@ -135,7 +138,7 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -143,7 +146,7 @@ describe("PUT /posts", () => {
   // ShortDescription validation
   it("should return 400 and error if shortDescription is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: null,
     };
 
@@ -163,14 +166,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if shortDescription is empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: "    ",
     };
 
@@ -193,14 +196,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if shortDescription is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: "Design pattern".repeat(100),
     };
 
@@ -223,7 +226,7 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -231,7 +234,7 @@ describe("PUT /posts", () => {
   // Content validation
   it("should return 400 and error if content is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content: [],
     };
 
@@ -249,14 +252,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if content is empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content: "",
     };
 
@@ -279,14 +282,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if content is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content:
         "Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers.".repeat(
           100
@@ -312,7 +315,7 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -320,7 +323,7 @@ describe("PUT /posts", () => {
   // BlogId validation
   it("should return 400 and error if blogId is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: 1234,
     };
 
@@ -338,14 +341,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if blogId is empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "    ",
     };
 
@@ -368,14 +371,14 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
 
   it("should return 400 and error if blogId does not match the db", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "BlogId",
     };
 
@@ -398,7 +401,7 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -406,7 +409,7 @@ describe("PUT /posts", () => {
   // Combined validation
   it("should return 400 and array with errors if couple of fields are incorrect", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "BlogId",
       content: "",
     };
@@ -434,7 +437,7 @@ describe("PUT /posts", () => {
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).not.toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
     });
   });
@@ -444,14 +447,14 @@ describe("PUT /posts", () => {
     const { body } = await req
       .put(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.NO_CONTENT_204);
 
     const res = await req
       .get(`${SETTINGS.PATH.POSTS}/${mockPosts[0].id}`)
       .expect(STATUS.OK_200);
     expect(res.body).toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
       blogName: mockPosts[0].blogName,
     });

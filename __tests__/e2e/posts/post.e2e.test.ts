@@ -1,12 +1,15 @@
 import app from "../../../src/app";
 import { agent } from "supertest";
-import { resetBlogsDB, resetPostsDB } from "../../../src/db-in-memory/db-in-memory";
+import {
+  resetBlogsDB,
+  resetPostsDB,
+} from "../../../src/db-in-memory/db-in-memory";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { mockBlogs, userCredentials } from "../helpers";
 import TPostInputModel from "../../../src/models/PostInputModel";
 
 const req = agent(app);
-const correctBodyParams: TPostInputModel = {
+const correctBlogBodyParams: TPostInputModel = {
   title: "Chain",
   shortDescription: "Design pattern",
   content:
@@ -21,7 +24,7 @@ describe("POST /posts", () => {
   it("should return 401 if user is not authorized (authorized no headers)", async () => {
     await req
       .post(SETTINGS.PATH.POSTS)
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
   });
 
@@ -29,7 +32,7 @@ describe("POST /posts", () => {
     await req
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.incorrect })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
   });
 
@@ -40,11 +43,11 @@ describe("POST /posts", () => {
     const { body } = await req
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
 
     expect(body).toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       id: expect.any(String),
       blogName: mockBlogs[0].name,
     });
@@ -57,7 +60,7 @@ describe("POST /posts", () => {
   it("should return 400 and error if title is not string", async () => {
     resetBlogsDB(mockBlogs);
 
-    const bodyParams = { ...correctBodyParams, title: null };
+    const bodyParams = { ...correctBlogBodyParams, title: null };
 
     const { body } = await req
       .post(SETTINGS.PATH.POSTS)
@@ -76,7 +79,7 @@ describe("POST /posts", () => {
   it("should return 400 and error if title is empty string", async () => {
     resetBlogsDB(mockBlogs);
 
-    const bodyParams = { ...correctBodyParams, title: "" };
+    const bodyParams = { ...correctBlogBodyParams, title: "" };
 
     const { body } = await req
       .post(SETTINGS.PATH.POSTS)
@@ -97,7 +100,7 @@ describe("POST /posts", () => {
   it("should return 400 and error if title is too long", async () => {
     resetBlogsDB(mockBlogs);
 
-    const bodyParams = { ...correctBodyParams, title: "Title".repeat(100) };
+    const bodyParams = { ...correctBlogBodyParams, title: "Title".repeat(100) };
 
     const { body } = await req
       .post(SETTINGS.PATH.POSTS)
@@ -120,7 +123,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: null,
     };
 
@@ -144,7 +147,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: "    ",
     };
 
@@ -171,7 +174,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       shortDescription: "Design pattern".repeat(100),
     };
 
@@ -199,7 +202,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content: [],
     };
 
@@ -221,7 +224,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content: "",
     };
 
@@ -248,7 +251,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       content:
         "Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers.".repeat(
           100
@@ -279,7 +282,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: 1234,
     };
 
@@ -301,7 +304,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "    ",
     };
 
@@ -328,7 +331,7 @@ describe("POST /posts", () => {
     resetBlogsDB(mockBlogs);
 
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "BlogId",
     };
 
@@ -354,7 +357,7 @@ describe("POST /posts", () => {
   // Combined validation
   it("should return 400 and array with errors if couple of fields are incorrect", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       blogId: "BlogId",
       content: "",
     };

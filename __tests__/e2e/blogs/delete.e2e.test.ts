@@ -1,6 +1,6 @@
 import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBodyParams, req, userCredentials } from "../helpers";
+import { correctBlogBodyParams, req, userCredentials } from "../helpers";
 
 describe("DELETE /blogs", () => {
   let id: string;
@@ -12,13 +12,13 @@ describe("DELETE /blogs", () => {
 
   beforeEach(async () => {
     const {
-      body: { id: postId },
+      body: { id: blogId },
     } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
-    id = postId;
+    id = blogId;
   });
 
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));

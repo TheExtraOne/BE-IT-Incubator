@@ -1,5 +1,5 @@
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBodyParams, req, userCredentials } from "../helpers";
+import { correctBlogBodyParams, req, userCredentials } from "../helpers";
 import { client, connectToDb } from "../../../src/repository/db";
 
 describe("GET /blogs", () => {
@@ -22,14 +22,14 @@ describe("GET /blogs", () => {
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
 
     expect(res.body).toEqual([
       {
-        ...correctBodyParams,
+        ...correctBlogBodyParams,
         createdAt: expect.any(String),
         id: expect.any(String),
         isMembership: false,
@@ -45,7 +45,7 @@ describe("GET /blogs", () => {
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
 
     await req.get(`${SETTINGS.PATH.BLOGS}/-1`).expect(STATUS.NOT_FOUND_404);
@@ -57,7 +57,7 @@ describe("GET /blogs", () => {
     } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
 
     const { body } = await req
@@ -65,7 +65,7 @@ describe("GET /blogs", () => {
       .expect(STATUS.OK_200);
 
     expect(body).toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       createdAt: expect.any(String),
       id: expect.any(String),
       isMembership: false,

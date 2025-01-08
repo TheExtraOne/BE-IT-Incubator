@@ -1,7 +1,7 @@
 import TBlogInputModel from "../../../src/controllers/models/BlogInputModel";
 import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBodyParams, req, userCredentials } from "../helpers";
+import { correctBlogBodyParams, req, userCredentials } from "../helpers";
 
 const newBodyParams: TBlogInputModel = {
   name: "New name",
@@ -10,7 +10,7 @@ const newBodyParams: TBlogInputModel = {
 };
 
 const unchangedResponse = {
-  ...correctBodyParams,
+  ...correctBlogBodyParams,
   createdAt: expect.any(String),
   id: expect.any(String),
   isMembership: false,
@@ -26,13 +26,13 @@ describe("PUT /blogs", () => {
 
   beforeEach(async () => {
     const {
-      body: { id: postId },
+      body: { id: blogId },
     } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
-    id = postId;
+    id = blogId;
   });
 
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));

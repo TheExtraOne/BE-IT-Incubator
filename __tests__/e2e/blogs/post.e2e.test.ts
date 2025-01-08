@@ -1,5 +1,5 @@
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBodyParams, req, userCredentials } from "../helpers";
+import { correctBlogBodyParams, req, userCredentials } from "../helpers";
 import { client, connectToDb } from "../../../src/repository/db";
 
 describe("POST /blogs", () => {
@@ -16,7 +16,7 @@ describe("POST /blogs", () => {
   it("should return 401 if user is not authorized (authorized no headers)", async () => {
     await req
       .post(SETTINGS.PATH.BLOGS)
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const { body } = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
@@ -27,7 +27,7 @@ describe("POST /blogs", () => {
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.incorrect })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const { body } = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
@@ -39,11 +39,11 @@ describe("POST /blogs", () => {
     const { body } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(correctBlogBodyParams)
       .expect(STATUS.CREATED_201);
 
     expect(body).toEqual({
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       createdAt: expect.any(String),
       id: expect.any(String),
       isMembership: false,
@@ -56,7 +56,7 @@ describe("POST /blogs", () => {
   // Name validation
   it("should return 400 and error if name is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       name: null,
     };
 
@@ -76,7 +76,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if name is empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       name: "    ",
     };
 
@@ -96,7 +96,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if name is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       name: "Blog Name".repeat(100),
     };
 
@@ -119,7 +119,7 @@ describe("POST /blogs", () => {
   // Description validation
   it("should return 400 and error if description is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       description: null,
     };
 
@@ -139,7 +139,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if description is an empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       description: "",
     };
 
@@ -161,7 +161,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if description is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       description: "Best refactoring practice and design patterns".repeat(100),
     };
 
@@ -187,7 +187,7 @@ describe("POST /blogs", () => {
   // WebsiteUrl validation
   it("should return 400 and error if websiteUrl is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       websiteUrl: 123,
     };
 
@@ -207,7 +207,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if websiteUrl is an empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       websiteUrl: "",
     };
 
@@ -229,7 +229,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if websiteUrl is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       websiteUrl: "https://refactoring.guru".repeat(100),
     };
 
@@ -254,7 +254,7 @@ describe("POST /blogs", () => {
 
   it("should return 400 and error if websiteUrl does not match the reg exp", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       websiteUrl: "htt:///refactoring.guru",
     };
 
@@ -280,7 +280,7 @@ describe("POST /blogs", () => {
   // Combined validation
   it("should return 400 and array with length === 1 if one field contains two errors", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...correctBlogBodyParams,
       websiteUrl: "htt:///refactoring.guru".repeat(100),
     };
 

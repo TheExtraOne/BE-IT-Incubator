@@ -2,7 +2,8 @@ import { config } from "dotenv";
 config();
 
 export const SETTINGS = {
-  ADMIN_CREDENTIALS: `${process.env.LOGIN}:${process.env.PASSWORD}`,
+  ADMIN_CREDENTIALS:
+    `${process.env.LOGIN}:${process.env.PASSWORD}` || "admin:qwerty",
   PORT: process.env.PORT || 3003,
   PATH: {
     BLOGS: "/blogs",

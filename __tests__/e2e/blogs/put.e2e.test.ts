@@ -1,80 +1,94 @@
-import app from "../../../src/app";
-import { agent } from "supertest";
-import { resetBlogsDB } from "../../../src/db-in-memory/db-in-memory";
+import TBlogInputModel from "../../../src/controllers/models/BlogInputModel";
+import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { mockBlogs, userCredentials } from "../helpers";
-import TBlogInputModel from "../../../src/models/BlogInputModel";
+import { correctBodyParams, req, userCredentials } from "../helpers";
 
-const req = agent(app);
-const correctBodyParams: TBlogInputModel = {
-  name: "Refactor Guru",
-  description: "Best refactoring practice and design patterns",
+const newBodyParams: TBlogInputModel = {
+  name: "New name",
+  description: "New description",
   websiteUrl: "https://refactoring.guru",
 };
 
+const unchangedResponse = {
+  ...correctBodyParams,
+  createdAt: expect.any(String),
+  id: expect.any(String),
+  isMembership: false,
+};
+
 describe("PUT /blogs", () => {
-  beforeEach(async () => resetBlogsDB(mockBlogs));
+  let id: string;
+
+  beforeAll(async () => {
+    await connectToDb();
+    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
+  });
+
+  beforeEach(async () => {
+    const {
+      body: { id: postId },
+    } = await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBodyParams)
+      .expect(STATUS.CREATED_201);
+    id = postId;
+  });
+
+  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
+
+  afterAll(async () => await client.close());
 
   // Authorization
   it("should return 401 if user is not authorized (authorized no headers)", async () => {
     await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
-      .send(correctBodyParams)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
+      .send(newBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 401 if login or password is incorrect", async () => {
     await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.incorrect })
-      .send(correctBodyParams)
+      .send(newBodyParams)
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // Id matching
   it("should return 404 in case if id is not matching the db", async () => {
     await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs.length + 1}`)
+      .put(`${SETTINGS.PATH.BLOGS}/-1`)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(newBodyParams)
       .expect(STATUS.NOT_FOUND_404);
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // Name validation
   it("should return 400 and error if name is not string", async () => {
-    resetBlogsDB(mockBlogs);
-
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       name: null,
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -84,22 +98,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if name is empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       name: "    ",
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -109,22 +120,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if name is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       name: "Blog Name".repeat(100),
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -136,23 +144,20 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // Description validation
   it("should return 400 and error if description is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       description: null,
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -162,22 +167,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if description is an empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       description: "",
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -189,22 +191,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if description is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       description: "Best refactoring practice and design patterns".repeat(100),
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -219,23 +218,20 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // WebsiteUrl validation
   it("should return 400 and error if websiteUrl is not string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       websiteUrl: 123,
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -245,22 +241,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if websiteUrl is an empty string", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       websiteUrl: "",
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -272,22 +265,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if websiteUrl is too long", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       websiteUrl: "https://refactoring.guru".repeat(100),
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -302,22 +292,19 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and error if websiteUrl does not match the reg exp", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       websiteUrl: "htt:///refactoring.guru",
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -332,28 +319,30 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // Combined validation
   it("should return 400 and array with length === 1 if one field contains two errors", async () => {
     const bodyParams = {
-      ...correctBodyParams,
+      ...newBodyParams,
       websiteUrl: "htt:///refactoring.guru".repeat(100),
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
 
     expect(body.errorsMessages.length).toBe(1);
+
+    const res = await req
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
+      .expect(STATUS.OK_200);
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   it("should return 400 and array with errors if couple of fields are incorrect", async () => {
@@ -364,7 +353,7 @@ describe("PUT /blogs", () => {
     };
 
     const { body } = await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
       .send(bodyParams)
       .expect(STATUS.BAD_REQUEST_400);
@@ -387,26 +376,27 @@ describe("PUT /blogs", () => {
     });
 
     const res = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(res.body).not.toEqual({
-      ...correctBodyParams,
-      id: expect.any(String),
-    });
+    expect(res.body).toEqual(unchangedResponse);
   });
 
   // Success case
   it("should return 204 if login, password and body params are correct. A proper blog should be updated", async () => {
-    resetBlogsDB(mockBlogs);
     await req
-      .put(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .put(`${SETTINGS.PATH.BLOGS}/${id}`)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBodyParams)
+      .send(newBodyParams)
       .expect(STATUS.NO_CONTENT_204);
 
     const { body } = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
-    expect(body).toEqual({ ...correctBodyParams, id: expect.any(String) });
+    expect(body).toEqual({
+      ...newBodyParams,
+      createdAt: expect.any(String),
+      id: expect.any(String),
+      isMembership: false,
+    });
   });
 });

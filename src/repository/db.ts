@@ -5,10 +5,11 @@ import TPostDbViewModel from "./models/PostDbViewModel";
 
 export let blogCollection: Collection<TBlogDbViewModel>;
 export let postCollection: Collection<TPostDbViewModel>;
+export let client: MongoClient;
 
 // export const connectToDb = async (url:string, dbName: string) => {
 export const connectToDb = async () => {
-  const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL);
+  client = new MongoClient(SETTINGS.MONGO_URL);
   const db: Db = client.db(SETTINGS.DB_NAME);
 
   blogCollection = db.collection<TBlogDbViewModel>(

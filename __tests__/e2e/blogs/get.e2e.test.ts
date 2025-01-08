@@ -1,13 +1,16 @@
-import app from "../../../src/app";
-import { agent } from "supertest";
-import { resetBlogsDB } from "../../../src/db-in-memory/db-in-memory";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { mockBlogs } from "../helpers";
-
-const req = agent(app);
+import { correctBodyParams, req, userCredentials } from "../helpers";
+import { client, connectToDb } from "../../../src/repository/db";
 
 describe("GET /blogs", () => {
-  beforeEach(async () => resetBlogsDB());
+  beforeAll(async () => {
+    await connectToDb();
+    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
+  });
+
+  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
+
+  afterAll(async () => await client.close());
 
   it("should return 200 and an empty array if the db is empty", async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
@@ -16,10 +19,22 @@ describe("GET /blogs", () => {
   });
 
   it("should return 200 and an array with blogs if the db is not empty", async () => {
-    resetBlogsDB(mockBlogs);
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBodyParams)
+      .expect(STATUS.CREATED_201);
+
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
 
-    expect(res.body).toEqual(mockBlogs);
+    expect(res.body).toEqual([
+      {
+        ...correctBodyParams,
+        createdAt: expect.any(String),
+        id: expect.any(String),
+        isMembership: false,
+      },
+    ]);
   });
 
   it("should return 404 in case if id was passed, but the db is empty", async () => {
@@ -27,22 +42,33 @@ describe("GET /blogs", () => {
   });
 
   it("should return 404 in case if id is not matching the db", async () => {
-    resetBlogsDB(mockBlogs);
     await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs.length + 1}`)
-      .expect(STATUS.NOT_FOUND_404);
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBodyParams)
+      .expect(STATUS.CREATED_201);
+
+    await req.get(`${SETTINGS.PATH.BLOGS}/-1`).expect(STATUS.NOT_FOUND_404);
   });
 
-  it("should return 200 and blog (with id, name, description and websiteUrl) in case if id is matching the db", async () => {
-    resetBlogsDB(mockBlogs);
+  it("should return 200 and blog (with id, name, description, websiteUrl,createdAt and isMembership) in case if id is matching the db", async () => {
+    const {
+      body: { id },
+    } = await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBodyParams)
+      .expect(STATUS.CREATED_201);
+
     const { body } = await req
-      .get(`${SETTINGS.PATH.BLOGS}/${mockBlogs[0].id}`)
+      .get(`${SETTINGS.PATH.BLOGS}/${id}`)
       .expect(STATUS.OK_200);
 
-    const { id, name, description, websiteUrl } = mockBlogs[0];
-    expect(body.id).toBe(id);
-    expect(body.name).toBe(name);
-    expect(body.description).toBe(description);
-    expect(body.websiteUrl).toBe(websiteUrl);
+    expect(body).toEqual({
+      ...correctBodyParams,
+      createdAt: expect.any(String),
+      id: expect.any(String),
+      isMembership: false,
+    });
   });
 });

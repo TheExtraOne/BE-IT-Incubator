@@ -21,16 +21,15 @@ describe("DELETE /posts", () => {
     } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .send(correctBlogBodyParams);
 
     const {
       body: { id: postId },
     } = await req
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
-      .send({ ...correctPostBodyParams, blogId })
-      .expect(STATUS.CREATED_201);
+      .send({ ...correctPostBodyParams, blogId });
+
     id = postId;
   });
 

@@ -16,8 +16,8 @@ describe("DELETE /blogs", () => {
     } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
-      .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .send(correctBlogBodyParams);
+
     id = blogId;
   });
 

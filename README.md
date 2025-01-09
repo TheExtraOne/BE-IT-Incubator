@@ -5,14 +5,14 @@ Detailed Documentation can be found in Swagger. A simple REST API for blogs and 
 ## Environment variables
 
 - **PORT**: The port for the API gateway (3000).
+- **MONGO_URL**: Connection string to MongoDb.
+- **LOGIN_PASSWORD**: Credentials for authorization.
 
 ## Project Structure
 
 The `src` directory contains the core components of our application:
 
-- `db`: Imitation of DataBase.
 - `middleware`: Contains middlewares for authorization and validation.
-- `models`: Contains TS types.
 - `repository`: Contains Data access layer repository.
 - `controllers`: Contains Presentation layer controllers.
 - `tests`: Contains e2e tests.
@@ -26,6 +26,7 @@ The `src` directory contains the core components of our application:
 
     yarn jest
     yarn jest filePath
+    yarn jest:coverage
 
 ## TODO
 
@@ -33,6 +34,5 @@ The `src` directory contains the core components of our application:
 - [+] Refactor Presentational layer (controllers) in async way
 - [+] Add mongo DB
 - [+] Add mapping
-- [-] Update tests
-- [+] Handle testing repository
+- [+] Update tests
 - [+] Add new fields according to swagger

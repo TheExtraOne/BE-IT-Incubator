@@ -6,16 +6,25 @@ import {
   req,
   userCredentials,
 } from "../helpers";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("GET /posts", () => {
+  let server: MongoMemoryServer;
+
   beforeAll(async () => {
-    await connectToDb();
+    server = await MongoMemoryServer.create();
+    const uri = server.getUri();
+
+    await connectToDb(uri);
     await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
   });
 
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
 
-  afterAll(async () => await client.close());
+  afterAll(async () => {
+    await client.close();
+    await server.stop();
+  });
 
   it("should return 200 and an empty array if the db is empty", async () => {
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);

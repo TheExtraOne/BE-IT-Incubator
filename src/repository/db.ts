@@ -7,8 +7,8 @@ export let blogCollection: Collection<TBlogDbViewModel>;
 export let postCollection: Collection<TPostDbViewModel>;
 export let client: MongoClient;
 
-export const connectToDb = async () => {
-  client = new MongoClient(SETTINGS.MONGO_URL);
+export const connectToDb = async (url: string) => {
+  client = new MongoClient(url);
   const db: Db = client.db(SETTINGS.DB_NAME);
 
   blogCollection = db.collection<TBlogDbViewModel>(

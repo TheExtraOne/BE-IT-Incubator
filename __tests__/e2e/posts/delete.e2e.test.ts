@@ -6,12 +6,17 @@ import {
   req,
   userCredentials,
 } from "../helpers";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("DELETE /posts", () => {
   let id: string;
+  let server: MongoMemoryServer;
 
   beforeAll(async () => {
-    await connectToDb();
+    server = await MongoMemoryServer.create();
+    const uri = server.getUri();
+
+    await connectToDb(uri);
     await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
   });
 
@@ -35,7 +40,10 @@ describe("DELETE /posts", () => {
 
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
 
-  afterAll(async () => await client.close());
+  afterAll(async () => {
+    await client.close();
+    await server.stop();
+  });
 
   // Authorization
   it("should return 401 if user is not authorized (authorized no headers)", async () => {

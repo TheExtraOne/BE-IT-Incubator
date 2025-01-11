@@ -20,9 +20,19 @@ const postsRouter = Router({});
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
-    const { pageNumber = 1, pageSize = 10 } = req.query;
+    const {
+      pageNumber = 1,
+      pageSize = 10,
+      sortBy = "createdAt",
+      sortDirection = "desc",
+    } = req.query;
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
-      await postsService.getAllPosts(pageNumber, pageSize);
+      await postsService.getAllPosts(
+        +pageNumber,
+        +pageSize,
+        sortBy,
+        sortDirection
+      );
 
     res.status(STATUS.OK_200).json(posts);
   },

@@ -19,16 +19,20 @@ const blogsService = {
   getAllBlogs: async (
     searchNameTerm: string | null,
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string
   ): Promise<TResponseWithPagination<TBlogViewModel[] | []>> => {
-    const blogsCount = await blogsRepository.getBlogsCount();
+    const blogsCount = await blogsRepository.getBlogsCount(searchNameTerm);
     const pagesCount =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
     const blogs: [] | TBlogRepViewModel[] = await blogsRepository.getAllBlogs(
       searchNameTerm,
       blogsToSkip,
-      pageSize
+      pageSize,
+      sortBy,
+      sortDirection
     );
 
     return {

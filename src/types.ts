@@ -20,3 +20,5 @@ export type TResponseWithPagination<T> = {
   totalCount: number;
   items: T;
 };
+
+export type TSortDirection = "asc" | "desc";

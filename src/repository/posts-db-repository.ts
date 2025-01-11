@@ -18,9 +18,16 @@ const postsRepository = {
 
   getAllPosts: async (
     postsToSkip: number,
-    pageSize: number
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string
   ): Promise<TPostRepViewModel[] | []> =>
-    await postCollection.find({}).skip(postsToSkip).limit(pageSize).toArray(),
+    await postCollection
+      .find({})
+      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .skip(postsToSkip)
+      .limit(pageSize)
+      .toArray(),
 
   getPostById: async (id: string): Promise<TPostRepViewModel | null> =>
     await postCollection.findOne({ id }),

@@ -21,7 +21,9 @@ const mapPosts = (posts: TPostRepViewModel[] | []): TPostViewModel[] | [] =>
 const postsService = {
   getAllPosts: async (
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string
   ): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
     const postsCount = await postsRepository.getPostsCount();
     const pagesCount =
@@ -30,7 +32,9 @@ const postsService = {
 
     const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts(
       postsToSkip,
-      pageSize
+      pageSize,
+      sortBy,
+      sortDirection
     );
 
     return {

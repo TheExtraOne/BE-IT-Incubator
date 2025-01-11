@@ -20,9 +20,21 @@ const blogsRouter = Router({});
 
 const blogsController = {
   getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
-    const { searchNameTerm = null, pageNumber = 1, pageSize = 10 } = req.query;
+    const {
+      searchNameTerm = null,
+      pageNumber = 1,
+      pageSize = 10,
+      sortBy = "createdAt",
+      sortDirection = "desc",
+    } = req.query;
     const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
-      await blogsService.getAllBlogs(searchNameTerm, +pageNumber, +pageSize);
+      await blogsService.getAllBlogs(
+        searchNameTerm,
+        +pageNumber,
+        +pageSize,
+        sortBy,
+        sortDirection
+      );
 
     res.status(STATUS.OK_200).json(blogs);
   },

@@ -11,20 +11,26 @@ type TNewBlog = {
 };
 
 const blogsRepository = {
-  getBlogsCount: async (): Promise<number> => {
-    return await blogCollection.count({});
+  getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
+    const filter: Record<string, RegExp> | Record<string, never> = {};
+    if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
+
+    return await blogCollection.count(filter);
   },
 
   getAllBlogs: async (
     searchNameTerm: string | null,
     blogsToSkip: number,
-    pageSize: number
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string
   ): Promise<TBlogRepViewModel[] | []> => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
     return await blogCollection
       .find(filter)
+      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip(blogsToSkip)
       .limit(pageSize)
       .toArray();

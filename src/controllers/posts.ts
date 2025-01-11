@@ -27,12 +27,12 @@ const postsController = {
       sortDirection = "desc",
     } = req.query;
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
-      await postsService.getAllPosts(
-        +pageNumber,
-        +pageSize,
+      await postsService.getAllPosts({
+        pageNumber: +pageNumber,
+        pageSize: +pageSize,
         sortBy,
-        sortDirection
-      );
+        sortDirection,
+      });
 
     res.status(STATUS.OK_200).json(posts);
   },
@@ -53,12 +53,12 @@ const postsController = {
   createPost: async (req: TRequestWithBody<TPostInputModel>, res: Response) => {
     const { title, shortDescription, content, blogId } = req.body;
 
-    const newPost: TPostViewModel | null = await postsService.createPost(
+    const newPost: TPostViewModel | null = await postsService.createPost({
       title,
       shortDescription,
       content,
-      blogId
-    );
+      blogId,
+    });
 
     res.status(STATUS.CREATED_201).json(newPost);
   },
@@ -68,13 +68,13 @@ const postsController = {
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const success = await postsService.updatePostById(
-      req.params.id,
+    const success = await postsService.updatePostById({
+      id: req.params.id,
       title,
       shortDescription,
       content,
-      blogId
-    );
+      blogId,
+    });
 
     success
       ? res.sendStatus(STATUS.NO_CONTENT_204)

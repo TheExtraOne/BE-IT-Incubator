@@ -33,13 +33,13 @@ const blogsController = {
       sortDirection = "desc",
     } = req.query;
     const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
-      await blogsService.getAllBlogs(
+      await blogsService.getAllBlogs({
         searchNameTerm,
-        +pageNumber,
-        +pageSize,
+        pageNumber: +pageNumber,
+        pageSize: +pageSize,
         sortBy,
-        sortDirection
-      );
+        sortDirection,
+      });
 
     res.status(STATUS.OK_200).json(blogs);
   },
@@ -76,24 +76,24 @@ const blogsController = {
       sortDirection = "desc",
     } = req.query;
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
-      await postsService.getAllPostsForBlogById(
-        req.params.id,
-        +pageNumber,
-        +pageSize,
+      await postsService.getAllPostsForBlogById({
+        blogId: req.params.id,
+        pageNumber: +pageNumber,
+        pageSize: +pageSize,
         sortBy,
-        sortDirection
-      );
+        sortDirection,
+      });
 
     res.status(STATUS.OK_200).json(posts);
   },
 
   createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog: TBlogViewModel = await blogsService.createBlog(
+    const newBlog: TBlogViewModel = await blogsService.createBlog({
       name,
       description,
-      websiteUrl
-    );
+      websiteUrl,
+    });
 
     res.status(STATUS.CREATED_201).json(newBlog);
   },
@@ -107,12 +107,12 @@ const blogsController = {
   ) => {
     const blogId = req.params.id;
     const { title, shortDescription, content } = req.body;
-    const newPost: TPostViewModel | null = await postsService.createPost(
+    const newPost: TPostViewModel | null = await postsService.createPost({
       title,
       shortDescription,
       content,
-      blogId
-    );
+      blogId,
+    });
 
     if (!newPost) {
       res.sendStatus(STATUS.NOT_FOUND_404);
@@ -126,12 +126,12 @@ const blogsController = {
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const is_successful = await blogsService.updateBlogById(
-      req.params.id,
+    const is_successful = await blogsService.updateBlogById({
+      id: req.params.id,
       name,
       description,
-      websiteUrl
-    );
+      websiteUrl,
+    });
 
     res.sendStatus(
       is_successful ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404

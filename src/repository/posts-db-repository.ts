@@ -1,3 +1,4 @@
+import { TSorting } from "../types";
 import { postCollection } from "./db";
 import TPostRepViewModel from "./models/PostRepViewModel";
 
@@ -11,6 +12,11 @@ type TNewPost = {
   createdAt: string;
 };
 
+type TSkipsLimits = {
+  postsToSkip: number;
+  pageSize: number;
+};
+
 const postsRepository = {
   getPostsCount: async (
     filter: Record<string, string> | undefined = {}
@@ -18,13 +24,16 @@ const postsRepository = {
     return await postCollection.count(filter);
   },
 
-  getAllPosts: async (
-    postsToSkip: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string,
-    filter: Record<string, string> | undefined = {}
-  ): Promise<TPostRepViewModel[] | []> =>
+  getAllPosts: async ({
+    postsToSkip,
+    pageSize,
+    sortBy,
+    sortDirection,
+    filter = {},
+  }: {
+    filter?: Record<string, string>;
+  } & TSkipsLimits &
+    TSorting): Promise<TPostRepViewModel[] | []> =>
     await postCollection
       .find(filter)
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
@@ -41,13 +50,19 @@ const postsRepository = {
     return newPost;
   },
 
-  updatePostById: async (
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<boolean> => {
+  updatePostById: async ({
+    id,
+    title,
+    shortDescription,
+    content,
+    blogId,
+  }: {
+    id: string;
+    title: string;
+    shortDescription: string;
+    content: string;
+    blogId: string;
+  }): Promise<boolean> => {
     const { matchedCount } = await postCollection.updateOne(
       { id },
       { $set: { title, shortDescription, content, blogId } }

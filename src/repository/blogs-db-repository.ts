@@ -1,3 +1,4 @@
+import { TSorting } from "../types";
 import { blogCollection } from "./db";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 
@@ -9,6 +10,11 @@ type TNewBlog = {
   createdAt: string;
   isMembership: boolean;
 };
+type TSearchParam = { searchNameTerm: string | null };
+type TSkipsLimits = {
+  blogsToSkip: number;
+  pageSize: number;
+};
 
 const blogsRepository = {
   getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
@@ -18,13 +24,15 @@ const blogsRepository = {
     return await blogCollection.count(filter);
   },
 
-  getAllBlogs: async (
-    searchNameTerm: string | null,
-    blogsToSkip: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string
-  ): Promise<TBlogRepViewModel[] | []> => {
+  getAllBlogs: async ({
+    searchNameTerm,
+    blogsToSkip,
+    pageSize,
+    sortBy,
+    sortDirection,
+  }: TSearchParam & TSkipsLimits & TSorting): Promise<
+    TBlogRepViewModel[] | []
+  > => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
@@ -48,12 +56,17 @@ const blogsRepository = {
     return newBlog;
   },
 
-  updateBlogById: async (
-    id: string,
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<boolean> => {
+  updateBlogById: async ({
+    id,
+    name,
+    description,
+    websiteUrl,
+  }: {
+    id: string;
+    name: string;
+    description: string;
+    websiteUrl: string;
+  }): Promise<boolean> => {
     const { matchedCount } = await blogCollection.updateOne(
       { id },
       { $set: { name, description, websiteUrl } }

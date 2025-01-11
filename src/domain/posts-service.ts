@@ -2,7 +2,7 @@ import blogsRepository from "../repository/blogs-db-repository";
 import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
 import TPostRepViewModel from "../repository/models/PostRepViewModel";
 import postsRepository from "../repository/posts-db-repository";
-import { TResponseWithPagination } from "../types";
+import { TPages, TResponseWithPagination, TSorting } from "../types";
 import TPostViewModel from "./models/PostViewModel";
 
 const mapPost = (post: TPostRepViewModel): TPostViewModel => ({
@@ -19,23 +19,25 @@ const mapPosts = (posts: TPostRepViewModel[] | []): TPostViewModel[] | [] =>
   posts.map(mapPost);
 
 const postsService = {
-  getAllPosts: async (
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string
-  ): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
+  getAllPosts: async ({
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDirection,
+  }: TPages & TSorting): Promise<
+    TResponseWithPagination<TPostViewModel[] | []>
+  > => {
     const postsCount = await postsRepository.getPostsCount();
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 
-    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts(
+    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts({
       postsToSkip,
       pageSize,
       sortBy,
-      sortDirection
-    );
+      sortDirection,
+    });
 
     return {
       pagesCount,
@@ -54,25 +56,28 @@ const postsService = {
     return post ? mapPost(post) : null;
   },
 
-  getAllPostsForBlogById: async (
-    blogId: string,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string
-  ): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
+  getAllPostsForBlogById: async ({
+    blogId,
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDirection,
+  }: {
+    blogId: string;
+  } & TPages &
+    TSorting): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
     const postsCount = await postsRepository.getPostsCount({ blogId });
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 
-    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts(
+    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts({
       postsToSkip,
       pageSize,
       sortBy,
       sortDirection,
-      { blogId }
-    );
+      filter: { blogId },
+    });
 
     return {
       pagesCount,
@@ -90,12 +95,17 @@ const postsService = {
     return !!blog;
   },
 
-  createPost: async (
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<TPostViewModel | null> => {
+  createPost: async ({
+    title,
+    shortDescription,
+    content,
+    blogId,
+  }: {
+    title: string;
+    shortDescription: string;
+    content: string;
+    blogId: string;
+  }): Promise<TPostViewModel | null> => {
     const blog: TBlogRepViewModel | null = await blogsRepository.getBlogById(
       blogId
     );
@@ -117,20 +127,26 @@ const postsService = {
     return mapPost(createdPost);
   },
 
-  updatePostById: async (
-    id: string,
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<boolean> =>
-    await postsRepository.updatePostById(
+  updatePostById: async ({
+    id,
+    title,
+    shortDescription,
+    content,
+    blogId,
+  }: {
+    id: string;
+    title: string;
+    shortDescription: string;
+    content: string;
+    blogId: string;
+  }): Promise<boolean> =>
+    await postsRepository.updatePostById({
       id,
       title,
       shortDescription,
       content,
-      blogId
-    ),
+      blogId,
+    }),
 
   deletePostById: async (id: string): Promise<boolean> =>
     await postsRepository.deletePostById(id),

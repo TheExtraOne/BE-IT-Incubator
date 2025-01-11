@@ -1,7 +1,9 @@
 import blogsRepository from "../repository/blogs-db-repository";
 import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
 import TBlogViewModel from "./models/BlogViewModel";
-import { TResponseWithPagination } from "../types";
+import { TPages, TResponseWithPagination, TSorting } from "../types";
+
+type TSearchParam = { searchNameTerm: string | null };
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogViewModel => ({
   id: blog.id,
@@ -16,24 +18,26 @@ const mapBlogs = (blogs: TBlogRepViewModel[] | []): TBlogViewModel[] =>
   blogs.map(mapBlog);
 
 const blogsService = {
-  getAllBlogs: async (
-    searchNameTerm: string | null,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string
-  ): Promise<TResponseWithPagination<TBlogViewModel[] | []>> => {
+  getAllBlogs: async ({
+    searchNameTerm,
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDirection,
+  }: TSearchParam & TPages & TSorting): Promise<
+    TResponseWithPagination<TBlogViewModel[] | []>
+  > => {
     const blogsCount = await blogsRepository.getBlogsCount(searchNameTerm);
     const pagesCount =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
-    const blogs: [] | TBlogRepViewModel[] = await blogsRepository.getAllBlogs(
+    const blogs: [] | TBlogRepViewModel[] = await blogsRepository.getAllBlogs({
       searchNameTerm,
       blogsToSkip,
       pageSize,
       sortBy,
-      sortDirection
-    );
+      sortDirection,
+    });
 
     return {
       pagesCount,
@@ -52,11 +56,15 @@ const blogsService = {
     return blog ? mapBlog(blog) : null;
   },
 
-  createBlog: async (
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<TBlogViewModel> => {
+  createBlog: async ({
+    name,
+    description,
+    websiteUrl,
+  }: {
+    name: string;
+    description: string;
+    websiteUrl: string;
+  }): Promise<TBlogViewModel> => {
     const newBlog: TBlogViewModel = {
       id: `${Date.now() + Math.random()}`,
       name,
@@ -70,13 +78,18 @@ const blogsService = {
     return mapBlog(createdBlog);
   },
 
-  updateBlogById: async (
-    id: string,
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<boolean> =>
-    await blogsRepository.updateBlogById(id, name, description, websiteUrl),
+  updateBlogById: async ({
+    id,
+    name,
+    description,
+    websiteUrl,
+  }: {
+    id: string;
+    name: string;
+    description: string;
+    websiteUrl: string;
+  }): Promise<boolean> =>
+    await blogsRepository.updateBlogById({ id, name, description, websiteUrl }),
 
   deleteBlogById: async (id: string): Promise<boolean> =>
     await blogsRepository.deleteBlogById(id),

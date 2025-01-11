@@ -19,6 +19,7 @@ import TQueryBlogModel from "./models/QueryBlogModel";
 import TQueryPostModel from "./models/QueryPostModel";
 import postsService from "../domain/posts-service";
 import TPostViewModel from "./models/PostViewModel";
+import postsInputValidator from "../middleware/post-input-validation-middleware";
 
 const blogsRouter = Router({});
 
@@ -95,6 +96,29 @@ const blogsController = {
     res.status(STATUS.CREATED_201).json(newBlog);
   },
 
+  createPostForBlogId: async (
+    req: TRequestWithParamsAndBody<
+      TPathParamsBlogModel,
+      { title: string; shortDescription: string; content: string }
+    >,
+    res: Response
+  ) => {
+    const blogId = req.params.id;
+    const { title, shortDescription, content } = req.body;
+    const newPost: TPostViewModel | null = await postsService.createPost(
+      title,
+      shortDescription,
+      content,
+      blogId
+    );
+
+    if (!newPost) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+    res.status(STATUS.CREATED_201).json(newPost);
+  },
+
   updateBlog: async (
     req: TRequestWithParamsAndBody<TPathParamsBlogModel, TBlogInputModel>,
     res: Response
@@ -132,9 +156,22 @@ const blogInputMiddlewares = [
   InputCheckErrorsMiddleware,
 ];
 
+const postInputMiddlewares = [
+  authorizationMiddleware,
+  postsInputValidator.titleValidation,
+  postsInputValidator.shortDescriptionValidation,
+  postsInputValidator.contentValidator,
+  InputCheckErrorsMiddleware,
+];
+
 blogsRouter.get("/", blogsController.getBlogs);
 blogsRouter.get("/:id", blogsController.getBlog);
 blogsRouter.get("/:id/posts", blogsController.getAllPostsForBlogById);
+blogsRouter.post(
+  "/:id/posts",
+  [...postInputMiddlewares],
+  blogsController.createPostForBlogId
+);
 blogsRouter.post("/", [...blogInputMiddlewares], blogsController.createBlog);
 blogsRouter.put("/:id", [...blogInputMiddlewares], blogsController.updateBlog);
 blogsRouter.delete("/:id", authorizationMiddleware, blogsController.deleteBlog);

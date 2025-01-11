@@ -12,36 +12,21 @@ type TNewPost = {
 };
 
 const postsRepository = {
-  getPostsCount: async (): Promise<number> => {
-    return await postCollection.count({});
-  },
-
-  getPostsCountForBlogId: async (blogId: string): Promise<number> => {
-    return await postCollection.count({ blogId });
+  getPostsCount: async (
+    filter: Record<string, string> | undefined = {}
+  ): Promise<number> => {
+    return await postCollection.count(filter);
   },
 
   getAllPosts: async (
     postsToSkip: number,
     pageSize: number,
     sortBy: string,
-    sortDirection: string
+    sortDirection: string,
+    filter: Record<string, string> | undefined = {}
   ): Promise<TPostRepViewModel[] | []> =>
     await postCollection
-      .find({})
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
-      .skip(postsToSkip)
-      .limit(pageSize)
-      .toArray(),
-
-  getAllPostsForBlogId: async (
-    blogId: string,
-    postsToSkip: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: string
-  ): Promise<TPostRepViewModel[] | []> =>
-    await postCollection
-      .find({ blogId })
+      .find(filter)
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip(postsToSkip)
       .limit(pageSize)

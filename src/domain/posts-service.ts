@@ -60,20 +60,19 @@ const postsService = {
     pageSize: number,
     sortBy: string,
     sortDirection: string
-  ) => {
-    const postsCount = await postsRepository.getPostsCountForBlogId(blogId);
+  ): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
+    const postsCount = await postsRepository.getPostsCount({ blogId });
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 
-    const posts: [] | TPostRepViewModel[] =
-      await postsRepository.getAllPostsForBlogId(
-        blogId,
-        postsToSkip,
-        pageSize,
-        sortBy,
-        sortDirection
-      );
+    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts(
+      postsToSkip,
+      pageSize,
+      sortBy,
+      sortDirection,
+      { blogId }
+    );
 
     return {
       pagesCount,

@@ -75,8 +75,8 @@ const blogsController = {
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
       await postsService.getAllPostsForBlogById(
         req.params.id,
-        pageNumber,
-        pageSize,
+        +pageNumber,
+        +pageSize,
         sortBy,
         sortDirection
       );

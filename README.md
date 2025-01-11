@@ -39,5 +39,5 @@ The `src` directory contains the core components of our application:
 - [+] Add Sorting to Pagination for posts
 - [+] Add SearchNameTerm for blogs (register doesn't matter)
 - [-] Create a new endpoint POST - blogs/{id}/posts (for creating post for a specific blog)
-- [-] Create a new endpoint GET - blogs/{id}/posts (for getting posts for a specific blog)
+- [+] Create a new endpoint GET - blogs/{id}/posts (for getting posts for a specific blog)
 - [-] Update tests

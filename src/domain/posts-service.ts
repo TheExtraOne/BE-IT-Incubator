@@ -54,6 +54,43 @@ const postsService = {
     return post ? mapPost(post) : null;
   },
 
+  getAllPostsForBlogById: async (
+    blogId: string,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: string
+  ) => {
+    const postsCount = await postsRepository.getPostsCountForBlogId(blogId);
+    const pagesCount =
+      postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
+    const postsToSkip = (pageNumber - 1) * pageSize;
+
+    const posts: [] | TPostRepViewModel[] =
+      await postsRepository.getAllPostsForBlogId(
+        blogId,
+        postsToSkip,
+        pageSize,
+        sortBy,
+        sortDirection
+      );
+
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: postsCount,
+      items: mapPosts(posts),
+    };
+  },
+
+  checkIfBlogIdCorrect: async (blogId: string) => {
+    const blog: TBlogRepViewModel | null = await blogsRepository.getBlogById(
+      blogId
+    );
+    return !!blog;
+  },
+
   createPost: async (
     title: string,
     shortDescription: string,

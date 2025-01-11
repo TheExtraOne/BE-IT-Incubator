@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { STATUS } from "../settings";
 import blogsService from "../domain/blogs-service";
 import TPathParamsBlogModel from "./models/PathParamsBlogModel";
@@ -8,6 +8,7 @@ import {
   TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQuery,
+  TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../types";
 import TBlogInputModel from "./models/BlogInputModel";
@@ -15,6 +16,9 @@ import blogInputValidator from "../middleware/blog-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
 import TBlogViewModel from "./models/BlogViewModel";
 import TQueryBlogModel from "./models/QueryBlogModel";
+import TQueryPostModel from "./models/QueryPostModel";
+import postsService from "../domain/posts-service";
+import TPostViewModel from "./models/PostViewModel";
 
 const blogsRouter = Router({});
 
@@ -50,6 +54,34 @@ const blogsController = {
     blog
       ? res.status(STATUS.OK_200).json(blog)
       : res.sendStatus(STATUS.NOT_FOUND_404);
+  },
+
+  getAllPostsForBlogById: async (
+    req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
+    res: Response
+  ) => {
+    const isBlogIdExist = postsService.checkIfBlogIdCorrect(req.params.id);
+    if (!isBlogIdExist) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+
+    const {
+      pageNumber = 1,
+      pageSize = 10,
+      sortBy = "createdAt",
+      sortDirection = "desc",
+    } = req.query;
+    const posts: TResponseWithPagination<TPostViewModel[] | []> =
+      await postsService.getAllPostsForBlogById(
+        req.params.id,
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection
+      );
+
+    res.status(STATUS.OK_200).json(posts);
   },
 
   createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
@@ -102,6 +134,7 @@ const blogInputMiddlewares = [
 
 blogsRouter.get("/", blogsController.getBlogs);
 blogsRouter.get("/:id", blogsController.getBlog);
+blogsRouter.get("/:id/posts", blogsController.getAllPostsForBlogById);
 blogsRouter.post("/", [...blogInputMiddlewares], blogsController.createBlog);
 blogsRouter.put("/:id", [...blogInputMiddlewares], blogsController.updateBlog);
 blogsRouter.delete("/:id", authorizationMiddleware, blogsController.deleteBlog);

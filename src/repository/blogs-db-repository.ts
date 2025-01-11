@@ -1,47 +1,37 @@
 import { blogCollection } from "./db";
-import TBlogDbViewModel from "./models/BlogDbViewModel";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 
-const mapBlog = (blog: TBlogDbViewModel): TBlogRepViewModel => ({
-  id: blog.id,
-  name: blog.name,
-  description: blog.description,
-  websiteUrl: blog.websiteUrl,
-  createdAt: blog.createdAt,
-  isMembership: blog.isMembership,
-});
-
-const mapBlogs = (blogs: TBlogDbViewModel[]): TBlogRepViewModel[] =>
-  blogs.map(mapBlog);
+type TNewBlog = {
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+};
 
 const blogsRepository = {
-  getAllBlogs: async (): Promise<TBlogRepViewModel[]> => {
-    const blogs = await blogCollection.find({}).toArray();
+  getAllBlogs: async (
+    searchNameTerm: string | null
+  ): Promise<TBlogRepViewModel[] | []> => {
+    const filter: Record<string, RegExp> | Record<string, never> = {};
+    if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
-    return mapBlogs(blogs);
+    return await blogCollection.find(filter).toArray();
   },
+
   getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {
     const blog: TBlogRepViewModel | null = await blogCollection.findOne({ id });
 
-    return blog ? mapBlog(blog) : null;
+    return blog;
   },
-  createBlog: async (
-    name: string,
-    description: string,
-    websiteUrl: string
-  ): Promise<TBlogRepViewModel> => {
-    const newBlog: TBlogRepViewModel = {
-      id: `${Date.now() + Math.random()}`,
-      name,
-      description,
-      websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
+
+  createBlog: async (newBlog: TNewBlog): Promise<TBlogRepViewModel> => {
     await blogCollection.insertOne(newBlog);
 
-    return mapBlog(newBlog);
+    return newBlog;
   },
+
   updateBlogById: async (
     id: string,
     name: string,
@@ -55,6 +45,7 @@ const blogsRepository = {
 
     return !!matchedCount;
   },
+
   deleteBlogById: async (id: string): Promise<boolean> => {
     const { deletedCount } = await blogCollection.deleteOne({ id });
 

@@ -1,9 +1,9 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../settings";
-import TBlogDbViewModel from "./models/BlogDbViewModel";
 import TPostDbViewModel from "./models/PostDbViewModel";
+import TBlogRepViewModel from "./models/BlogRepViewModel";
 
-export let blogCollection: Collection<TBlogDbViewModel>;
+export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostDbViewModel>;
 export let client: MongoClient;
 
@@ -11,7 +11,7 @@ export const connectToDb = async (url: string) => {
   client = new MongoClient(url);
   const db: Db = client.db(SETTINGS.DB_NAME);
 
-  blogCollection = db.collection<TBlogDbViewModel>(
+  blogCollection = db.collection<TBlogRepViewModel>(
     SETTINGS.BLOG_COLLECTION_NAME
   );
   postCollection = db.collection<TPostDbViewModel>(

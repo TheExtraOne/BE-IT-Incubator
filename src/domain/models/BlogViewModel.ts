@@ -1,8 +1,4 @@
-type TBlogDbViewModel = {
-  /**
-   * _id in DB of the blog
-   */
-  _id?: string;
+type TBlogViewModel = {
   /**
    * id of the blog
    */
@@ -29,4 +25,4 @@ type TBlogDbViewModel = {
   isMembership: boolean;
 };
 
-export default TBlogDbViewModel;
+export default TBlogViewModel;

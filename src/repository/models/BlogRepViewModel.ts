@@ -1,5 +1,9 @@
 type TBlogRepViewModel = {
   /**
+   * _id of the blog in DB
+   */
+  _id?: string;
+  /**
    * id of the blog
    */
   id: string;

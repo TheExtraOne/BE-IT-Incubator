@@ -31,7 +31,7 @@ The `src` directory contains the core components of our application:
 ## TODO
 
 - [+] Add business layer (service) fro blogs
-- [-] Add business layer (service) fro posts
+- [+] Add business layer (service) fro posts
 - [-] Add Pagination With Sorting for blogs
 - [-] Add Pagination With Sorting for posts
 - [+] Add SearchNameTerm for blogs (register doesn't matter)

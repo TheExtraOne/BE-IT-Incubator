@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
-import postsRepository from "../repository/posts-db-repository";
+import postsService from "../domain/posts-service";
 import TPathParamsPostModel from "./models/PathParamsPostModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
@@ -17,7 +17,7 @@ const postsRouter = Router({});
 
 const postsController = {
   getPosts: async (_req: Request, res: Response) => {
-    const posts: TPostViewModel[] = await postsRepository.getAllPosts();
+    const posts: TPostViewModel[] = await postsService.getAllPosts();
 
     res.status(STATUS.OK_200).json(posts);
   },
@@ -26,7 +26,7 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const post: TPostViewModel | null = await postsRepository.getPostById(
+    const post: TPostViewModel | null = await postsService.getPostById(
       req.params.id
     );
 
@@ -38,7 +38,7 @@ const postsController = {
   createPost: async (req: TRequestWithBody<TPostInputModel>, res: Response) => {
     const { title, shortDescription, content, blogId } = req.body;
 
-    const newPost: TPostViewModel | null = await postsRepository.createPost(
+    const newPost: TPostViewModel | null = await postsService.createPost(
       title,
       shortDescription,
       content,
@@ -53,7 +53,7 @@ const postsController = {
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const success = await postsRepository.updatePostById(
+    const success = await postsService.updatePostById(
       req.params.id,
       title,
       shortDescription,
@@ -70,7 +70,7 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const success = await postsRepository.deletePostById(req.params.id);
+    const success = await postsService.deletePostById(req.params.id);
 
     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
   },

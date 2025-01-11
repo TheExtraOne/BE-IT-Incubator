@@ -1,8 +1,4 @@
-type TPostDbViewModel = {
-  /**
-   * _id in DB of the post
-   */
-  _id?: string;
+type TPostViewModel = {
   /**
    * id of the post
    */
@@ -33,4 +29,4 @@ type TPostDbViewModel = {
   createdAt: string;
 };
 
-export default TPostDbViewModel;
+export default TPostViewModel;

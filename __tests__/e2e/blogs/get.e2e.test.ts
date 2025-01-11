@@ -46,6 +46,41 @@ describe("GET /blogs", () => {
     ]);
   });
 
+  it("should return 200 and an array with blogs that are matching passed query param", async () => {
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+
+    const res = await req
+      .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=ru`)
+      .expect(STATUS.OK_200);
+
+    expect(res.body).toEqual([
+      {
+        ...correctBlogBodyParams,
+        createdAt: expect.any(String),
+        id: expect.any(String),
+        isMembership: false,
+      },
+    ]);
+  });
+
+  it("should return an empty array if blogs name is not matching passed query param", async () => {
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+
+    const res = await req
+      .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=doka`)
+      .expect(STATUS.OK_200);
+
+    expect(res.body).toEqual([]);
+  });
+
   it("should return 404 in case if id was passed, but the db is empty", async () => {
     await req.get(`${SETTINGS.PATH.BLOGS}/1`).expect(STATUS.NOT_FOUND_404);
   });

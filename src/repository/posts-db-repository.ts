@@ -1,53 +1,29 @@
-import { postCollection, blogCollection } from "./db";
-import TPostDbViewModel from "./models/PostDbViewModel";
+import { postCollection } from "./db";
 import TPostRepViewModel from "./models/PostRepViewModel";
 
-const mapPost = (post: TPostDbViewModel): TPostRepViewModel => ({
-  id: post.id,
-  title: post.title,
-  shortDescription: post.shortDescription,
-  content: post.content,
-  blogId: post.blogId,
-  blogName: post.blogName,
-  createdAt: post.createdAt,
-});
-
-const mapPosts = (posts: TPostDbViewModel[]): TPostRepViewModel[] =>
-  posts.map(mapPost);
+type TNewPost = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+  createdAt: string;
+};
 
 const postsRepository = {
-  getAllPosts: async (): Promise<TPostRepViewModel[]> => {
-    const posts = await postCollection.find({}).toArray();
+  getAllPosts: async (): Promise<TPostRepViewModel[] | []> =>
+    await postCollection.find({}).toArray(),
 
-    return mapPosts(posts);
-  },
-  getPostById: async (id: string): Promise<TPostRepViewModel | null> => {
-    const post = await postCollection.findOne({ id });
+  getPostById: async (id: string): Promise<TPostRepViewModel | null> =>
+    await postCollection.findOne({ id }),
 
-    return post ? mapPost(post) : null;
-  },
-  createPost: async (
-    title: string,
-    shortDescription: string,
-    content: string,
-    blogId: string
-  ): Promise<TPostRepViewModel | null> => {
-    const blog = await blogCollection.findOne({ id: blogId });
-    if (!blog) return null;
-
-    const newPost = {
-      id: `${Date.now() + Math.random()}`,
-      title,
-      shortDescription,
-      content,
-      blogId,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-    };
+  createPost: async (newPost: TNewPost): Promise<TPostRepViewModel> => {
     await postCollection.insertOne(newPost);
 
-    return mapPost(newPost);
+    return newPost;
   },
+
   updatePostById: async (
     id: string,
     title: string,
@@ -62,6 +38,7 @@ const postsRepository = {
 
     return !!matchedCount;
   },
+
   deletePostById: async (id: string): Promise<boolean> => {
     const { deletedCount } = await postCollection.deleteOne({ id });
 

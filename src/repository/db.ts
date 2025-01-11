@@ -1,10 +1,10 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../settings";
-import TPostDbViewModel from "./models/PostDbViewModel";
+import TPostRepViewModel from "./models/PostRepViewModel";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
-export let postCollection: Collection<TPostDbViewModel>;
+export let postCollection: Collection<TPostRepViewModel>;
 export let client: MongoClient;
 
 export const connectToDb = async (url: string) => {
@@ -14,7 +14,7 @@ export const connectToDb = async (url: string) => {
   blogCollection = db.collection<TBlogRepViewModel>(
     SETTINGS.BLOG_COLLECTION_NAME
   );
-  postCollection = db.collection<TPostDbViewModel>(
+  postCollection = db.collection<TPostRepViewModel>(
     SETTINGS.POST_COLLECTION_NAME
   );
 

@@ -1,5 +1,9 @@
 type TPostRepViewModel = {
   /**
+   * _id in DB of the post
+   */
+  _id?: string;
+  /**
    * id of the post
    */
   id: string;

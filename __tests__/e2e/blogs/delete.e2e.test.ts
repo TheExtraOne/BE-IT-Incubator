@@ -16,14 +16,12 @@ describe("DELETE /blogs", () => {
   });
 
   beforeEach(async () => {
-    const {
-      body: { id: blogId },
-    } = await req
+    const { body } = await req
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams);
 
-    id = blogId;
+    id = body.id;
   });
 
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
@@ -40,7 +38,7 @@ describe("DELETE /blogs", () => {
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 401 if login or password is incorrect", async () => {
@@ -49,7 +47,7 @@ describe("DELETE /blogs", () => {
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 404 if id is not matching", async () => {
@@ -59,7 +57,7 @@ describe("DELETE /blogs", () => {
       .expect(STATUS.NOT_FOUND_404);
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 204 if id is matching", async () => {
@@ -69,6 +67,6 @@ describe("DELETE /blogs", () => {
       .expect(STATUS.NO_CONTENT_204);
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(0);
+    expect(res.body.items.length).toEqual(0);
   });
 });

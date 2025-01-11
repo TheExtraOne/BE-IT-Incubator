@@ -52,7 +52,7 @@ describe("DELETE /posts", () => {
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 401 if login or password is incorrect", async () => {
@@ -61,7 +61,7 @@ describe("DELETE /posts", () => {
       .expect(STATUS.UNAUTHORIZED_401);
 
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 404 if id is not matching", async () => {
@@ -71,7 +71,7 @@ describe("DELETE /posts", () => {
       .expect(STATUS.NOT_FOUND_404);
 
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body.items.length).toEqual(1);
   });
 
   it("should return 204 if id is matching", async () => {
@@ -81,6 +81,6 @@ describe("DELETE /posts", () => {
       .expect(STATUS.NO_CONTENT_204);
 
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
-    expect(res.body.length).toEqual(0);
+    expect(res.body.items.length).toEqual(0);
   });
 });

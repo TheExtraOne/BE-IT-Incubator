@@ -26,10 +26,16 @@ describe("GET /posts", () => {
     await server.stop();
   });
 
-  it("should return 200 and an empty array if the db is empty", async () => {
+  it("should return 200 and an empty array of items if the db is empty", async () => {
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([]);
+    expect(res.body).toEqual({
+      items: [],
+      page: 1,
+      pageSize: 10,
+      pagesCount: 0,
+      totalCount: 0,
+    });
   });
 
   it("should return 200 and an array with posts if the db is not empty", async () => {
@@ -50,7 +56,7 @@ describe("GET /posts", () => {
       .expect(STATUS.CREATED_201);
 
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
-    expect(res.body).toEqual([
+    expect(res.body.items).toEqual([
       {
         ...correctPostBodyParams,
         blogId,
@@ -59,6 +65,53 @@ describe("GET /posts", () => {
         createdAt: expect.any(String),
       },
     ]);
+  });
+
+  it("should return 200 and correct number of items, page, pageSize, pageCount and totalCount", async () => {
+    const {
+      body: { id: blogId, name: blogName },
+    } = await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+
+    await req
+      .post(SETTINGS.PATH.POSTS)
+      .set({ Authorization: userCredentials.correct })
+      .send({ ...correctPostBodyParams, blogId })
+      .expect(STATUS.CREATED_201);
+    const {
+      body: { id },
+    } = await req
+      .post(SETTINGS.PATH.POSTS)
+      .set({ Authorization: userCredentials.correct })
+      .send({ ...correctPostBodyParams, blogId })
+      .expect(STATUS.CREATED_201);
+    await req
+      .post(SETTINGS.PATH.POSTS)
+      .set({ Authorization: userCredentials.correct })
+      .send({ ...correctPostBodyParams, blogId })
+      .expect(STATUS.CREATED_201);
+
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?pageNumber=2&pageSize=1`)
+      .expect(STATUS.OK_200);
+    expect(res.body).toEqual({
+      items: [
+        {
+          ...correctPostBodyParams,
+          blogId,
+          blogName,
+          id,
+          createdAt: expect.any(String),
+        },
+      ],
+      page: 2,
+      pageSize: 1,
+      pagesCount: 3,
+      totalCount: 3,
+    });
   });
 
   it("should return 404 in case if id was passed, but the db is empty", async () => {

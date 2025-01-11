@@ -21,10 +21,16 @@ describe("GET /blogs", () => {
     await server.stop();
   });
 
-  it("should return 200 and an empty array if the db is empty", async () => {
+  it("should return 200 and an empty array of items if the db is empty", async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([]);
+    expect(res.body).toEqual({
+      items: [],
+      page: 1,
+      pageSize: 10,
+      pagesCount: 0,
+      totalCount: 0,
+    });
   });
 
   it("should return 200 and an array with blogs if the db is not empty", async () => {
@@ -36,7 +42,7 @@ describe("GET /blogs", () => {
 
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([
+    expect(res.body.items).toEqual([
       {
         ...correctBlogBodyParams,
         createdAt: expect.any(String),
@@ -44,6 +50,43 @@ describe("GET /blogs", () => {
         isMembership: false,
       },
     ]);
+  });
+
+  it("should return correct number of items, page, pageSize, pageCount, totalCount", async () => {
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+    await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ Authorization: userCredentials.correct })
+      .send(correctBlogBodyParams)
+      .expect(STATUS.CREATED_201);
+
+    const res = await req
+      .get(`${SETTINGS.PATH.BLOGS}?pageNumber=2&pageSize=2`)
+      .expect(STATUS.OK_200);
+
+    expect(res.body).toEqual({
+      items: [
+        {
+          ...correctBlogBodyParams,
+          createdAt: expect.any(String),
+          id: expect.any(String),
+          isMembership: false,
+        },
+      ],
+      page: 2,
+      pageSize: 2,
+      pagesCount: 2,
+      totalCount: 3,
+    });
   });
 
   it("should return 200 and an array with blogs that are matching passed query param", async () => {
@@ -57,7 +100,7 @@ describe("GET /blogs", () => {
       .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=ru`)
       .expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([
+    expect(res.body.items).toEqual([
       {
         ...correctBlogBodyParams,
         createdAt: expect.any(String),
@@ -78,7 +121,7 @@ describe("GET /blogs", () => {
       .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=doka`)
       .expect(STATUS.OK_200);
 
-    expect(res.body).toEqual([]);
+    expect(res.body.items).toEqual([]);
   });
 
   it("should return 404 in case if id was passed, but the db is empty", async () => {

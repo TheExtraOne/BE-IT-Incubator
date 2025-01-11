@@ -61,7 +61,9 @@ const blogsController = {
     req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
     res: Response
   ) => {
-    const isBlogIdExist = postsService.checkIfBlogIdCorrect(req.params.id);
+    const isBlogIdExist = await postsService.checkIfBlogIdCorrect(
+      req.params.id
+    );
     if (!isBlogIdExist) {
       res.sendStatus(STATUS.NOT_FOUND_404);
       return;

@@ -12,8 +12,15 @@ type TNewPost = {
 };
 
 const postsRepository = {
-  getAllPosts: async (): Promise<TPostRepViewModel[] | []> =>
-    await postCollection.find({}).toArray(),
+  getPostsCount: async (): Promise<number> => {
+    return await postCollection.count({});
+  },
+
+  getAllPosts: async (
+    postsToSkip: number,
+    pageSize: number
+  ): Promise<TPostRepViewModel[] | []> =>
+    await postCollection.find({}).skip(postsToSkip).limit(pageSize).toArray(),
 
   getPostById: async (id: string): Promise<TPostRepViewModel | null> =>
     await postCollection.findOne({ id }),

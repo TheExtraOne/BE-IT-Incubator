@@ -7,17 +7,22 @@ import {
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithParamsAndBody,
+  TRequestWithQuery,
+  TResponseWithPagination,
 } from "../types";
 import TPostInputModel from "./models/PostInputModel";
 import postsInputValidator from "../middleware/post-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
 import TPostViewModel from "./models/PostViewModel";
+import TQueryPostModel from "./models/QueryPostModel";
 
 const postsRouter = Router({});
 
 const postsController = {
-  getPosts: async (_req: Request, res: Response) => {
-    const posts: TPostViewModel[] = await postsService.getAllPosts();
+  getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
+    const { pageNumber = 1, pageSize = 10 } = req.query;
+    const posts: TResponseWithPagination<TPostViewModel[] | []> =
+      await postsService.getAllPosts(pageNumber, pageSize);
 
     res.status(STATUS.OK_200).json(posts);
   },

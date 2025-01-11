@@ -12,3 +12,11 @@ export type TFieldError = {
 export type TAPIErrorResult = {
   errorsMessages: TFieldError[] | null;
 };
+
+export type TResponseWithPagination<T> = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: T;
+};

@@ -1,7 +1,7 @@
 import blogsRepository from "../repository/blogs-db-repository";
 import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
-import { blogCollection } from "../repository/db";
 import TBlogViewModel from "./models/BlogViewModel";
+import { TResponseWithPagination } from "../types";
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogViewModel => ({
   id: blog.id,
@@ -17,13 +17,27 @@ const mapBlogs = (blogs: TBlogRepViewModel[] | []): TBlogViewModel[] =>
 
 const blogsService = {
   getAllBlogs: async (
-    searchNameTerm: string | null
-  ): Promise<TBlogViewModel[] | []> => {
+    searchNameTerm: string | null,
+    pageNumber: number,
+    pageSize: number
+  ): Promise<TResponseWithPagination<TBlogViewModel[] | []>> => {
+    const blogsCount = await blogsRepository.getBlogsCount();
+    const pagesCount =
+      blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
+    const blogsToSkip = (pageNumber - 1) * pageSize;
     const blogs: [] | TBlogRepViewModel[] = await blogsRepository.getAllBlogs(
-      searchNameTerm
+      searchNameTerm,
+      blogsToSkip,
+      pageSize
     );
 
-    return mapBlogs(blogs);
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: blogsCount,
+      items: mapBlogs(blogs),
+    };
   },
 
   getBlogById: async (id: string): Promise<TBlogViewModel | null> => {

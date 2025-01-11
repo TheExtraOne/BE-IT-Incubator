@@ -8,6 +8,7 @@ import {
   TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQuery,
+  TResponseWithPagination,
 } from "../types";
 import TBlogInputModel from "./models/BlogInputModel";
 import blogInputValidator from "../middleware/blog-input-validation-middleware";
@@ -19,10 +20,9 @@ const blogsRouter = Router({});
 
 const blogsController = {
   getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
-    const { searchNameTerm = null } = req.query;
-    const blogs: TBlogViewModel[] | [] = await blogsService.getAllBlogs(
-      searchNameTerm
-    );
+    const { searchNameTerm = null, pageNumber = 1, pageSize = 10 } = req.query;
+    const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
+      await blogsService.getAllBlogs(searchNameTerm, +pageNumber, +pageSize);
 
     res.status(STATUS.OK_200).json(blogs);
   },

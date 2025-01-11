@@ -2,6 +2,7 @@ import blogsRepository from "../repository/blogs-db-repository";
 import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
 import TPostRepViewModel from "../repository/models/PostRepViewModel";
 import postsRepository from "../repository/posts-db-repository";
+import { TResponseWithPagination } from "../types";
 import TPostViewModel from "./models/PostViewModel";
 
 const mapPost = (post: TPostRepViewModel): TPostViewModel => ({
@@ -18,10 +19,27 @@ const mapPosts = (posts: TPostRepViewModel[] | []): TPostViewModel[] | [] =>
   posts.map(mapPost);
 
 const postsService = {
-  getAllPosts: async (): Promise<TPostViewModel[] | []> => {
-    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts();
+  getAllPosts: async (
+    pageNumber: number,
+    pageSize: number
+  ): Promise<TResponseWithPagination<TPostViewModel[] | []>> => {
+    const postsCount = await postsRepository.getPostsCount();
+    const pagesCount =
+      postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
+    const postsToSkip = (pageNumber - 1) * pageSize;
 
-    return mapPosts(posts);
+    const posts: [] | TPostRepViewModel[] = await postsRepository.getAllPosts(
+      postsToSkip,
+      pageSize
+    );
+
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: postsCount,
+      items: mapPosts(posts),
+    };
   },
 
   getPostById: async (id: string): Promise<TPostViewModel | null> => {

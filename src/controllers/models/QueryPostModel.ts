@@ -1,8 +1,4 @@
-type TQueryBlogModel = {
-  /**
-   * search term for blog Name: Name should contains this term in any position
-   */
-  searchNameTerm: string | null;
+type TQueryPostModel = {
   /**
    * pageNumber is number of portions that should be returned
    */
@@ -13,4 +9,4 @@ type TQueryBlogModel = {
   pageSize: number;
 };
 
-export default TQueryBlogModel;
+export default TQueryPostModel;

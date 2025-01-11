@@ -11,13 +11,23 @@ type TNewBlog = {
 };
 
 const blogsRepository = {
+  getBlogsCount: async (): Promise<number> => {
+    return await blogCollection.count({});
+  },
+
   getAllBlogs: async (
-    searchNameTerm: string | null
+    searchNameTerm: string | null,
+    blogsToSkip: number,
+    pageSize: number
   ): Promise<TBlogRepViewModel[] | []> => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
-    return await blogCollection.find(filter).toArray();
+    return await blogCollection
+      .find(filter)
+      .skip(blogsToSkip)
+      .limit(pageSize)
+      .toArray();
   },
 
   getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {

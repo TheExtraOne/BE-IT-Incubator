@@ -21,7 +21,8 @@ const postsRepository = {
   getPostsCount: async (
     filter: Record<string, string> | undefined = {}
   ): Promise<number> => {
-    return await postCollection.count(filter);
+    // return await postCollection.count(filter);
+    return await postCollection.countDocuments(filter);
   },
 
   getAllPosts: async ({

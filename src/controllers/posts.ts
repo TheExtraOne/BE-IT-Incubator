@@ -24,14 +24,15 @@ const postsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection = "desc",
+      sortDirection,
     } = req.query;
+    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
       await postsService.getAllPosts({
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection,
+        sortDirection: direction,
       });
 
     res.status(STATUS.OK_200).json(posts);

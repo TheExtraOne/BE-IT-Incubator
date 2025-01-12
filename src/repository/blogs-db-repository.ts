@@ -21,7 +21,8 @@ const blogsRepository = {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
-    return await blogCollection.count(filter);
+    // return await blogCollection.count(filter);
+    return await blogCollection.countDocuments(filter);
   },
 
   getAllBlogs: async ({

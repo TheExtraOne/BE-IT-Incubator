@@ -30,15 +30,16 @@ const blogsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection = "desc",
+      sortDirection,
     } = req.query;
+    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
       await blogsService.getAllBlogs({
         searchNameTerm,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection,
+        sortDirection: direction,
       });
 
     res.status(STATUS.OK_200).json(blogs);
@@ -73,15 +74,16 @@ const blogsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection = "desc",
+      sortDirection,
     } = req.query;
+    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
       await postsService.getAllPostsForBlogById({
         blogId: req.params.id,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection,
+        sortDirection: direction,
       });
 
     res.status(STATUS.OK_200).json(posts);

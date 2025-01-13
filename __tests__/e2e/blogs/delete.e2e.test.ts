@@ -31,42 +31,45 @@ describe("DELETE /blogs", () => {
     await server.stop();
   });
 
-  // Authorization
-  it("should return 401 if user is not authorized (authorized no headers)", async () => {
-    await req
-      .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
-      .expect(STATUS.UNAUTHORIZED_401);
+  describe("Authorization", () => {
+    it("should return 401 if user is not authorized (authorized no headers)", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
+        .expect(STATUS.UNAUTHORIZED_401);
 
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.items.length).toEqual(1);
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      expect(res.body.items.length).toEqual(1);
+    });
+
+    it("should return 401 if login or password is incorrect", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
+        .expect(STATUS.UNAUTHORIZED_401);
+
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      expect(res.body.items.length).toEqual(1);
+    });
   });
 
-  it("should return 401 if login or password is incorrect", async () => {
-    await req
-      .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
-      .expect(STATUS.UNAUTHORIZED_401);
+  describe("Deleting blog", () => {
+    it("should return 404 if id is not matching", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.BLOGS}/-1`)
+        .set({ Authorization: userCredentials.correct })
+        .expect(STATUS.NOT_FOUND_404);
 
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.items.length).toEqual(1);
-  });
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      expect(res.body.items.length).toEqual(1);
+    });
 
-  it("should return 404 if id is not matching", async () => {
-    await req
-      .delete(`${SETTINGS.PATH.BLOGS}/-1`)
-      .set({ Authorization: userCredentials.correct })
-      .expect(STATUS.NOT_FOUND_404);
+    it("should return 204 if id is matching", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .expect(STATUS.NO_CONTENT_204);
 
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.items.length).toEqual(1);
-  });
-
-  it("should return 204 if id is matching", async () => {
-    await req
-      .delete(`${SETTINGS.PATH.BLOGS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .expect(STATUS.NO_CONTENT_204);
-
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
-    expect(res.body.items.length).toEqual(0);
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      expect(res.body.items.length).toEqual(0);
+    });
   });
 });

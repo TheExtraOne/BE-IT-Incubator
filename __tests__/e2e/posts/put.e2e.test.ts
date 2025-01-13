@@ -64,413 +64,417 @@ describe("PUT /posts", () => {
     await server.stop();
   });
 
-  // Authorization
-  it("should return 401 if user is not authorized (authorized no headers)", async () => {
-    await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .send(newBodyParams)
-      .expect(STATUS.UNAUTHORIZED_401);
+  describe("Authorization", () => {
+    it("should return 401 if user is not authorized (authorized no headers)", async () => {
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .send(newBodyParams)
+        .expect(STATUS.UNAUTHORIZED_401);
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
-
-  it("should return 401 if login or password is incorrect", async () => {
-    await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.incorrect })
-      .send(newBodyParams)
-      .expect(STATUS.UNAUTHORIZED_401);
-
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
-
-    expect(res.body).toEqual(unchangedResponse);
-  });
-
-  // Id matching
-  it("should return 404 in case if id is not matching the db", async () => {
-    await req
-      .put(`${SETTINGS.PATH.POSTS}/-1`)
-      .set({ Authorization: userCredentials.correct })
-      .send(newBodyParams)
-      .expect(STATUS.NOT_FOUND_404);
-
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
-
-    expect(res.body).toEqual(unchangedResponse);
-  });
-
-  // Title validation
-  it("should return 400 and error if title is not string", async () => {
-    const bodyParams = { ...newBodyParams, title: null };
-
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
-
-    expect(body).toEqual({
-      errorsMessages: [{ field: "title", message: "Incorrect type" }],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 401 if login or password is incorrect", async () => {
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.incorrect })
+        .send(newBodyParams)
+        .expect(STATUS.UNAUTHORIZED_401);
 
-    expect(res.body).toEqual(unchangedResponse);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
+
+      expect(res.body).toEqual(unchangedResponse);
+    });
   });
 
-  it("should return 400 and error if title is empty string", async () => {
-    const bodyParams = { ...newBodyParams, title: "" };
+  describe("Updating", () => {
+    // Id matching
+    it("should return 404 in case if id is not matching the db", async () => {
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/-1`)
+        .set({ Authorization: userCredentials.correct })
+        .send(newBodyParams)
+        .expect(STATUS.NOT_FOUND_404);
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        { field: "title", message: "Title is a required field" },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
+    });
+    // Success
+    it("should return 201 with new post if login, password and body params are correct. New post should contain id, title, shortDescription, content, blogId, createdAt and blogName", async () => {
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(newBodyParams)
+        .expect(STATUS.NO_CONTENT_204);
+
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
+
+      expect(res.body).toEqual({
+        ...newBodyParams,
+        id,
+        blogName,
+        createdAt: expect.any(String),
+      });
+    });
+  });
+
+  describe("Validation", () => {
+    // Title validation
+    it("should return 400 and error if title is not string", async () => {
+      const bodyParams = { ...newBodyParams, title: null };
+
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
+
+      expect(body).toEqual({
+        errorsMessages: [{ field: "title", message: "Incorrect type" }],
+      });
+
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
+
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if title is empty string", async () => {
+      const bodyParams = { ...newBodyParams, title: "" };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if title is too long", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      title: "Title".repeat(100),
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          { field: "title", message: "Title is a required field" },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        { field: "title", message: "Incorrect length. Min = 1, max = 15" },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if title is too long", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        title: "Title".repeat(100),
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  // ShortDescription validation
-  it("should return 400 and error if shortDescription is not string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      shortDescription: null,
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          { field: "title", message: "Incorrect length. Min = 1, max = 15" },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        { field: "shortDescription", message: "Incorrect type" },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    // ShortDescription validation
+    it("should return 400 and error if shortDescription is not string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        shortDescription: null,
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if shortDescription is empty string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      shortDescription: "    ",
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          { field: "shortDescription", message: "Incorrect type" },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "shortDescription",
-          message: "ShortDescription is a required field",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if shortDescription is empty string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        shortDescription: "    ",
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if shortDescription is too long", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      shortDescription: "Design pattern".repeat(100),
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "shortDescription",
+            message: "ShortDescription is a required field",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "shortDescription",
-          message: "Incorrect length. Min = 1, max = 100",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if shortDescription is too long", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        shortDescription: "Design pattern".repeat(100),
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  // Content validation
-  it("should return 400 and error if content is not string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      content: [],
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "shortDescription",
+            message: "Incorrect length. Min = 1, max = 100",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [{ field: "content", message: "Incorrect type" }],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    // Content validation
+    it("should return 400 and error if content is not string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        content: [],
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if content is empty string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      content: "",
-    };
+      expect(body).toEqual({
+        errorsMessages: [{ field: "content", message: "Incorrect type" }],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "content",
-          message: "Content is a required field",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if content is empty string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        content: "",
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if content is too long", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      content:
-        "Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers.".repeat(
-          100
-        ),
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "content",
+            message: "Content is a required field",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "content",
-          message: "Incorrect length. Min = 1, max = 1000",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if content is too long", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        content:
+          "Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers.".repeat(
+            100
+          ),
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  // BlogId validation
-  it("should return 400 and error if blogId is not string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      blogId: 1234,
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "content",
+            message: "Incorrect length. Min = 1, max = 1000",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [{ field: "blogId", message: "Incorrect type" }],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    // BlogId validation
+    it("should return 400 and error if blogId is not string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        blogId: 1234,
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if blogId is empty string", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      blogId: "    ",
-    };
+      expect(body).toEqual({
+        errorsMessages: [{ field: "blogId", message: "Incorrect type" }],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "blogId",
-          message: "BlogId is a required field",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if blogId is empty string", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        blogId: "    ",
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  it("should return 400 and error if blogId does not match the db", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      blogId: "BlogId",
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "blogId",
+            message: "BlogId is a required field",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "blogId",
-          message: "BlogId does not exist",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    it("should return 400 and error if blogId does not match the db", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        blogId: "BlogId",
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  // Combined validation
-  it("should return 400 and array with errors if couple of fields are incorrect", async () => {
-    const bodyParams = {
-      ...newBodyParams,
-      blogId: "BlogId",
-      content: "",
-    };
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "blogId",
+            message: "BlogId does not exist",
+          },
+        ],
+      });
 
-    const { body } = await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(bodyParams)
-      .expect(STATUS.BAD_REQUEST_400);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(body).toEqual({
-      errorsMessages: [
-        {
-          field: "content",
-          message: "Content is a required field",
-        },
-        {
-          field: "blogId",
-          message: "BlogId does not exist",
-        },
-      ],
+      expect(res.body).toEqual(unchangedResponse);
     });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+    // Combined validation
+    it("should return 400 and array with errors if couple of fields are incorrect", async () => {
+      const bodyParams = {
+        ...newBodyParams,
+        blogId: "BlogId",
+        content: "",
+      };
 
-    expect(res.body).toEqual(unchangedResponse);
-  });
+      const { body } = await req
+        .put(`${SETTINGS.PATH.POSTS}/${id}`)
+        .set({ Authorization: userCredentials.correct })
+        .send(bodyParams)
+        .expect(STATUS.BAD_REQUEST_400);
 
-  // Success
-  it("should return 201 with new post if login, password and body params are correct. New post should contain id, title, shortDescription, content, blogId, createdAt and blogName", async () => {
-    await req
-      .put(`${SETTINGS.PATH.POSTS}/${id}`)
-      .set({ Authorization: userCredentials.correct })
-      .send(newBodyParams)
-      .expect(STATUS.NO_CONTENT_204);
+      expect(body).toEqual({
+        errorsMessages: [
+          {
+            field: "content",
+            message: "Content is a required field",
+          },
+          {
+            field: "blogId",
+            message: "BlogId does not exist",
+          },
+        ],
+      });
 
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${id}`)
-      .expect(STATUS.OK_200);
+      const res = await req
+        .get(`${SETTINGS.PATH.POSTS}/${id}`)
+        .expect(STATUS.OK_200);
 
-    expect(res.body).toEqual({
-      ...newBodyParams,
-      id,
-      blogName,
-      createdAt: expect.any(String),
+      expect(res.body).toEqual(unchangedResponse);
     });
   });
 });

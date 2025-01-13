@@ -1,4 +1,4 @@
-import TBlogInputModel from "../../../src/controllers/models/BlogInputModel";
+import { TBlogInputModel } from "../../../src/controllers/models";
 import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { correctBlogBodyParams, req, userCredentials } from "../helpers";

@@ -1,8 +1,6 @@
 import { Router, Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import postsService from "../domain/posts-service";
-import TPathParamsPostModel from "./models/PathParamsPostModel";
-import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -10,12 +8,18 @@ import {
   TRequestWithQuery,
   TResponseWithPagination,
 } from "../types";
-import TPostInputModel from "./models/PostInputModel";
-import postsInputValidator from "../middleware/post-body-input-validation-middleware";
-import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
-import TPostViewModel from "./models/PostViewModel";
-import TQueryPostModel from "./models/QueryPostModel";
-import queryInputValidator from "../middleware/query-input-validation-middleware";
+import {
+  TPathParamsPostModel,
+  TPostInputModel,
+  TPostViewModel,
+  TQueryPostModel,
+} from "./models";
+import {
+  authorizationMiddleware,
+  inputCheckErrorsMiddleware,
+  postsBodyInputValidator,
+  queryInputValidator,
+} from "../middleware";
 
 const postsRouter = Router({});
 
@@ -94,18 +98,18 @@ const postsController = {
 
 const postBodyInputMiddlewares = [
   authorizationMiddleware,
-  postsInputValidator.titleValidation,
-  postsInputValidator.shortDescriptionValidation,
-  postsInputValidator.contentValidator,
-  postsInputValidator.blogIdValidator,
-  InputCheckErrorsMiddleware,
+  postsBodyInputValidator.titleValidation,
+  postsBodyInputValidator.shortDescriptionValidation,
+  postsBodyInputValidator.contentValidator,
+  postsBodyInputValidator.blogIdValidator,
+  inputCheckErrorsMiddleware,
 ];
 const postQueryInputValidator = [
   queryInputValidator.pageNumberValidator,
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
-  InputCheckErrorsMiddleware,
+  inputCheckErrorsMiddleware,
 ];
 
 postsRouter.get("/", [...postQueryInputValidator], postsController.getPosts);

@@ -1,8 +1,6 @@
 import { Router, Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import blogsService from "../domain/blogs-service";
-import TPathParamsBlogModel from "./models/PathParamsBlogModel";
-import authorizationMiddleware from "../middleware/authorization-middleware";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -11,16 +9,22 @@ import {
   TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../types";
-import TBlogInputModel from "./models/BlogInputModel";
-import blogBodyInputValidator from "../middleware/blog-body-input-validation-middleware";
-import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
-import TBlogViewModel from "./models/BlogViewModel";
-import TQueryBlogModel from "./models/QueryBlogModel";
-import TQueryPostModel from "./models/QueryPostModel";
 import postsService from "../domain/posts-service";
-import TPostViewModel from "./models/PostViewModel";
-import postsBodyInputValidator from "../middleware/post-body-input-validation-middleware";
-import queryInputValidator from "../middleware/query-input-validation-middleware";
+import {
+  TBlogInputModel,
+  TBlogViewModel,
+  TPathParamsBlogModel,
+  TPostViewModel,
+  TQueryBlogModel,
+  TQueryPostModel,
+} from "./models";
+import {
+  authorizationMiddleware,
+  blogBodyInputValidator,
+  inputCheckErrorsMiddleware,
+  postsBodyInputValidator,
+  queryInputValidator,
+} from "../middleware";
 
 const blogsRouter = Router({});
 
@@ -154,25 +158,25 @@ const blogsController = {
 const blogBodyInputMiddlewares = [
   authorizationMiddleware,
   ...Object.values(blogBodyInputValidator),
-  InputCheckErrorsMiddleware,
+  inputCheckErrorsMiddleware,
 ];
 const postBodyInputMiddlewares = [
   authorizationMiddleware,
   postsBodyInputValidator.contentValidator,
   postsBodyInputValidator.shortDescriptionValidation,
   postsBodyInputValidator.titleValidation,
-  InputCheckErrorsMiddleware,
+  inputCheckErrorsMiddleware,
 ];
 const blogQueryInputValidator = [
   ...Object.values(queryInputValidator),
-  InputCheckErrorsMiddleware,
+  inputCheckErrorsMiddleware,
 ];
 const postQueryInputValidator = [
   queryInputValidator.pageNumberValidator,
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
-  InputCheckErrorsMiddleware,
+  inputCheckErrorsMiddleware,
 ];
 
 blogsRouter.get("/", [...blogQueryInputValidator], blogsController.getBlogs);

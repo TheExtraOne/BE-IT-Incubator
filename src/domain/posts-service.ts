@@ -3,7 +3,7 @@ import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
 import TPostRepViewModel from "../repository/models/PostRepViewModel";
 import postsRepository from "../repository/posts-db-repository";
 import { TPages, TResponseWithPagination, TSorting } from "../types";
-import TPostViewModel from "./models/PostViewModel";
+import { TPostViewModel } from "./models";
 
 const mapPost = (post: TPostRepViewModel): TPostViewModel => ({
   id: post.id,

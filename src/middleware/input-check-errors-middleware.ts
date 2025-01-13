@@ -11,7 +11,7 @@ type TExpressValidator = {
   location: string;
 };
 
-const InputCheckErrorsMiddleware = (
+const inputCheckErrorsMiddleware = (
   req: Request,
   res: Response<TAPIErrorResult>,
   next: NextFunction
@@ -38,4 +38,4 @@ const InputCheckErrorsMiddleware = (
   next();
 };
 
-export default InputCheckErrorsMiddleware;
+export default inputCheckErrorsMiddleware;

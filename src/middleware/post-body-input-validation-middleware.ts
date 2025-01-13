@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import blogsRepository from "../repository/blogs-db-repository";
 
-const postsInputValidator = {
+const postsBodyInputValidator = {
   titleValidation: body("title")
     .isString()
     .withMessage("Incorrect type")
@@ -43,4 +43,4 @@ const postsInputValidator = {
     }),
 };
 
-export default postsInputValidator;
+export default postsBodyInputValidator;

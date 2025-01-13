@@ -23,3 +23,5 @@ export const STATUS = {
   NOT_FOUND_404: 404,
   UNAUTHORIZED_401: 401,
 };
+
+export const SORT_DIRECTION = { ASC: "asc", DESC: "desc" } as const;

@@ -1,5 +1,5 @@
-import { Router, Request, Response } from "express";
-import { STATUS } from "../settings";
+import { Router, Response } from "express";
+import { SORT_DIRECTION, STATUS } from "../settings";
 import postsService from "../domain/posts-service";
 import TPathParamsPostModel from "./models/PathParamsPostModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
@@ -11,10 +11,11 @@ import {
   TResponseWithPagination,
 } from "../types";
 import TPostInputModel from "./models/PostInputModel";
-import postsInputValidator from "../middleware/post-input-validation-middleware";
+import postsInputValidator from "../middleware/post-body-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
 import TPostViewModel from "./models/PostViewModel";
 import TQueryPostModel from "./models/QueryPostModel";
+import queryInputValidator from "../middleware/query-input-validation-middleware";
 
 const postsRouter = Router({});
 
@@ -24,15 +25,14 @@ const postsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection,
+      sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
       await postsService.getAllPosts({
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection: direction,
+        sortDirection,
       });
 
     res.status(STATUS.OK_200).json(posts);
@@ -92,7 +92,7 @@ const postsController = {
   },
 };
 
-const postInputMiddlewares = [
+const postBodyInputMiddlewares = [
   authorizationMiddleware,
   postsInputValidator.titleValidation,
   postsInputValidator.shortDescriptionValidation,
@@ -100,11 +100,26 @@ const postInputMiddlewares = [
   postsInputValidator.blogIdValidator,
   InputCheckErrorsMiddleware,
 ];
+const postQueryInputValidator = [
+  queryInputValidator.pageNumberValidator,
+  queryInputValidator.pageSizeValidator,
+  queryInputValidator.sortByValidator,
+  queryInputValidator.sortDirectionValidator,
+  InputCheckErrorsMiddleware,
+];
 
-postsRouter.get("/", postsController.getPosts);
+postsRouter.get("/", [...postQueryInputValidator], postsController.getPosts);
 postsRouter.get("/:id", postsController.getPost);
-postsRouter.post("/", [...postInputMiddlewares], postsController.createPost);
-postsRouter.put("/:id", [...postInputMiddlewares], postsController.updatePost);
+postsRouter.post(
+  "/",
+  [...postBodyInputMiddlewares],
+  postsController.createPost
+);
+postsRouter.put(
+  "/:id",
+  [...postBodyInputMiddlewares],
+  postsController.updatePost
+);
 postsRouter.delete("/:id", authorizationMiddleware, postsController.deletePost);
 
 export default postsRouter;

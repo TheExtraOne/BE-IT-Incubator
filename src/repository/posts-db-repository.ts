@@ -1,3 +1,4 @@
+import { SORT_DIRECTION } from "../settings";
 import { TSorting } from "../types";
 import { postCollection } from "./db";
 import TPostRepViewModel from "./models/PostRepViewModel";
@@ -37,7 +38,7 @@ const postsRepository = {
     TSorting): Promise<TPostRepViewModel[] | []> =>
     await postCollection
       .find(filter)
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(postsToSkip)
       .limit(pageSize)
       .toArray(),

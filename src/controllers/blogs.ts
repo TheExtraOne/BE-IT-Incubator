@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-import { STATUS } from "../settings";
+import { SORT_DIRECTION, STATUS } from "../settings";
 import blogsService from "../domain/blogs-service";
 import TPathParamsBlogModel from "./models/PathParamsBlogModel";
 import authorizationMiddleware from "../middleware/authorization-middleware";
@@ -12,14 +12,15 @@ import {
   TResponseWithPagination,
 } from "../types";
 import TBlogInputModel from "./models/BlogInputModel";
-import blogInputValidator from "../middleware/blog-input-validation-middleware";
+import blogBodyInputValidator from "../middleware/blog-body-input-validation-middleware";
 import InputCheckErrorsMiddleware from "../middleware/input-check-errors-middleware";
 import TBlogViewModel from "./models/BlogViewModel";
 import TQueryBlogModel from "./models/QueryBlogModel";
 import TQueryPostModel from "./models/QueryPostModel";
 import postsService from "../domain/posts-service";
 import TPostViewModel from "./models/PostViewModel";
-import postsInputValidator from "../middleware/post-input-validation-middleware";
+import postsBodyInputValidator from "../middleware/post-body-input-validation-middleware";
+import queryInputValidator from "../middleware/query-input-validation-middleware";
 
 const blogsRouter = Router({});
 
@@ -30,16 +31,15 @@ const blogsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection,
+      sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
       await blogsService.getAllBlogs({
         searchNameTerm,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection: direction,
+        sortDirection,
       });
 
     res.status(STATUS.OK_200).json(blogs);
@@ -74,16 +74,15 @@ const blogsController = {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
-      sortDirection,
+      sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const direction = sortDirection?.toString() === "asc" ? "asc" : "desc";
     const posts: TResponseWithPagination<TPostViewModel[] | []> =
       await postsService.getAllPostsForBlogById({
         blogId: req.params.id,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
-        sortDirection: direction,
+        sortDirection,
       });
 
     res.status(STATUS.OK_200).json(posts);
@@ -152,32 +151,52 @@ const blogsController = {
   },
 };
 
-const blogInputMiddlewares = [
+const blogBodyInputMiddlewares = [
   authorizationMiddleware,
-  blogInputValidator.nameValidation,
-  blogInputValidator.descriptionValidation,
-  blogInputValidator.websiteUrlValidation,
+  ...Object.values(blogBodyInputValidator),
+  InputCheckErrorsMiddleware,
+];
+const postBodyInputMiddlewares = [
+  authorizationMiddleware,
+  postsBodyInputValidator.contentValidator,
+  postsBodyInputValidator.shortDescriptionValidation,
+  postsBodyInputValidator.titleValidation,
+  InputCheckErrorsMiddleware,
+];
+const blogQueryInputValidator = [
+  ...Object.values(queryInputValidator),
+  InputCheckErrorsMiddleware,
+];
+const postQueryInputValidator = [
+  queryInputValidator.pageNumberValidator,
+  queryInputValidator.pageSizeValidator,
+  queryInputValidator.sortByValidator,
+  queryInputValidator.sortDirectionValidator,
   InputCheckErrorsMiddleware,
 ];
 
-const postInputMiddlewares = [
-  authorizationMiddleware,
-  postsInputValidator.titleValidation,
-  postsInputValidator.shortDescriptionValidation,
-  postsInputValidator.contentValidator,
-  InputCheckErrorsMiddleware,
-];
-
-blogsRouter.get("/", blogsController.getBlogs);
+blogsRouter.get("/", [...blogQueryInputValidator], blogsController.getBlogs);
 blogsRouter.get("/:id", blogsController.getBlog);
-blogsRouter.get("/:id/posts", blogsController.getAllPostsForBlogById);
+blogsRouter.get(
+  "/:id/posts",
+  [...postQueryInputValidator],
+  blogsController.getAllPostsForBlogById
+);
 blogsRouter.post(
   "/:id/posts",
-  [...postInputMiddlewares],
+  [...postBodyInputMiddlewares],
   blogsController.createPostForBlogId
 );
-blogsRouter.post("/", [...blogInputMiddlewares], blogsController.createBlog);
-blogsRouter.put("/:id", [...blogInputMiddlewares], blogsController.updateBlog);
+blogsRouter.post(
+  "/",
+  [...blogBodyInputMiddlewares],
+  blogsController.createBlog
+);
+blogsRouter.put(
+  "/:id",
+  [...blogBodyInputMiddlewares],
+  blogsController.updateBlog
+);
 blogsRouter.delete("/:id", authorizationMiddleware, blogsController.deleteBlog);
 
 export default blogsRouter;

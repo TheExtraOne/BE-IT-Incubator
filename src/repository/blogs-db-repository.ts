@@ -1,3 +1,4 @@
+import { SORT_DIRECTION } from "../settings";
 import { TSorting } from "../types";
 import { blogCollection } from "./db";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
@@ -39,7 +40,7 @@ const blogsRepository = {
 
     return await blogCollection
       .find(filter)
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(blogsToSkip)
       .limit(pageSize)
       .toArray();

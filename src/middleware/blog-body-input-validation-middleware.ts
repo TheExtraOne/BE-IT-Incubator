@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-const blogInputValidator = {
+const blogBodyInputValidator = {
   nameValidation: body("name")
     .isString()
     .withMessage("Incorrect type")
@@ -37,4 +37,4 @@ const blogInputValidator = {
     }),
 };
 
-export default blogInputValidator;
+export default blogBodyInputValidator;

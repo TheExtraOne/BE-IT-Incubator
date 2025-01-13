@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import postsService from "../domain/posts-service";
 import {
@@ -14,14 +14,6 @@ import {
   TPostViewModel,
   TQueryPostModel,
 } from "./models";
-import {
-  authorizationMiddleware,
-  inputCheckErrorsMiddleware,
-  postsBodyInputValidator,
-  queryInputValidator,
-} from "../middleware";
-
-const postsRouter = Router({});
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
@@ -96,34 +88,4 @@ const postsController = {
   },
 };
 
-const postBodyInputMiddlewares = [
-  authorizationMiddleware,
-  postsBodyInputValidator.titleValidation,
-  postsBodyInputValidator.shortDescriptionValidation,
-  postsBodyInputValidator.contentValidator,
-  postsBodyInputValidator.blogIdValidator,
-  inputCheckErrorsMiddleware,
-];
-const postQueryInputValidator = [
-  queryInputValidator.pageNumberValidator,
-  queryInputValidator.pageSizeValidator,
-  queryInputValidator.sortByValidator,
-  queryInputValidator.sortDirectionValidator,
-  inputCheckErrorsMiddleware,
-];
-
-postsRouter.get("/", [...postQueryInputValidator], postsController.getPosts);
-postsRouter.get("/:id", postsController.getPost);
-postsRouter.post(
-  "/",
-  [...postBodyInputMiddlewares],
-  postsController.createPost
-);
-postsRouter.put(
-  "/:id",
-  [...postBodyInputMiddlewares],
-  postsController.updatePost
-);
-postsRouter.delete("/:id", authorizationMiddleware, postsController.deletePost);
-
-export default postsRouter;
+export default postsController;

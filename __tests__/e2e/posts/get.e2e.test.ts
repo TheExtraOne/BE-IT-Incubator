@@ -165,4 +165,83 @@ describe("GET /posts", () => {
       createdAt: expect.any(String),
     });
   });
+
+  // Query parameters validation
+  it("should return 400 when pageNumber is not an integer", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?pageNumber=1.5`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Should be an integer",
+        field: "pageNumber",
+      },
+    ]);
+  });
+
+  it("should return 400 when pageNumber is less than 1", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?pageNumber=0`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Minimum allowed value is 1",
+        field: "pageNumber",
+      },
+    ]);
+  });
+
+  it("should return 400 when pageSize is not an integer", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?pageSize=1.5`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Should be an integer",
+        field: "pageSize",
+      },
+    ]);
+  });
+
+  it("should return 400 when pageSize is less than 1", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?pageSize=0`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Minimum allowed value is 1",
+        field: "pageSize",
+      },
+    ]);
+  });
+
+  it("should return 400 when sortBy is empty", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?sortBy=`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Can't be an empty string",
+        field: "sortBy",
+      },
+    ]);
+  });
+
+  it("should return 400 when sortDirection has invalid value", async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}?sortDirection=invalid`)
+      .expect(STATUS.BAD_REQUEST_400);
+
+    expect(res.body.errorsMessages).toEqual([
+      {
+        message: "Should be 'asc' or 'desc'",
+        field: "sortDirection",
+      },
+    ]);
+  });
 });

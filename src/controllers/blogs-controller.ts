@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import blogsService from "../domain/blogs-service";
 import {
@@ -18,15 +18,6 @@ import {
   TQueryBlogModel,
   TQueryPostModel,
 } from "./models";
-import {
-  authorizationMiddleware,
-  blogBodyInputValidator,
-  inputCheckErrorsMiddleware,
-  postsBodyInputValidator,
-  queryInputValidator,
-} from "../middleware";
-
-const blogsRouter = Router({});
 
 const blogsController = {
   getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
@@ -155,52 +146,4 @@ const blogsController = {
   },
 };
 
-const blogBodyInputMiddlewares = [
-  authorizationMiddleware,
-  ...Object.values(blogBodyInputValidator),
-  inputCheckErrorsMiddleware,
-];
-const postBodyInputMiddlewares = [
-  authorizationMiddleware,
-  postsBodyInputValidator.contentValidator,
-  postsBodyInputValidator.shortDescriptionValidation,
-  postsBodyInputValidator.titleValidation,
-  inputCheckErrorsMiddleware,
-];
-const blogQueryInputValidator = [
-  ...Object.values(queryInputValidator),
-  inputCheckErrorsMiddleware,
-];
-const postQueryInputValidator = [
-  queryInputValidator.pageNumberValidator,
-  queryInputValidator.pageSizeValidator,
-  queryInputValidator.sortByValidator,
-  queryInputValidator.sortDirectionValidator,
-  inputCheckErrorsMiddleware,
-];
-
-blogsRouter.get("/", [...blogQueryInputValidator], blogsController.getBlogs);
-blogsRouter.get("/:id", blogsController.getBlog);
-blogsRouter.get(
-  "/:id/posts",
-  [...postQueryInputValidator],
-  blogsController.getAllPostsForBlogById
-);
-blogsRouter.post(
-  "/:id/posts",
-  [...postBodyInputMiddlewares],
-  blogsController.createPostForBlogId
-);
-blogsRouter.post(
-  "/",
-  [...blogBodyInputMiddlewares],
-  blogsController.createBlog
-);
-blogsRouter.put(
-  "/:id",
-  [...blogBodyInputMiddlewares],
-  blogsController.updateBlog
-);
-blogsRouter.delete("/:id", authorizationMiddleware, blogsController.deleteBlog);
-
-export default blogsRouter;
+export default blogsController;

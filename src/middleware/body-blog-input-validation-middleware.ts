@@ -27,14 +27,10 @@ const bodyBlogInputValidator = {
     .withMessage("WebsiteUrl is a required field")
     .isLength({ min: 1, max: 100 })
     .withMessage("Incorrect length. Min = 1, max = 100")
-    .custom((value) => {
-      const regex =
-        /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-      const isMatching = regex.test(value);
-
-      if (!isMatching) throw new Error("Incorrect URL value");
-      return isMatching;
-    }),
+    .matches(
+      /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
+    )
+    .withMessage("Incorrect URL value"),
 };
 
 export default bodyBlogInputValidator;

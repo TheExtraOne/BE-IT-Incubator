@@ -1,9 +1,14 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../settings";
-import { TBlogRepViewModel, TPostRepViewModel } from "./models";
+import {
+  TBlogRepViewModel,
+  TPostRepViewModel,
+  TUserRepViewModel,
+} from "./models";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
+export let userCollection: Collection<TUserRepViewModel>;
 export let client: MongoClient;
 
 export const connectToDb = async (url: string): Promise<boolean> => {
@@ -11,10 +16,13 @@ export const connectToDb = async (url: string): Promise<boolean> => {
   const db: Db = client.db(SETTINGS.DB_NAME);
 
   blogCollection = db.collection<TBlogRepViewModel>(
-    SETTINGS.BLOG_COLLECTION_NAME
+    SETTINGS.COLLECTION_NAMES.BLOGS
   );
   postCollection = db.collection<TPostRepViewModel>(
-    SETTINGS.POST_COLLECTION_NAME
+    SETTINGS.COLLECTION_NAMES.POSTS
+  );
+  userCollection = db.collection<TUserRepViewModel>(
+    SETTINGS.COLLECTION_NAMES.USERS
   );
 
   try {

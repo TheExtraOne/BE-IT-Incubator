@@ -2,41 +2,54 @@ import { Router } from "express";
 import {
   authorizationMiddleware,
   inputCheckErrorsMiddleware,
-  postsBodyInputValidator,
+  bodyPostsInputValidator,
   queryInputValidator,
 } from "../middleware";
 import postsController from "./posts-controller";
 
 const postsRouter = Router({});
 
-const postBodyInputMiddlewares = [
-  authorizationMiddleware,
-  postsBodyInputValidator.titleValidation,
-  postsBodyInputValidator.shortDescriptionValidation,
-  postsBodyInputValidator.contentValidator,
-  postsBodyInputValidator.blogIdValidator,
-  inputCheckErrorsMiddleware,
-];
-const postQueryInputValidator = [
+const getAllPostsMiddleware = [
   queryInputValidator.pageNumberValidator,
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
   inputCheckErrorsMiddleware,
 ];
+const getPostByIdMiddleware = [inputCheckErrorsMiddleware];
+const createPostMiddleware = [
+  authorizationMiddleware,
+  bodyPostsInputValidator.titleValidation,
+  bodyPostsInputValidator.shortDescriptionValidation,
+  bodyPostsInputValidator.contentValidator,
+  bodyPostsInputValidator.blogIdValidator,
+  inputCheckErrorsMiddleware,
+];
+const updatePostByIdMiddleware = [
+  authorizationMiddleware,
+  bodyPostsInputValidator.titleValidation,
+  bodyPostsInputValidator.shortDescriptionValidation,
+  bodyPostsInputValidator.contentValidator,
+  bodyPostsInputValidator.blogIdValidator,
+  inputCheckErrorsMiddleware,
+];
+const deletePostByIdMiddleware = [
+  authorizationMiddleware,
+  inputCheckErrorsMiddleware,
+];
 
-postsRouter.get("/", [...postQueryInputValidator], postsController.getPosts);
-postsRouter.get("/:id", postsController.getPost);
-postsRouter.post(
-  "/",
-  [...postBodyInputMiddlewares],
-  postsController.createPost
-);
+postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
+postsRouter.get("/:id", [...getPostByIdMiddleware], postsController.getPost);
+postsRouter.post("/", [...createPostMiddleware], postsController.createPost);
 postsRouter.put(
   "/:id",
-  [...postBodyInputMiddlewares],
+  [...updatePostByIdMiddleware],
   postsController.updatePost
 );
-postsRouter.delete("/:id", authorizationMiddleware, postsController.deletePost);
+postsRouter.delete(
+  "/:id",
+  [...deletePostByIdMiddleware],
+  postsController.deletePost
+);
 
 export default postsRouter;

@@ -3,6 +3,7 @@ import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
+  incorrectId,
   req,
   userCredentials,
 } from "../helpers";
@@ -68,7 +69,9 @@ describe("GET /posts", () => {
       ]);
     });
     it("should return 404 in case if id was passed, but the db is empty", async () => {
-      await req.get(`${SETTINGS.PATH.POSTS}/1`).expect(STATUS.NOT_FOUND_404);
+      await req
+        .get(`${SETTINGS.PATH.POSTS}/678619d10375b7522f04da0e`)
+        .expect(STATUS.NOT_FOUND_404);
     });
 
     it("should return 404 in case if id is not matching the db", async () => {
@@ -86,7 +89,9 @@ describe("GET /posts", () => {
         .send({ ...correctPostBodyParams, blogId })
         .expect(STATUS.CREATED_201);
 
-      await req.get(`${SETTINGS.PATH.POSTS}/-1`).expect(STATUS.NOT_FOUND_404);
+      await req
+        .get(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
+        .expect(STATUS.NOT_FOUND_404);
     });
 
     it("should return 200 and a post (with id, title, shortDescription, content, blogId, createdAt and blogName) in case if id is matching the db", async () => {

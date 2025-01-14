@@ -1,5 +1,10 @@
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBlogBodyParams, req, userCredentials } from "../helpers";
+import {
+  correctBlogBodyParams,
+  incorrectId,
+  req,
+  userCredentials,
+} from "../helpers";
 import { client, connectToDb } from "../../../src/repository/db";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
@@ -54,7 +59,9 @@ describe("GET /blogs", () => {
     });
 
     it("should return 404 in case if id was passed, but the db is empty", async () => {
-      await req.get(`${SETTINGS.PATH.BLOGS}/1`).expect(STATUS.NOT_FOUND_404);
+      await req
+        .get(`${SETTINGS.PATH.BLOGS}/678619d10375b7522f04da0e`)
+        .expect(STATUS.NOT_FOUND_404);
     });
 
     it("should return 404 in case if id is not matching the db", async () => {
@@ -64,7 +71,9 @@ describe("GET /blogs", () => {
         .send(correctBlogBodyParams)
         .expect(STATUS.CREATED_201);
 
-      await req.get(`${SETTINGS.PATH.BLOGS}/-1`).expect(STATUS.NOT_FOUND_404);
+      await req
+        .get(`${SETTINGS.PATH.BLOGS}/${incorrectId}`)
+        .expect(STATUS.NOT_FOUND_404);
     });
 
     it("should return 200 and blog (with id, name, description, websiteUrl,createdAt and isMembership) in case if id is matching the db", async () => {

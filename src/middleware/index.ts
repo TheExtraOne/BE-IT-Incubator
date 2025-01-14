@@ -1,13 +1,15 @@
 import authorizationMiddleware from "./authorization-middleware";
-import blogBodyInputValidator from "./blog-body-input-validation-middleware";
+import bodyBlogInputValidator from "./body-blog-input-validation-middleware";
 import inputCheckErrorsMiddleware from "./input-check-errors-middleware";
-import postsBodyInputValidator from "./post-body-input-validation-middleware";
+import bodyPostsInputValidator from "./body-post-input-validation-middleware";
 import queryInputValidator from "./query-input-validation-middleware";
+import paramObjectIdValidator from "./param-object-id-validator";
 
 export {
   authorizationMiddleware,
-  blogBodyInputValidator,
+  bodyBlogInputValidator,
   inputCheckErrorsMiddleware,
-  postsBodyInputValidator,
+  bodyPostsInputValidator,
   queryInputValidator,
+  paramObjectIdValidator,
 };

@@ -43,10 +43,10 @@ Testing (`tests`):
 
 ## Development Scripts
 
-`yarn watch`: TypeScript compilation in watch mode
-`yarn dev`: Run development server with debugging
-`yarn jest`: Run tests in isolation
-`yarn jest:coverage`: Generate test coverage reports
+- `yarn watch`: TypeScript compilation in watch mode
+- `yarn dev`: Run development server with debugging
+- `yarn jest`: Run tests in isolation
+- `yarn jest:coverage`: Generate test coverage reports
 
 ## TODO
 

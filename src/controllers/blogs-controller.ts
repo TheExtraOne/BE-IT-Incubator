@@ -85,7 +85,7 @@ const blogsController = {
 
   createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog: TBlogViewModel = await blogsService.createBlog({
+    const newBlog: TBlogViewModel | null = await blogsService.createBlog({
       name,
       description,
       websiteUrl,

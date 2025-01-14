@@ -3,6 +3,7 @@ import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
+  incorrectId,
   req,
   userCredentials,
 } from "../helpers";
@@ -120,7 +121,7 @@ describe("GET /blogs/:id/posts", () => {
   describe("Blog posts retrieval", () => {
     it("should return 404 if blog id does not exist", async () => {
       await req
-        .get(`${SETTINGS.PATH.BLOGS}/nonexistentid/posts`)
+        .get(`${SETTINGS.PATH.BLOGS}/${incorrectId}/posts`)
         .expect(STATUS.NOT_FOUND_404);
     });
 

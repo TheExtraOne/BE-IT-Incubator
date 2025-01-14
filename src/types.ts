@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { SORT_DIRECTION } from "./settings";
 
 export type TRequestWithBody<T> = Request<{}, {}, T>;
 export type TRequestWithParams<T> = Request<T>;
@@ -22,7 +23,7 @@ export type TResponseWithPagination<T> = {
   items: T;
 };
 
-export type TSortDirection = "asc" | "desc";
+export type TSortDirection = SORT_DIRECTION.ASC | SORT_DIRECTION.DESC;
 
 export type TSorting = {
   sortBy: string;

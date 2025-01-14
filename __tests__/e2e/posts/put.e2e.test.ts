@@ -2,6 +2,7 @@ import { client, connectToDb } from "../../../src/repository/db";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
+  incorrectId,
   req,
   userCredentials,
 } from "../helpers";
@@ -97,7 +98,7 @@ describe("PUT /posts", () => {
     // Id matching
     it("should return 404 in case if id is not matching the db", async () => {
       await req
-        .put(`${SETTINGS.PATH.POSTS}/-1`)
+        .put(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .send(newBodyParams)
         .expect(STATUS.NOT_FOUND_404);
@@ -403,7 +404,7 @@ describe("PUT /posts", () => {
         errorsMessages: [
           {
             field: "blogId",
-            message: "BlogId is a required field",
+            message: "Incorrect type",
           },
         ],
       });
@@ -418,7 +419,7 @@ describe("PUT /posts", () => {
     it("should return 400 and error if blogId does not match the db", async () => {
       const bodyParams = {
         ...newBodyParams,
-        blogId: "BlogId",
+        blogId: incorrectId,
       };
 
       const { body } = await req
@@ -447,7 +448,7 @@ describe("PUT /posts", () => {
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
       const bodyParams = {
         ...newBodyParams,
-        blogId: "BlogId",
+        blogId: incorrectId,
         content: "",
       };
 

@@ -1,10 +1,10 @@
+import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../settings";
 import { TSorting } from "../types";
 import { postCollection } from "./db";
 import TPostRepViewModel from "./models/PostRepViewModel";
 
 type TNewPost = {
-  id: string;
   title: string;
   shortDescription: string;
   content: string;
@@ -21,10 +21,7 @@ type TSkipsLimits = {
 const postsRepository = {
   getPostsCount: async (
     filter: Record<string, string> | undefined = {}
-  ): Promise<number> => {
-    // return await postCollection.count(filter);
-    return await postCollection.countDocuments(filter);
-  },
+  ): Promise<number> => await postCollection.countDocuments(filter),
 
   getAllPosts: async ({
     postsToSkip,
@@ -43,13 +40,17 @@ const postsRepository = {
       .limit(pageSize)
       .toArray(),
 
-  getPostById: async (id: string): Promise<TPostRepViewModel | null> =>
-    await postCollection.findOne({ id }),
+  getPostById: async (id: string): Promise<TPostRepViewModel | null> => {
+    if (!ObjectId.isValid(id)) return null;
+    return await postCollection.findOne({ _id: new ObjectId(id) });
+  },
 
-  createPost: async (newPost: TNewPost): Promise<TPostRepViewModel> => {
-    await postCollection.insertOne(newPost);
+  createPost: async (newPost: TNewPost): Promise<string> => {
+    const { insertedId } = await postCollection.insertOne(
+      newPost as TPostRepViewModel
+    );
 
-    return newPost;
+    return insertedId.toString();
   },
 
   updatePostById: async ({
@@ -65,8 +66,9 @@ const postsRepository = {
     content: string;
     blogId: string;
   }): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
     const { matchedCount } = await postCollection.updateOne(
-      { id },
+      { _id: new ObjectId(id) },
       { $set: { title, shortDescription, content, blogId } }
     );
 
@@ -74,7 +76,10 @@ const postsRepository = {
   },
 
   deletePostById: async (id: string): Promise<boolean> => {
-    const { deletedCount } = await postCollection.deleteOne({ id });
+    if (!ObjectId.isValid(id)) return false;
+    const { deletedCount } = await postCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
     return !!deletedCount;
   },

@@ -3,6 +3,7 @@ import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
+  incorrectId,
   req,
   userCredentials,
 } from "../helpers";
@@ -68,7 +69,7 @@ describe("DELETE /posts", () => {
   describe("Deleting", () => {
     it("should return 404 if id is not matching", async () => {
       await req
-        .delete(`${SETTINGS.PATH.POSTS}/-1`)
+        .delete(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .expect(STATUS.NOT_FOUND_404);
 

@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import blogsRepository from "../repository/blogs-db-repository";
 
-const postsBodyInputValidator = {
+const bodyPostsInputValidator = {
   titleValidation: body("title")
     .isString()
     .withMessage("Incorrect type")
@@ -30,11 +30,8 @@ const postsBodyInputValidator = {
     .withMessage("Incorrect length. Min = 1, max = 1000"),
 
   blogIdValidator: body("blogId")
-    .isString()
+    .isMongoId()
     .withMessage("Incorrect type")
-    .trim()
-    .notEmpty()
-    .withMessage("BlogId is a required field")
     .custom(async (value) => {
       const isBlogExist = await blogsRepository.getBlogById(value);
 
@@ -43,4 +40,4 @@ const postsBodyInputValidator = {
     }),
 };
 
-export default postsBodyInputValidator;
+export default bodyPostsInputValidator;

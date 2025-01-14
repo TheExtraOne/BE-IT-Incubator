@@ -1,61 +1,60 @@
 import { Router } from "express";
 import {
   authorizationMiddleware,
-  blogBodyInputValidator,
+  bodyBlogInputValidator,
   inputCheckErrorsMiddleware,
-  postsBodyInputValidator,
+  bodyPostsInputValidator,
   queryInputValidator,
 } from "../middleware";
 import blogsController from "./blogs-controller";
 
 const blogsRouter = Router({});
 
-const blogBodyInputMiddlewares = [
-  authorizationMiddleware,
-  ...Object.values(blogBodyInputValidator),
-  inputCheckErrorsMiddleware,
-];
-const postBodyInputMiddlewares = [
-  authorizationMiddleware,
-  postsBodyInputValidator.contentValidator,
-  postsBodyInputValidator.shortDescriptionValidation,
-  postsBodyInputValidator.titleValidation,
-  inputCheckErrorsMiddleware,
-];
-const blogQueryInputValidator = [
+const getAllBlogsMiddleWares = [
   ...Object.values(queryInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const postQueryInputValidator = [
+const getBlogByIdMiddleware = [inputCheckErrorsMiddleware];
+const getAllPostsForBlogIdMiddleware = [
   queryInputValidator.pageNumberValidator,
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
   inputCheckErrorsMiddleware,
 ];
+const createPostForBlogIdMiddleware = [
+  authorizationMiddleware,
+  bodyPostsInputValidator.contentValidator,
+  bodyPostsInputValidator.shortDescriptionValidation,
+  bodyPostsInputValidator.titleValidation,
+  inputCheckErrorsMiddleware,
+];
+const createBlogMiddleware = [
+  authorizationMiddleware,
+  ...Object.values(bodyBlogInputValidator),
+  inputCheckErrorsMiddleware,
+];
+const updateBlogById = [
+  authorizationMiddleware,
+  ...Object.values(bodyBlogInputValidator),
+  inputCheckErrorsMiddleware,
+];
+const deleteBlogById = [authorizationMiddleware, inputCheckErrorsMiddleware];
 
-blogsRouter.get("/", [...blogQueryInputValidator], blogsController.getBlogs);
-blogsRouter.get("/:id", blogsController.getBlog);
+blogsRouter.get("/", [...getAllBlogsMiddleWares], blogsController.getBlogs);
+blogsRouter.get("/:id", [...getBlogByIdMiddleware], blogsController.getBlog);
 blogsRouter.get(
   "/:id/posts",
-  [...postQueryInputValidator],
+  [...getAllPostsForBlogIdMiddleware],
   blogsController.getAllPostsForBlogById
 );
 blogsRouter.post(
   "/:id/posts",
-  [...postBodyInputMiddlewares],
+  [...createPostForBlogIdMiddleware],
   blogsController.createPostForBlogId
 );
-blogsRouter.post(
-  "/",
-  [...blogBodyInputMiddlewares],
-  blogsController.createBlog
-);
-blogsRouter.put(
-  "/:id",
-  [...blogBodyInputMiddlewares],
-  blogsController.updateBlog
-);
-blogsRouter.delete("/:id", authorizationMiddleware, blogsController.deleteBlog);
+blogsRouter.post("/", [...createBlogMiddleware], blogsController.createBlog);
+blogsRouter.put("/:id", [...updateBlogById], blogsController.updateBlog);
+blogsRouter.delete("/:id", [...deleteBlogById], blogsController.deleteBlog);
 
 export default blogsRouter;

@@ -2,6 +2,7 @@ import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
+  incorrectId,
   req,
   userCredentials,
 } from "../helpers";
@@ -335,7 +336,7 @@ describe("POST /posts", () => {
         errorsMessages: [
           {
             field: "blogId",
-            message: "BlogId is a required field",
+            message: "Incorrect type",
           },
         ],
       });
@@ -347,7 +348,7 @@ describe("POST /posts", () => {
     it("should return 400 and error if blogId does not match the db", async () => {
       const bodyParams = {
         ...correctPostBodyParams,
-        blogId: "BlogId",
+        blogId: incorrectId,
       };
 
       const { body } = await req
@@ -373,7 +374,7 @@ describe("POST /posts", () => {
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
       const bodyParams = {
         ...correctPostBodyParams,
-        blogId: "BlogId",
+        blogId: incorrectId,
         content: "",
       };
 

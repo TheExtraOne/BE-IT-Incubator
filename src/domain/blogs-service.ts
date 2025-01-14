@@ -6,7 +6,7 @@ import { TPages, TResponseWithPagination, TSorting } from "../types";
 type TSearchParam = { searchNameTerm: string | null };
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogViewModel => ({
-  id: blog.id,
+  id: blog._id.toString(),
   name: blog.name,
   description: blog.description,
   websiteUrl: blog.websiteUrl,
@@ -64,18 +64,18 @@ const blogsService = {
     name: string;
     description: string;
     websiteUrl: string;
-  }): Promise<TBlogViewModel> => {
-    const newBlog: TBlogViewModel = {
-      id: `${Date.now() + Math.random()}`,
+  }): Promise<TBlogViewModel | null> => {
+    const newBlog: Omit<TBlogViewModel, "id"> = {
       name,
       description,
       websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    const createdBlog = await blogsRepository.createBlog(newBlog);
+    const insertedId = await blogsRepository.createBlog(newBlog);
+    const createdBlog = await blogsService.getBlogById(insertedId);
 
-    return mapBlog(createdBlog);
+    return createdBlog;
   },
 
   updateBlogById: async ({

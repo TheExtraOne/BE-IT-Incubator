@@ -3,7 +3,9 @@ import { connectToDb } from "./repository/db";
 import { SETTINGS } from "./settings";
 
 const startApp = async () => {
-  await connectToDb(SETTINGS.MONGO_URL);
+  const isSuccessful = await connectToDb(SETTINGS.MONGO_URL);
+  if (!isSuccessful) process.exit(1);
+
   app.listen(SETTINGS.PORT, () => {
     console.log("...server started in port " + SETTINGS.PORT);
   });

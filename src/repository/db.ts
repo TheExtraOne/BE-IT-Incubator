@@ -7,7 +7,7 @@ export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
 export let client: MongoClient;
 
-export const connectToDb = async (url: string) => {
+export const connectToDb = async (url: string): Promise<boolean> => {
   client = new MongoClient(url);
   const db: Db = client.db(SETTINGS.DB_NAME);
 
@@ -21,8 +21,10 @@ export const connectToDb = async (url: string) => {
   try {
     await client.connect();
     console.log("Successful connected to db");
+    return true;
   } catch (e) {
     console.log(`Can not connect to db. ${e}`);
     await client.close();
+    return false;
   }
 };

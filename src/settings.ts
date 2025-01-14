@@ -24,4 +24,7 @@ export const STATUS = {
   UNAUTHORIZED_401: 401,
 };
 
-export const SORT_DIRECTION = { ASC: "asc", DESC: "desc" } as const;
+export enum SORT_DIRECTION {
+  ASC = "asc",
+  DESC = "desc",
+}

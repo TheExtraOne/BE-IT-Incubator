@@ -1,12 +1,6 @@
-type TBlogRepViewModel = {
-  /**
-   * _id of the blog in DB
-   */
-  _id?: string;
-  /**
-   * id of the blog
-   */
-  id: string;
+import { WithId, OptionalUnlessRequiredId } from "mongodb";
+
+type TBlogRepViewModel = WithId<{
   /**
    * name of the blog
    */
@@ -27,6 +21,6 @@ type TBlogRepViewModel = {
    * Flag if user has not expired membership subscription to blog
    */
   isMembership: boolean;
-};
+}>;
 
 export default TBlogRepViewModel;

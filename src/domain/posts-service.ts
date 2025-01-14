@@ -6,7 +6,7 @@ import { TPages, TResponseWithPagination, TSorting } from "../types";
 import { TPostViewModel } from "./models";
 
 const mapPost = (post: TPostRepViewModel): TPostViewModel => ({
-  id: post.id,
+  id: post._id.toString(),
   title: post.title,
   shortDescription: post.shortDescription,
   content: post.content,
@@ -112,7 +112,6 @@ const postsService = {
     if (!blog) return null;
 
     const newPost = {
-      id: `${Date.now() + Math.random()}`,
       title,
       shortDescription,
       content,
@@ -120,11 +119,10 @@ const postsService = {
       blogName: blog.name,
       createdAt: new Date().toISOString(),
     };
-    const createdPost: TPostRepViewModel = await postsRepository.createPost(
-      newPost
-    );
+    const insertedId = await postsRepository.createPost(newPost);
+    const createdPost = await postsService.getPostById(insertedId);
 
-    return mapPost(createdPost);
+    return createdPost;
   },
 
   updatePostById: async ({

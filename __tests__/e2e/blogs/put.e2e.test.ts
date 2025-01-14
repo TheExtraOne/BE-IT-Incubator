@@ -1,7 +1,12 @@
 import { TBlogInputModel } from "../../../src/controllers/models";
 import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBlogBodyParams, req, userCredentials } from "../helpers";
+import {
+  correctBlogBodyParams,
+  incorrectId,
+  req,
+  userCredentials,
+} from "../helpers";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 const newBodyParams: TBlogInputModel = {
@@ -78,7 +83,7 @@ describe("PUT /blogs", () => {
     // Id matching
     it("should return 404 in case if id is not matching the db", async () => {
       await req
-        .put(`${SETTINGS.PATH.BLOGS}/-1`)
+        .put(`${SETTINGS.PATH.BLOGS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .send(newBodyParams)
         .expect(STATUS.NOT_FOUND_404);

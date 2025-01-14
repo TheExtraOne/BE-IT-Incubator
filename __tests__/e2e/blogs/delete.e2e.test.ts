@@ -1,6 +1,11 @@
 import { client, connectToDb } from "../../../src/repository/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
-import { correctBlogBodyParams, req, userCredentials } from "../helpers";
+import {
+  correctBlogBodyParams,
+  incorrectId,
+  req,
+  userCredentials,
+} from "../helpers";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("DELETE /blogs", () => {
@@ -54,7 +59,7 @@ describe("DELETE /blogs", () => {
   describe("Deleting blog", () => {
     it("should return 404 if id is not matching", async () => {
       await req
-        .delete(`${SETTINGS.PATH.BLOGS}/-1`)
+        .delete(`${SETTINGS.PATH.BLOGS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .expect(STATUS.NOT_FOUND_404);
 

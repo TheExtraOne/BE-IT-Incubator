@@ -1,12 +1,6 @@
-type TPostRepViewModel = {
-  /**
-   * _id in DB of the post
-   */
-  _id?: string;
-  /**
-   * id of the post
-   */
-  id: string;
+import { WithId, OptionalUnlessRequiredId } from "mongodb";
+
+type TPostRepViewModel = WithId<{
   /**
    * title of the post
    */
@@ -31,6 +25,6 @@ type TPostRepViewModel = {
    * Date of creating in ISO format
    */
   createdAt: string;
-};
+}>;
 
 export default TPostRepViewModel;

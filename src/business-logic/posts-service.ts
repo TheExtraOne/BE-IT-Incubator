@@ -1,7 +1,7 @@
 import { TBlogRepViewModel, TPostRepViewModel } from "../data-access/models";
 import postsRepository from "../data-access/command-repository/posts-repository";
 import { TPages, TResponseWithPagination, TSorting } from "../types";
-import { TPostServiceViewModel } from "./models";
+import { TPostServiceInputModel, TPostServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
 import postsQueryRepository from "../data-access/query-repository/posts-query-repository";
@@ -104,12 +104,7 @@ const postsService = {
     shortDescription,
     content,
     blogId,
-  }: {
-    title: string;
-    shortDescription: string;
-    content: string;
-    blogId: string;
-  }): Promise<TPostServiceViewModel | null> => {
+  }: TPostServiceInputModel): Promise<TPostServiceViewModel | null> => {
     const blog: TBlogRepViewModel | null =
       await blogsQueryRepository.getBlogById(blogId);
     if (!blog) return null;

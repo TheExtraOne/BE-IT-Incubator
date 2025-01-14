@@ -1,4 +1,4 @@
-import { TBlogInputModel } from "../../../src/api/models";
+import { TBlogControllerInputModel } from "../../../src/api/models";
 import { client, connectToDb } from "../../../src/data-access/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../helpers";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-const newBodyParams: TBlogInputModel = {
+const newBodyParams: TBlogControllerInputModel = {
   name: "New name",
   description: "New description",
   websiteUrl: "https://refactoring.guru",

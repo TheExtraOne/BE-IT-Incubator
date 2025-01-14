@@ -1,9 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { SETTINGS, STATUS } from "./settings";
-import blogsRouter from "./api/blogs-router";
-import postsRouter from "./api/posts-router";
-import testingRouter from "./api/testing";
+import { blogsRouter, postsRouter, testingRouter, usersRouter } from "./api";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +13,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);
 app.use(SETTINGS.PATH.POSTS, postsRouter);
+app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.TESTING, testingRouter);
 
 export default app;

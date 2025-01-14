@@ -52,8 +52,10 @@ Testing (`tests`):
 
 - [+] Remove old generated ids with if of the mongo db
 - [+] Refactor DAL: add query repository
-- [ ] Log in
-- [ ] CRUD for user
+- [ ] CRUD for user: get All
+- [+] CRUD for user: create
+- [ ] CRUD for user: delete
 - [ ] Add Pagination for users
 - [ ] Add Sorting for users
+- [ ] Log in
 - [ ] Update tests

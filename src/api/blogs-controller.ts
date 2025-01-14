@@ -11,7 +11,7 @@ import {
 } from "../types";
 import postsService from "../business-logic/posts-service";
 import {
-  TBlogInputModel,
+  TBlogControllerInputModel,
   TBlogControllerViewModel,
   TPathParamsBlogModel,
   TPostControllerViewModel,
@@ -80,7 +80,10 @@ const blogsController = {
     res.status(STATUS.OK_200).json(posts);
   },
 
-  createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
+  createBlog: async (
+    req: TRequestWithBody<TBlogControllerInputModel>,
+    res: Response
+  ) => {
     const { name, description, websiteUrl } = req.body;
     const newBlog: TBlogControllerViewModel = await blogsService.createBlog({
       name,
@@ -116,7 +119,10 @@ const blogsController = {
   },
 
   updateBlog: async (
-    req: TRequestWithParamsAndBody<TPathParamsBlogModel, TBlogInputModel>,
+    req: TRequestWithParamsAndBody<
+      TPathParamsBlogModel,
+      TBlogControllerInputModel
+    >,
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;

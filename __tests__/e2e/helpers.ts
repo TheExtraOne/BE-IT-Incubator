@@ -1,7 +1,7 @@
 import { agent } from "supertest";
 import { SETTINGS } from "../../src/settings";
 import app from "../../src/app";
-import { TBlogInputModel } from "../../src/api/models";
+import { TBlogControllerInputModel } from "../../src/api/models";
 import { getEncodedCredentials } from "../../src/middleware/authorization-middleware";
 
 export const userCredentials = {
@@ -11,7 +11,7 @@ export const userCredentials = {
 
 export const req = agent(app);
 
-export const correctBlogBodyParams: TBlogInputModel = {
+export const correctBlogBodyParams: TBlogControllerInputModel = {
   name: "Refactor Guru",
   description: "Best refactoring practice and design patterns",
   websiteUrl: "https://refactoring.guru",

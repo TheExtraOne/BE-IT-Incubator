@@ -1,4 +1,4 @@
-type TBlogInputModel = {
+type TBlogServiceInputModel = {
   /**
    * name of the blog
    */
@@ -13,4 +13,4 @@ type TBlogInputModel = {
   websiteUrl: string;
 };
 
-export default TBlogInputModel;
+export default TBlogServiceInputModel;

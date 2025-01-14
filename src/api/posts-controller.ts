@@ -10,7 +10,7 @@ import {
 } from "../types";
 import {
   TPathParamsPostModel,
-  TPostInputModel,
+  TPostControllerInputModel,
   TPostControllerViewModel,
   TQueryPostModel,
 } from "./models";
@@ -46,7 +46,10 @@ const postsController = {
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  createPost: async (req: TRequestWithBody<TPostInputModel>, res: Response) => {
+  createPost: async (
+    req: TRequestWithBody<TPostControllerInputModel>,
+    res: Response
+  ) => {
     const { title, shortDescription, content, blogId } = req.body;
 
     const newPost: TPostControllerViewModel | null =
@@ -61,7 +64,10 @@ const postsController = {
   },
 
   updatePost: async (
-    req: TRequestWithParamsAndBody<TPathParamsPostModel, TPostInputModel>,
+    req: TRequestWithParamsAndBody<
+      TPathParamsPostModel,
+      TPostControllerInputModel
+    >,
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;

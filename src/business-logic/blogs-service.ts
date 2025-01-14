@@ -2,7 +2,7 @@ import blogsRepository from "../data-access/command-repository/blogs-repository"
 import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
 import { TPages, TResponseWithPagination, TSorting } from "../types";
 import { TBlogRepViewModel } from "../data-access/models";
-import { TBlogServiceViewModel } from "./models";
+import { TBlogServiceInputModel, TBlogServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 
 type TSearchParam = { searchNameTerm: string | null };
@@ -62,11 +62,7 @@ const blogsService = {
     name,
     description,
     websiteUrl,
-  }: {
-    name: string;
-    description: string;
-    websiteUrl: string;
-  }): Promise<TBlogServiceViewModel> => {
+  }: TBlogServiceInputModel): Promise<TBlogServiceViewModel> => {
     const newBlog: TBlogRepViewModel = {
       _id: new ObjectId(),
       name,

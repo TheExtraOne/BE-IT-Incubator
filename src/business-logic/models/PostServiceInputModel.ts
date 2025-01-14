@@ -1,4 +1,4 @@
-type TPostInputModel = {
+type TPostServiceInputModel = {
   /**
    * title of the post
    */
@@ -17,4 +17,4 @@ type TPostInputModel = {
   blogId: string;
 };
 
-export default TPostInputModel;
+export default TPostServiceInputModel;

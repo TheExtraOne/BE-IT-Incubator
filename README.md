@@ -29,10 +29,10 @@ This repository is a Blogger Platform REST API. The project follows a clean arch
 The `src` directory contains the core components of our application:
 
 - `middleware`: Authorization, validation, and error handling.
-- `controllers`: Handle HTTP requests/responses with separate routers for blogs and posts.
-- `domain`: Business logic services for blogs and posts.
-- `repository`: MongoDB data access layer.
-- `models`: Separate models for different layers (controller, domain, repository).
+- `api`: Handle HTTP requests/responses with separate routers and controllers for blogs and posts.
+- `business-logic`: Services for blogs and posts.
+- `data-access`: MongoDB data access layer (command and query repository).
+- `models`: Separate models for different layers (controller, bll, repository).
 
 Testing (`tests`):
 
@@ -50,14 +50,10 @@ Testing (`tests`):
 
 ## TODO
 
-- [+] Add business layer (service) fro blogs
-- [+] Add business layer (service) fro posts
-- [+] Add Pagination for blogs
-- [+] Add Pagination for posts
-- [+] Add Sorting to Pagination for blogs
-- [+] Add Sorting to Pagination for posts
-- [+] Add SearchNameTerm for blogs (register doesn't matter)
-- [+] Create a new endpoint POST - blogs/{id}/posts (for creating post for a specific blog)
-- [+] Create a new endpoint GET - blogs/{id}/posts (for getting posts for a specific blog)
-- [+] Add validation for query parameters in middleware
-- [+] Update tests
+- [+] Remove old generated ids with if of the mongo db
+- [+] Refactor DAL: add query repository
+- [ ] Log in
+- [ ] CRUD for user
+- [ ] Add Pagination for users
+- [ ] Add Sorting for users
+- [ ] Update tests

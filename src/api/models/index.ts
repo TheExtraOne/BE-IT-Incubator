@@ -1,19 +1,19 @@
 import TBlogInputModel from "./BlogInputModel";
-import TBlogViewModel from "./BlogViewModel";
+import TBlogControllerViewModel from "./BlogControllerViewModel";
 import TPathParamsBlogModel from "./PathParamsBlogModel";
 import TPathParamsPostModel from "./PathParamsPostModel";
 import TPostInputModel from "./PostInputModel";
-import TPostViewModel from "./PostViewModel";
+import TPostControllerViewModel from "./PostControllerViewModel";
 import TQueryBlogModel from "./QueryBlogModel";
 import TQueryPostModel from "./QueryPostModel";
 
 export {
   TBlogInputModel,
-  TBlogViewModel,
+  TBlogControllerViewModel,
   TPathParamsBlogModel,
   TPathParamsPostModel,
   TPostInputModel,
-  TPostViewModel,
+  TPostControllerViewModel,
   TQueryBlogModel,
   TQueryPostModel,
 };

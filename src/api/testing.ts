@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { STATUS } from "../settings";
-import testingRepository from "../repository/testing-repository";
+import testingRepository from "../data-access/testing-repository";
 
 const testingRouter = Router({});
 

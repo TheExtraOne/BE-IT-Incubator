@@ -1,7 +1,6 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../settings";
-import TPostRepViewModel from "./models/PostRepViewModel";
-import TBlogRepViewModel from "./models/BlogRepViewModel";
+import { TBlogRepViewModel, TPostRepViewModel } from "./models";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;

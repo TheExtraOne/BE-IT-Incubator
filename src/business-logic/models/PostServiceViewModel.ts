@@ -1,4 +1,4 @@
-type TPostViewModel = {
+type TPostServiceViewModel = {
   /**
    * id of the post
    */
@@ -29,4 +29,4 @@ type TPostViewModel = {
   createdAt: string;
 };
 
-export default TPostViewModel;
+export default TPostServiceViewModel;

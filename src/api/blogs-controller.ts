@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
-import blogsService from "../domain/blogs-service";
+import blogsService from "../business-logic/blogs-service";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -9,12 +9,12 @@ import {
   TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../types";
-import postsService from "../domain/posts-service";
+import postsService from "../business-logic/posts-service";
 import {
   TBlogInputModel,
-  TBlogViewModel,
+  TBlogControllerViewModel,
   TPathParamsBlogModel,
-  TPostViewModel,
+  TPostControllerViewModel,
   TQueryBlogModel,
   TQueryPostModel,
 } from "./models";
@@ -28,7 +28,7 @@ const blogsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const blogs: TResponseWithPagination<TBlogViewModel[] | []> =
+    const blogs: TResponseWithPagination<TBlogControllerViewModel[] | []> =
       await blogsService.getAllBlogs({
         searchNameTerm,
         pageNumber: +pageNumber,
@@ -44,9 +44,8 @@ const blogsController = {
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
-    const blog: TBlogViewModel | null = await blogsService.getBlogById(
-      req.params.id
-    );
+    const blog: TBlogControllerViewModel | null =
+      await blogsService.getBlogById(req.params.id);
 
     blog
       ? res.status(STATUS.OK_200).json(blog)
@@ -57,9 +56,7 @@ const blogsController = {
     req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
     res: Response
   ) => {
-    const isBlogIdExist = await postsService.checkIfBlogIdCorrect(
-      req.params.id
-    );
+    const isBlogIdExist = await postsService.checkIfBlogIdExist(req.params.id);
     if (!isBlogIdExist) {
       res.sendStatus(STATUS.NOT_FOUND_404);
       return;
@@ -71,7 +68,7 @@ const blogsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const posts: TResponseWithPagination<TPostViewModel[] | []> =
+    const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
       await postsService.getAllPostsForBlogById({
         blogId: req.params.id,
         pageNumber: +pageNumber,
@@ -85,7 +82,7 @@ const blogsController = {
 
   createBlog: async (req: TRequestWithBody<TBlogInputModel>, res: Response) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog: TBlogViewModel | null = await blogsService.createBlog({
+    const newBlog: TBlogControllerViewModel = await blogsService.createBlog({
       name,
       description,
       websiteUrl,
@@ -103,12 +100,13 @@ const blogsController = {
   ) => {
     const blogId = req.params.id;
     const { title, shortDescription, content } = req.body;
-    const newPost: TPostViewModel | null = await postsService.createPost({
-      title,
-      shortDescription,
-      content,
-      blogId,
-    });
+    const newPost: TPostControllerViewModel | null =
+      await postsService.createPost({
+        title,
+        shortDescription,
+        content,
+        blogId,
+      });
 
     if (!newPost) {
       res.sendStatus(STATUS.NOT_FOUND_404);

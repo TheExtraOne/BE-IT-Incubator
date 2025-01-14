@@ -1,23 +1,16 @@
 import { ObjectId } from "mongodb";
-import { SORT_DIRECTION } from "../settings";
-import { TSorting } from "../types";
-import { blogCollection } from "./db";
-import TBlogRepViewModel from "./models/BlogRepViewModel";
+import { SORT_DIRECTION } from "../../settings";
+import { TSorting } from "../../types";
+import { blogCollection } from "../db";
+import { TBlogRepViewModel } from "../models";
 
-type TNewBlog = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
 type TSearchParam = { searchNameTerm: string | null };
 type TSkipsLimits = {
   blogsToSkip: number;
   pageSize: number;
 };
 
-const blogsRepository = {
+const blogsQueryRepository = {
   getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
@@ -53,43 +46,6 @@ const blogsRepository = {
 
     return blog;
   },
-
-  createBlog: async (newBlog: TNewBlog): Promise<string> => {
-    const { insertedId } = await blogCollection.insertOne(
-      newBlog as TBlogRepViewModel
-    );
-
-    return insertedId.toString();
-  },
-
-  updateBlogById: async ({
-    id,
-    name,
-    description,
-    websiteUrl,
-  }: {
-    id: string;
-    name: string;
-    description: string;
-    websiteUrl: string;
-  }): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await blogCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { name, description, websiteUrl } }
-    );
-
-    return !!matchedCount;
-  },
-
-  deleteBlogById: async (id: string): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await blogCollection.deleteOne({
-      _id: new ObjectId(id),
-    });
-
-    return !!deletedCount;
-  },
 };
 
-export default blogsRepository;
+export default blogsQueryRepository;

@@ -1,5 +1,5 @@
-import { TBlogInputModel } from "../../../src/controllers/models";
-import { client, connectToDb } from "../../../src/repository/db";
+import { TBlogInputModel } from "../../../src/api/models";
+import { client, connectToDb } from "../../../src/data-access/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,

@@ -1,4 +1,4 @@
-import { client, connectToDb } from "../../../src/repository/db";
+import { client, connectToDb } from "../../../src/data-access/db";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,

@@ -1,11 +1,13 @@
-import blogsRepository from "../repository/blogs-db-repository";
-import TBlogRepViewModel from "../repository/models/BlogRepViewModel";
-import TBlogViewModel from "./models/BlogViewModel";
+import blogsRepository from "../data-access/command-repository/blogs-repository";
+import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
 import { TPages, TResponseWithPagination, TSorting } from "../types";
+import { TBlogRepViewModel } from "../data-access/models";
+import { TBlogServiceViewModel } from "./models";
+import { ObjectId } from "mongodb";
 
 type TSearchParam = { searchNameTerm: string | null };
 
-const mapBlog = (blog: TBlogRepViewModel): TBlogViewModel => ({
+const mapBlog = (blog: TBlogRepViewModel): TBlogServiceViewModel => ({
   id: blog._id.toString(),
   name: blog.name,
   description: blog.description,
@@ -14,7 +16,7 @@ const mapBlog = (blog: TBlogRepViewModel): TBlogViewModel => ({
   isMembership: blog.isMembership,
 });
 
-const mapBlogs = (blogs: TBlogRepViewModel[] | []): TBlogViewModel[] =>
+const mapBlogs = (blogs: TBlogRepViewModel[] | []): TBlogServiceViewModel[] =>
   blogs.map(mapBlog);
 
 const blogsService = {
@@ -25,19 +27,20 @@ const blogsService = {
     sortBy,
     sortDirection,
   }: TSearchParam & TPages & TSorting): Promise<
-    TResponseWithPagination<TBlogViewModel[] | []>
+    TResponseWithPagination<TBlogServiceViewModel[] | []>
   > => {
-    const blogsCount = await blogsRepository.getBlogsCount(searchNameTerm);
+    const blogsCount = await blogsQueryRepository.getBlogsCount(searchNameTerm);
     const pagesCount =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
-    const blogs: [] | TBlogRepViewModel[] = await blogsRepository.getAllBlogs({
-      searchNameTerm,
-      blogsToSkip,
-      pageSize,
-      sortBy,
-      sortDirection,
-    });
+    const blogs: [] | TBlogRepViewModel[] =
+      await blogsQueryRepository.getAllBlogs({
+        searchNameTerm,
+        blogsToSkip,
+        pageSize,
+        sortBy,
+        sortDirection,
+      });
 
     return {
       pagesCount,
@@ -48,10 +51,9 @@ const blogsService = {
     };
   },
 
-  getBlogById: async (id: string): Promise<TBlogViewModel | null> => {
-    const blog: TBlogRepViewModel | null = await blogsRepository.getBlogById(
-      id
-    );
+  getBlogById: async (id: string): Promise<TBlogServiceViewModel | null> => {
+    const blog: TBlogRepViewModel | null =
+      await blogsQueryRepository.getBlogById(id);
 
     return blog ? mapBlog(blog) : null;
   },
@@ -64,18 +66,18 @@ const blogsService = {
     name: string;
     description: string;
     websiteUrl: string;
-  }): Promise<TBlogViewModel | null> => {
-    const newBlog: Omit<TBlogViewModel, "id"> = {
+  }): Promise<TBlogServiceViewModel> => {
+    const newBlog: TBlogRepViewModel = {
+      _id: new ObjectId(),
       name,
       description,
       websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    const insertedId = await blogsRepository.createBlog(newBlog);
-    const createdBlog = await blogsService.getBlogById(insertedId);
+    await blogsRepository.createBlog(newBlog);
 
-    return createdBlog;
+    return mapBlog(newBlog);
   },
 
   updateBlogById: async ({

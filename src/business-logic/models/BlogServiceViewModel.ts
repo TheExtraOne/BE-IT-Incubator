@@ -1,4 +1,4 @@
-type TBlogViewModel = {
+type TBlogServiceViewModel = {
   /**
    * id of the blog
    */
@@ -25,4 +25,4 @@ type TBlogViewModel = {
   isMembership: boolean;
 };
 
-export default TBlogViewModel;
+export default TBlogServiceViewModel;

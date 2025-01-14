@@ -1,7 +1,7 @@
 import { agent } from "supertest";
 import { SETTINGS } from "../../src/settings";
 import app from "../../src/app";
-import { TBlogInputModel } from "../../src/controllers/models";
+import { TBlogInputModel } from "../../src/api/models";
 import { getEncodedCredentials } from "../../src/middleware/authorization-middleware";
 
 export const userCredentials = {

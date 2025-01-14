@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { SETTINGS, STATUS } from "./settings";
-import blogsRouter from "./controllers/blogs-router";
-import postsRouter from "./controllers/posts-router";
-import testingRouter from "./controllers/testing";
+import blogsRouter from "./api/blogs-router";
+import postsRouter from "./api/posts-router";
+import testingRouter from "./api/testing";
 
 const app = express();
 app.use(express.json());

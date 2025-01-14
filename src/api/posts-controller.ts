@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
-import postsService from "../domain/posts-service";
+import postsService from "../business-logic/posts-service";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -11,7 +11,7 @@ import {
 import {
   TPathParamsPostModel,
   TPostInputModel,
-  TPostViewModel,
+  TPostControllerViewModel,
   TQueryPostModel,
 } from "./models";
 
@@ -23,7 +23,7 @@ const postsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    const posts: TResponseWithPagination<TPostViewModel[] | []> =
+    const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
       await postsService.getAllPosts({
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -38,9 +38,8 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const post: TPostViewModel | null = await postsService.getPostById(
-      req.params.id
-    );
+    const post: TPostControllerViewModel | null =
+      await postsService.getPostById(req.params.id);
 
     post
       ? res.status(STATUS.OK_200).json(post)
@@ -50,12 +49,13 @@ const postsController = {
   createPost: async (req: TRequestWithBody<TPostInputModel>, res: Response) => {
     const { title, shortDescription, content, blogId } = req.body;
 
-    const newPost: TPostViewModel | null = await postsService.createPost({
-      title,
-      shortDescription,
-      content,
-      blogId,
-    });
+    const newPost: TPostControllerViewModel | null =
+      await postsService.createPost({
+        title,
+        shortDescription,
+        content,
+        blogId,
+      });
 
     res.status(STATUS.CREATED_201).json(newPost);
   },

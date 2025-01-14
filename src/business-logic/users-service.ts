@@ -2,6 +2,7 @@ import { TUserRepViewModel } from "../data-access/models";
 import { TUserServiceInputModel, TUserServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 import usersRepository from "../data-access/command-repository/users-repository";
+import usersQueryRepository from "../data-access/query-repository/users-query-repository";
 
 const mapUser = (user: TUserRepViewModel): TUserServiceViewModel => ({
   id: user._id.toString(),
@@ -10,12 +11,15 @@ const mapUser = (user: TUserRepViewModel): TUserServiceViewModel => ({
   createdAt: user.createdAt,
 });
 
-// const mapBlogs = (blogs: TBlogRepViewModel[] | []): TBlogServiceViewModel[] =>
-//   blogs.map(mapBlog);
+const mapUsers = (users: TUserRepViewModel[] | []): TUserServiceViewModel[] =>
+  users.map(mapUser);
 
 const usersService = {
-  getAllUsers: async () => {
-    // TODO
+  getAllUsers: async (): Promise<TUserServiceViewModel[] | []> => {
+    const users: TUserRepViewModel[] | [] =
+      await usersQueryRepository.getAllUsers();
+
+    return mapUsers(users);
   },
 
   createUser: async ({

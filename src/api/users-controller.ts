@@ -6,9 +6,10 @@ import usersService from "../business-logic/users-service";
 
 const usersController = {
   getUsers: async (_req: Request, res: Response) => {
-    // TODO
+    const users: TUserControllerViewModel[] | [] =
+      await usersService.getAllUsers();
 
-    res.status(STATUS.OK_200).json(["User1"]);
+    res.status(STATUS.OK_200).json(users);
   },
 
   createUser: async (

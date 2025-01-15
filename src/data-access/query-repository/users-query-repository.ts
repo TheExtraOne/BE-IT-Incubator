@@ -50,6 +50,20 @@ const usersQueryRepository = {
       .limit(pageSize)
       .toArray();
   },
+
+  isUniqueInDatabase: async ({
+    fieldName,
+    fieldValue,
+  }: {
+    fieldName: string;
+    fieldValue: string;
+  }): Promise<boolean> => {
+    const users = await userCollection
+      .find({ [fieldName]: fieldValue })
+      .toArray();
+
+    return !!users.length;
+  },
 };
 
 export default usersQueryRepository;

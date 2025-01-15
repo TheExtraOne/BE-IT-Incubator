@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import {
+  TFieldError,
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithQuery,
@@ -10,10 +11,15 @@ import {
   TPathParamsUserModel,
   TQueryUserModel,
   TUserControllerInputModel,
-  TUserControllerViewModel,
 } from "./models";
 import usersService from "../business-logic/users-service";
 import { TUserServiceViewModel } from "../business-logic/models";
+
+type TCreateUserReturnedValue = {
+  has_error: boolean;
+  errors: TFieldError[] | [];
+  createdUser: null | TUserServiceViewModel;
+};
 
 const usersController = {
   getUsers: async (req: TRequestWithQuery<TQueryUserModel>, res: Response) => {
@@ -44,14 +50,19 @@ const usersController = {
   ) => {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const createdUser: TUserControllerViewModel = await usersService.createUser(
-      {
+    const { has_error, errors, createdUser }: TCreateUserReturnedValue =
+      await usersService.createUser({
         login,
         email,
         password,
-      }
-    );
+      });
 
+    if (has_error) {
+      res.status(STATUS.BAD_REQUEST_400).json({
+        errorsMessages: errors,
+      });
+      return;
+    }
     res.status(STATUS.CREATED_201).json(createdUser);
   },
 

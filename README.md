@@ -57,6 +57,6 @@ Testing (`tests`):
 - [+] CRUD for user: delete
 - [+] Add Pagination for users
 - [+] Add Sorting for users
-- [ ] Add check for unique login and email
+- [+] Add check for unique login and email
 - [ ] Log in
 - [ ] Update tests

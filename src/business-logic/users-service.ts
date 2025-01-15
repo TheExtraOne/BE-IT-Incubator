@@ -3,7 +3,13 @@ import { TUserServiceInputModel, TUserServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 import usersRepository from "../data-access/command-repository/users-repository";
 import usersQueryRepository from "../data-access/query-repository/users-query-repository";
-import { TResponseWithPagination, TSortDirection } from "../types";
+import { TFieldError, TResponseWithPagination, TSortDirection } from "../types";
+
+type TCreateUserReturnedValue = {
+  has_error: boolean;
+  errors: TFieldError[] | [];
+  createdUser: null | TUserServiceViewModel;
+};
 
 const mapUser = (user: TUserRepViewModel): TUserServiceViewModel => ({
   id: user._id.toString(),
@@ -14,6 +20,31 @@ const mapUser = (user: TUserRepViewModel): TUserServiceViewModel => ({
 
 const mapUsers = (users: TUserRepViewModel[] | []): TUserServiceViewModel[] =>
   users.map(mapUser);
+
+const formError = ({
+  hasLoginError,
+  hasEmailError,
+}: {
+  hasLoginError: boolean;
+  hasEmailError: boolean;
+}): TFieldError[] | [] => {
+  const errors: TFieldError[] = [];
+  const message = "Login should be unique";
+  if (hasLoginError) {
+    errors.push({
+      message,
+      field: "login",
+    });
+  }
+  if (hasEmailError) {
+    errors.push({
+      message,
+      field: "email",
+    });
+  }
+
+  return errors;
+};
 
 const usersService = {
   getAllUsers: async ({
@@ -62,7 +93,29 @@ const usersService = {
     login,
     password,
     email,
-  }: TUserServiceInputModel): Promise<TUserServiceViewModel> => {
+  }: TUserServiceInputModel): Promise<TCreateUserReturnedValue> => {
+    const isLoginNonUnique: boolean =
+      await usersQueryRepository.isUniqueInDatabase({
+        fieldName: "login",
+        fieldValue: login,
+      });
+    const isEmailNonUnique: boolean =
+      await usersQueryRepository.isUniqueInDatabase({
+        fieldName: "email",
+        fieldValue: email,
+      });
+    const errors: TFieldError[] | [] = formError({
+      hasEmailError: isEmailNonUnique,
+      hasLoginError: isLoginNonUnique,
+    });
+    if (errors.length) {
+      return {
+        has_error: true,
+        errors,
+        createdUser: null,
+      };
+    }
+
     const newUser: TUserRepViewModel = {
       _id: new ObjectId(),
       login,
@@ -72,7 +125,11 @@ const usersService = {
     };
     await usersRepository.createUser(newUser);
 
-    return mapUser(newUser);
+    return {
+      has_error: false,
+      errors,
+      createdUser: mapUser(newUser),
+    };
   },
 
   deleteUserById: async (id: string): Promise<boolean> =>

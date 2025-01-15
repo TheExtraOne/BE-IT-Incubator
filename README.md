@@ -54,7 +54,7 @@ Testing (`tests`):
 - [+] Refactor DAL: add query repository
 - [+] CRUD for user: get All
 - [+] CRUD for user: create
-- [ ] CRUD for user: delete
+- [+] CRUD for user: delete
 - [ ] Add Pagination for users
 - [ ] Add Sorting for users
 - [ ] Add check for unique login and email

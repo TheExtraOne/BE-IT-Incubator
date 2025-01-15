@@ -9,9 +9,13 @@ const usersRepository = {
     return insertedId.toString();
   },
 
-  deleteUserById: async (id: string) => {
-    // if (!ObjectId.isValid(id)) return false;
-    // TODO
+  deleteUserById: async (id: string): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
+    const { deletedCount } = await userCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+
+    return !!deletedCount;
   },
 };
 

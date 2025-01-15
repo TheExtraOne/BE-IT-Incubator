@@ -39,10 +39,8 @@ const usersService = {
     return mapUser(newUser);
   },
 
-  deleteUserById: async (id: string) => {
-    // TODO
-    // await blogsRepository.deleteBlogById(id),
-  },
+  deleteUserById: async (id: string): Promise<boolean> =>
+    await usersRepository.deleteUserById(id),
 };
 
 export default usersService;

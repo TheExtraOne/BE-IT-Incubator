@@ -24,13 +24,3 @@ export type TResponseWithPagination<T> = {
 };
 
 export type TSortDirection = SORT_DIRECTION.ASC | SORT_DIRECTION.DESC;
-
-export type TSorting = {
-  sortBy: string;
-  sortDirection: TSortDirection;
-};
-
-export type TPages = {
-  pageNumber: number;
-  pageSize: number;
-};

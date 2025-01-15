@@ -9,6 +9,7 @@ import TQueryPostModel from "./QueryPostModel";
 import TUserControllerInputModel from "./UserControllerInputModel";
 import TUserControllerViewModel from "./UserControllerViewModel";
 import TPathParamsUserModel from "./PathParamsUserModel";
+import TQueryUserModel from "./QueryUserModel";
 
 export {
   TBlogControllerInputModel,
@@ -22,4 +23,5 @@ export {
   TUserControllerInputModel,
   TUserControllerViewModel,
   TPathParamsUserModel,
+  TQueryUserModel,
 };

@@ -3,6 +3,7 @@ import { TUserServiceInputModel, TUserServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 import usersRepository from "../data-access/command-repository/users-repository";
 import usersQueryRepository from "../data-access/query-repository/users-query-repository";
+import { TResponseWithPagination, TSortDirection } from "../types";
 
 const mapUser = (user: TUserRepViewModel): TUserServiceViewModel => ({
   id: user._id.toString(),
@@ -15,11 +16,46 @@ const mapUsers = (users: TUserRepViewModel[] | []): TUserServiceViewModel[] =>
   users.map(mapUser);
 
 const usersService = {
-  getAllUsers: async (): Promise<TUserServiceViewModel[] | []> => {
-    const users: TUserRepViewModel[] | [] =
-      await usersQueryRepository.getAllUsers();
+  getAllUsers: async ({
+    searchEmailTerm,
+    searchLoginTerm,
+    sortBy,
+    sortDirection,
+    pageNumber,
+    pageSize,
+  }: {
+    searchEmailTerm: string | null;
+    searchLoginTerm: string | null;
+    sortBy: string;
+    sortDirection: TSortDirection;
+    pageNumber: number;
+    pageSize: number;
+  }): Promise<TResponseWithPagination<TUserServiceViewModel[] | []>> => {
+    const usersCount: number = await usersQueryRepository.getUsersCount({
+      searchEmailTerm,
+      searchLoginTerm,
+    });
+    const pagesCount =
+      usersCount && pageSize ? Math.ceil(usersCount / pageSize) : 0;
+    const usersToSkip = (pageNumber - 1) * pageSize;
 
-    return mapUsers(users);
+    const users: TUserRepViewModel[] | [] =
+      await usersQueryRepository.getAllUsers({
+        searchEmailTerm,
+        searchLoginTerm,
+        sortBy,
+        sortDirection,
+        usersToSkip,
+        pageSize,
+      });
+
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: usersCount,
+      items: mapUsers(users),
+    };
   },
 
   createUser: async ({

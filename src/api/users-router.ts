@@ -1,15 +1,19 @@
 import { Router, Request, Response, NextFunction } from "express";
 import usersController from "./users-controller";
 import bodyUserInputValidator from "../middleware/body-user-input-validation-middleware";
-import { inputCheckErrorsMiddleware } from "../middleware";
+import { inputCheckErrorsMiddleware, queryInputValidator } from "../middleware";
 
 const usersRouter = Router({});
 
-const getAllUsersMiddleware: ((
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void)[] = [];
+const getAllUsersMiddleware = [
+  queryInputValidator.pageNumberValidator,
+  queryInputValidator.pageSizeValidator,
+  queryInputValidator.searchEmailTermValidator,
+  queryInputValidator.searchLoginTermValidator,
+  queryInputValidator.sortByValidator,
+  queryInputValidator.sortDirectionValidator,
+  inputCheckErrorsMiddleware,
+];
 const createUserMiddleWare = [
   bodyUserInputValidator.emailValidator,
   bodyUserInputValidator.loginValidation,

@@ -46,6 +46,22 @@ const queryInputValidator = {
     .notEmpty()
     .withMessage("Can't be an empty string"),
 
+  searchLoginTermValidator: query("searchLoginTerm")
+    .optional({ values: "undefined" })
+    .isString()
+    .withMessage("Incorrect type")
+    .trim()
+    .notEmpty()
+    .withMessage("Can't be an empty string"),
+
+  searchEmailTermValidator: query("searchEmailTerm")
+    .optional({ values: "undefined" })
+    .isString()
+    .withMessage("Incorrect type")
+    .trim()
+    .notEmpty()
+    .withMessage("Can't be an empty string"),
+
   sortDirectionValidator: query("sortDirection")
     .optional({ values: "undefined" })
     .custom((value) => {

@@ -1,14 +1,8 @@
 import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../../settings";
-import { TSorting } from "../../types";
+import { TSortDirection } from "../../types";
 import { blogCollection } from "../db";
 import { TBlogRepViewModel } from "../models";
-
-type TSearchParam = { searchNameTerm: string | null };
-type TSkipsLimits = {
-  blogsToSkip: number;
-  pageSize: number;
-};
 
 const blogsQueryRepository = {
   getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
@@ -24,9 +18,13 @@ const blogsQueryRepository = {
     pageSize,
     sortBy,
     sortDirection,
-  }: TSearchParam & TSkipsLimits & TSorting): Promise<
-    TBlogRepViewModel[] | []
-  > => {
+  }: {
+    searchNameTerm: string | null;
+    blogsToSkip: number;
+    pageSize: number;
+    sortBy: string;
+    sortDirection: TSortDirection;
+  }): Promise<TBlogRepViewModel[] | []> => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 

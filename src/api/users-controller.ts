@@ -1,17 +1,39 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
-import { TRequestWithBody, TRequestWithParams } from "../types";
+import {
+  TRequestWithBody,
+  TRequestWithParams,
+  TRequestWithQuery,
+  TResponseWithPagination,
+} from "../types";
 import {
   TPathParamsUserModel,
+  TQueryUserModel,
   TUserControllerInputModel,
   TUserControllerViewModel,
 } from "./models";
 import usersService from "../business-logic/users-service";
+import { TUserServiceViewModel } from "../business-logic/models";
 
 const usersController = {
-  getUsers: async (_req: Request, res: Response) => {
-    const users: TUserControllerViewModel[] | [] =
-      await usersService.getAllUsers();
+  getUsers: async (req: TRequestWithQuery<TQueryUserModel>, res: Response) => {
+    const {
+      searchEmailTerm = null,
+      searchLoginTerm = null,
+      sortBy = "createdAt",
+      sortDirection = SORT_DIRECTION.DESC,
+      pageNumber = 1,
+      pageSize = 10,
+    } = req.query;
+    const users: TResponseWithPagination<TUserServiceViewModel[] | []> =
+      await usersService.getAllUsers({
+        searchEmailTerm,
+        searchLoginTerm,
+        sortBy,
+        sortDirection,
+        pageNumber: +pageNumber,
+        pageSize: +pageSize,
+      });
 
     res.status(STATUS.OK_200).json(users);
   },

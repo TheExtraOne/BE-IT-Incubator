@@ -1,11 +1,9 @@
 import blogsRepository from "../data-access/command-repository/blogs-repository";
 import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
-import { TPages, TResponseWithPagination, TSorting } from "../types";
+import { TResponseWithPagination, TSortDirection } from "../types";
 import { TBlogRepViewModel } from "../data-access/models";
 import { TBlogServiceInputModel, TBlogServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
-
-type TSearchParam = { searchNameTerm: string | null };
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogServiceViewModel => ({
   id: blog._id.toString(),
@@ -26,9 +24,13 @@ const blogsService = {
     pageSize,
     sortBy,
     sortDirection,
-  }: TSearchParam & TPages & TSorting): Promise<
-    TResponseWithPagination<TBlogServiceViewModel[] | []>
-  > => {
+  }: {
+    searchNameTerm: string | null;
+    pageNumber: number;
+    pageSize: number;
+    sortBy: string;
+    sortDirection: TSortDirection;
+  }): Promise<TResponseWithPagination<TBlogServiceViewModel[] | []>> => {
     const blogsCount = await blogsQueryRepository.getBlogsCount(searchNameTerm);
     const pagesCount =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;

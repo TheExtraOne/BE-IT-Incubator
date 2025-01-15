@@ -1,6 +1,6 @@
 import { TSortDirection } from "../../types";
 
-type TQueryPostModel = {
+type TQueryUserModel = {
   /**
    * pageNumber is number of portions that should be returned
    */
@@ -17,6 +17,14 @@ type TQueryPostModel = {
    * direction of sorting
    */
   sortDirection?: TSortDirection;
+  /**
+   * filter by login
+   */
+  searchLoginTerm?: string;
+  /**
+   * filter by email
+   */
+  searchEmailTerm?: string;
 };
 
-export default TQueryPostModel;
+export default TQueryUserModel;

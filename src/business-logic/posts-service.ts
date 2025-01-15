@@ -1,6 +1,6 @@
 import { TBlogRepViewModel, TPostRepViewModel } from "../data-access/models";
 import postsRepository from "../data-access/command-repository/posts-repository";
-import { TPages, TResponseWithPagination, TSorting } from "../types";
+import { TResponseWithPagination, TSortDirection } from "../types";
 import { TPostServiceInputModel, TPostServiceViewModel } from "./models";
 import { ObjectId } from "mongodb";
 import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
@@ -26,9 +26,12 @@ const postsService = {
     pageSize,
     sortBy,
     sortDirection,
-  }: TPages & TSorting): Promise<
-    TResponseWithPagination<TPostServiceViewModel[] | []>
-  > => {
+  }: {
+    pageNumber: number;
+    pageSize: number;
+    sortBy: string;
+    sortDirection: TSortDirection;
+  }): Promise<TResponseWithPagination<TPostServiceViewModel[] | []>> => {
     const postsCount = await postsQueryRepository.getPostsCount();
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
@@ -66,10 +69,11 @@ const postsService = {
     sortDirection,
   }: {
     blogId: string;
-  } & TPages &
-    TSorting): Promise<
-    TResponseWithPagination<TPostServiceViewModel[] | []>
-  > => {
+    pageNumber: number;
+    pageSize: number;
+    sortBy: string;
+    sortDirection: TSortDirection;
+  }): Promise<TResponseWithPagination<TPostServiceViewModel[] | []>> => {
     const postsCount = await postsQueryRepository.getPostsCount({ blogId });
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;

@@ -1,13 +1,8 @@
 import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../../settings";
-import { TSorting } from "../../types";
+import { TSortDirection } from "../../types";
 import { postCollection } from "../db";
 import TPostRepViewModel from "../models/PostRepViewModel";
-
-type TSkipsLimits = {
-  postsToSkip: number;
-  pageSize: number;
-};
 
 const postsQueryRepository = {
   getPostsCount: async (
@@ -22,8 +17,11 @@ const postsQueryRepository = {
     filter = {},
   }: {
     filter?: Record<string, string>;
-  } & TSkipsLimits &
-    TSorting): Promise<TPostRepViewModel[] | []> =>
+    postsToSkip: number;
+    pageSize: number;
+    sortBy: string;
+    sortDirection: TSortDirection;
+  }): Promise<TPostRepViewModel[] | []> =>
     await postCollection
       .find(filter)
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })

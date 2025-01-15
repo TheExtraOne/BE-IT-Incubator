@@ -29,16 +29,15 @@ const formError = ({
   hasEmailError: boolean;
 }): TFieldError[] | [] => {
   const errors: TFieldError[] = [];
-  const message = "Login should be unique";
   if (hasLoginError) {
     errors.push({
-      message,
+      message: "Login already exists",
       field: "login",
     });
   }
   if (hasEmailError) {
     errors.push({
-      message,
+      message: "Email already exists",
       field: "email",
     });
   }

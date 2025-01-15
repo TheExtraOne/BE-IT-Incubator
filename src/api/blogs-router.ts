@@ -39,7 +39,7 @@ const updateBlogById = [
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const deleteBlogById = [authorizationMiddleware, inputCheckErrorsMiddleware];
+const deleteBlogById = [authorizationMiddleware];
 
 blogsRouter.get("/", [...getAllBlogsMiddleWares], blogsController.getBlogs);
 blogsRouter.get("/:id", [...getBlogByIdMiddleware], blogsController.getBlog);

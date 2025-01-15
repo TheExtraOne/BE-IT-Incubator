@@ -33,10 +33,7 @@ const updatePostByIdMiddleware = [
   bodyPostsInputValidator.blogIdValidator,
   inputCheckErrorsMiddleware,
 ];
-const deletePostByIdMiddleware = [
-  authorizationMiddleware,
-  inputCheckErrorsMiddleware,
-];
+const deletePostByIdMiddleware = [authorizationMiddleware];
 
 postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
 postsRouter.get("/:id", [...getPostByIdMiddleware], postsController.getPost);

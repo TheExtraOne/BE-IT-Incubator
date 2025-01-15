@@ -26,7 +26,9 @@ const bodyUserInputValidator = {
     .withMessage("Incorrect type")
     .trim()
     .notEmpty()
-    .withMessage("Email is a required field"),
+    .withMessage("Email is a required field")
+    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+    .withMessage("Incorrect email value"),
 };
 
 export default bodyUserInputValidator;

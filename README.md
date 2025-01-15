@@ -58,5 +58,7 @@ Testing (`tests`):
 - [+] Add Pagination for users
 - [+] Add Sorting for users
 - [+] Add check for unique login and email
+- [ ] Flow for hashing password
 - [ ] Log in
 - [ ] Update tests
+- [ ] Update docs

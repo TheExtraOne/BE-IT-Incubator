@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import usersRepository from "../data-access/command-repository/users-repository";
 import usersQueryRepository from "../data-access/query-repository/users-query-repository";
 import { TFieldError, TResponseWithPagination, TSortDirection } from "../types";
+import bcrypt from "bcryptjs";
 
 type TCreateUserReturnedValue = {
   has_error: boolean;
@@ -93,6 +94,18 @@ const usersService = {
     password,
     email,
   }: TUserServiceInputModel): Promise<TCreateUserReturnedValue> => {
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await usersService._generateHash({
+      value: password,
+      salt: passwordSalt,
+    });
+    // console.log("passwordHash", passwordHash);
+    // console.log("salt", salt);
+
+    // const saltRegex = /^(?:[^$]*\$){3}(.{22})/; // Improved regex
+    // const match = passwordHash.match(saltRegex);
+    // if (match) console.log(match[1]);
+
     const isLoginNonUnique: boolean =
       await usersQueryRepository.isUniqueInDatabase({
         fieldName: "login",
@@ -118,7 +131,8 @@ const usersService = {
     const newUser: TUserRepViewModel = {
       _id: new ObjectId(),
       login,
-      password,
+      passwordHash,
+      passwordSalt,
       email,
       createdAt: new Date().toISOString(),
     };
@@ -133,6 +147,28 @@ const usersService = {
 
   deleteUserById: async (id: string): Promise<boolean> =>
     await usersRepository.deleteUserById(id),
+
+  checkUserCredentials: async ({
+    loginOrEmail,
+    password,
+  }: {
+    loginOrEmail: string;
+    password: string;
+  }): Promise<boolean> => {
+    const user: TUserRepViewModel | null =
+      await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
+    if (!user) return false;
+
+    const passwordHash = await usersService._generateHash({
+      value: password,
+      salt: user.passwordSalt,
+    });
+
+    return passwordHash === user.passwordHash;
+  },
+
+  _generateHash: async ({ value, salt }: { value: string; salt: string }) =>
+    await bcrypt.hash(value, salt),
 };
 
 export default usersService;

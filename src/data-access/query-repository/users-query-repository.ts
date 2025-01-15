@@ -51,6 +51,13 @@ const usersQueryRepository = {
       .toArray();
   },
 
+  getByLoginOrEmail: async (
+    loginOrEmail: string
+  ): Promise<TUserRepViewModel | null> =>
+    await userCollection.findOne({
+      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    }),
+
   isUniqueInDatabase: async ({
     fieldName,
     fieldValue,

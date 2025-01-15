@@ -10,6 +10,7 @@ import TUserControllerInputModel from "./UserControllerInputModel";
 import TUserControllerViewModel from "./UserControllerViewModel";
 import TPathParamsUserModel from "./PathParamsUserModel";
 import TQueryUserModel from "./QueryUserModel";
+import TAuthControllerInputModel from "./AuthControllerInputModel";
 
 export {
   TBlogControllerInputModel,
@@ -24,4 +25,5 @@ export {
   TUserControllerViewModel,
   TPathParamsUserModel,
   TQueryUserModel,
+  TAuthControllerInputModel,
 };

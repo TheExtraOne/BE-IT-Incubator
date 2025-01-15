@@ -1,6 +1,6 @@
 # Blogger platform
 
-This repository is a Blogger Platform REST API. The project follows a clean architecture pattern with clear separation of concerns across presentation, business, and data access layers, making it maintainable and scalable. Features: full CRUD operations for blogs and posts, pagination with sorting capabilities, blog-specific post management, search functionality for blogs, query parameter validation, basic authorization, cross-origin resource sharing.
+This repository is a Blogger Platform REST API. The project follows a clean architecture pattern with clear separation of concerns across presentation, business, and data access layers, making it maintainable and scalable. Features: full CRUD operations for blogs, posts, and users, authentication system, pagination with sorting capabilities, blog-specific post management, search functionality, query parameter validation, basic authorization, cross-origin resource sharing.
 
 ## Technical Stack
 
@@ -10,6 +10,7 @@ This repository is a Blogger Platform REST API. The project follows a clean arch
 - Express-validator (v7.2.1) for request validation
 - CORS enabled for cross-origin requests
 - Environment configuration using dotenv
+- Password hashing for secure authentication
 
 ## Development Setup
 
@@ -20,26 +21,49 @@ This repository is a Blogger Platform REST API. The project follows a clean arch
 
 ## Environment variables
 
-- **PORT**: The port for the API gateway (3000).
-- **MONGO_URL**: Connection string to MongoDb.
-- **LOGIN_PASSWORD**: Credentials for authorization.
+- **PORT**: The port for the API gateway (3000)
+- **MONGO_URL**: Connection string to MongoDb
+- **LOGIN_PASSWORD**: Credentials for authorization
 
 ## Project Structure
 
 The `src` directory contains the core components of our application:
 
-- `middleware`: Authorization, validation, and error handling.
-- `api`: Handle HTTP requests/responses with separate routers and controllers for blogs and posts.
-- `business-logic`: Services for blogs and posts.
-- `data-access`: MongoDB data access layer (command and query repository).
-- `models`: Separate models for different layers (controller, bll, repository).
+- `middleware`: Authorization, validation, error handling, and input validation for auth, blogs, posts, and users
+- `api`: Handle HTTP requests/responses with separate routers and controllers for auth, blogs, posts, and users
+- `business-logic`: Services for auth, blogs, posts, and users
+- `data-access`: MongoDB data access layer with separate command and query repositories
+- `models`: Separate models for different layers (controller, business logic, repository)
 
 Testing (`tests`):
 
 - End-to-end tests using Jest and Supertest
-- Separate test suites for blogs and posts CRUD operations
+- Separate test suites for blogs, posts, and users CRUD operations
 - MongoDB Memory Server for testing
 - Coverage reporting capability
+
+## Features
+
+### Authentication
+
+- Secure user registration with password hashing
+- Login functionality with basic authorization
+- Unique login and email validation
+
+### Users Management
+
+- Complete CRUD operations
+- Pagination support
+- Sorting capabilities
+- Unique login/email validation
+
+### Blogs & Posts
+
+- Full CRUD operations
+- Blog-specific post management
+- Search functionality
+- Pagination and sorting
+- Query parameter validation
 
 ## Development Scripts
 
@@ -48,17 +72,17 @@ Testing (`tests`):
 - `yarn jest`: Run tests in isolation
 - `yarn jest:coverage`: Generate test coverage reports
 
+## Completed Improvements
+
+- ✅ Migrated to MongoDB native IDs
+- ✅ Implemented Query Repository pattern
+- ✅ Added complete User CRUD operations
+- ✅ Implemented pagination for users
+- ✅ Added sorting capabilities for users
+- ✅ Added unique login/email validation
+- ✅ Implemented password hashing
+- ✅ Added authentication system
+
 ## TODO
 
-- [+] Remove old generated ids with if of the mongo db
-- [+] Refactor DAL: add query repository
-- [+] CRUD for user: get All
-- [+] CRUD for user: create
-- [+] CRUD for user: delete
-- [+] Add Pagination for users
-- [+] Add Sorting for users
-- [+] Add check for unique login and email
-- [ ] Flow for hashing password
-- [ ] Log in
 - [ ] Update tests
-- [ ] Update docs

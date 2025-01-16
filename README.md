@@ -82,7 +82,8 @@ Testing (`tests`):
 - ✅ Added unique login/email validation
 - ✅ Implemented password hashing
 - ✅ Added authentication system
+- ✅ Updated tests
 
 ## TODO
 
-- [ ] Update tests
+- [ ]

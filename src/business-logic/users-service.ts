@@ -99,12 +99,6 @@ const usersService = {
       value: password,
       salt: passwordSalt,
     });
-    // console.log("passwordHash", passwordHash);
-    // console.log("salt", salt);
-
-    // const saltRegex = /^(?:[^$]*\$){3}(.{22})/; // Improved regex
-    // const match = passwordHash.match(saltRegex);
-    // if (match) console.log(match[1]);
 
     const isLoginNonUnique: boolean =
       await usersQueryRepository.isUniqueInDatabase({
@@ -132,7 +126,6 @@ const usersService = {
       _id: new ObjectId(),
       login,
       passwordHash,
-      passwordSalt,
       email,
       createdAt: new Date().toISOString(),
     };
@@ -159,12 +152,7 @@ const usersService = {
       await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
     if (!user) return false;
 
-    const passwordHash = await usersService._generateHash({
-      value: password,
-      salt: user.passwordSalt,
-    });
-
-    return passwordHash === user.passwordHash;
+    return bcrypt.compare(password, user.passwordHash);
   },
 
   _generateHash: async ({ value, salt }: { value: string; salt: string }) =>

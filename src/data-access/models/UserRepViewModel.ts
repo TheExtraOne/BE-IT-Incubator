@@ -10,10 +10,6 @@ type TUserRepViewModel = WithId<{
    */
   passwordHash: string;
   /**
-   * passwordSalt of the user's password
-   */
-  passwordSalt: string;
-  /**
    * email of the user
    */
   email: string;

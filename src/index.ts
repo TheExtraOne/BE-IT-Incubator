@@ -1,5 +1,5 @@
 import app from "./app";
-import { connectToDb } from "./data-access/db";
+import { connectToDb } from "./db/db";
 import { SETTINGS } from "./settings";
 
 const startApp = async () => {

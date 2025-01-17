@@ -1,13 +1,11 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { SETTINGS, STATUS } from "./settings";
-import {
-  blogsRouter,
-  postsRouter,
-  testingRouter,
-  usersRouter,
-  authRouter,
-} from "./api";
+import blogsRouter from "./blogs/blogs-router";
+import postsRouter from "./posts/posts-router";
+import usersRouter from "./users/users-router";
+import testingRouter from "./testing/testing-router";
+import authRouter from "./auth/auth-router";
 
 const app = express();
 app.use(express.json());

@@ -1,4 +1,4 @@
-import { client, connectToDb } from "../../../src/data-access/db";
+import { client, connectToDb } from "../../../src/db/db";
 import { SETTINGS, STATUS } from "../../../src/settings";
 import {
   correctBlogBodyParams,

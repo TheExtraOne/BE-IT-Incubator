@@ -1,6 +1,6 @@
 import { SETTINGS, STATUS } from "../../../src/settings";
 import { correctUserBodyParams, req, userCredentials } from "../helpers";
-import { client, connectToDb } from "../../../src/data-access/db";
+import { client, connectToDb } from "../../../src/db/db";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("GET /users", () => {

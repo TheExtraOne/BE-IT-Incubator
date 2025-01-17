@@ -1,8 +1,8 @@
 import { agent } from "supertest";
 import { SETTINGS } from "../../src/settings";
 import app from "../../src/app";
-import { TBlogControllerInputModel } from "../../src/api/models";
-import { getEncodedCredentials } from "../../src/middleware/authorization-middleware";
+import { getEncodedCredentials } from "../../src/common-middleware/authorization-middleware";
+import TBlogControllerInputModel from "../../src/blogs/models/BlogControllerInputModel";
 
 export const userCredentials = {
   correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN_CREDENTIALS)}`,

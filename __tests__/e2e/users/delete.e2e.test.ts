@@ -5,7 +5,7 @@ import {
   req,
   userCredentials,
 } from "../helpers";
-import { client, connectToDb } from "../../../src/data-access/db";
+import { client, connectToDb } from "../../../src/db/db";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("DELETE /users/:id", () => {

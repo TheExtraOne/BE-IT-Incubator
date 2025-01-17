@@ -18,6 +18,8 @@ import {
   TQueryBlogModel,
   TQueryPostModel,
 } from "./models";
+import blogsQueryRepository from "../data-access/query-repository/blogs-query-repository";
+import postsQueryRepository from "../data-access/query-repository/posts-query-repository";
 
 const blogsController = {
   getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
@@ -28,8 +30,10 @@ const blogsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
+
+    // We are reaching out to blogsQueryRepository directly because of CQRS
     const blogs: TResponseWithPagination<TBlogControllerViewModel[] | []> =
-      await blogsService.getAllBlogs({
+      await blogsQueryRepository.getAllBlogs({
         searchNameTerm,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -44,8 +48,9 @@ const blogsController = {
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
+    // We are reaching out to blogsQueryRepository directly because of CQRS
     const blog: TBlogControllerViewModel | null =
-      await blogsService.getBlogById(req.params.id);
+      await blogsQueryRepository.getBlogById(req.params.id);
 
     blog
       ? res.status(STATUS.OK_200).json(blog)
@@ -56,8 +61,10 @@ const blogsController = {
     req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
     res: Response
   ) => {
-    const isBlogIdExist = await postsService.checkIfBlogIdExist(req.params.id);
-    if (!isBlogIdExist) {
+    // We are reaching out to blogsQueryRepository directly because of CQRS
+    const blog: TBlogControllerViewModel | null =
+      await blogsQueryRepository.getBlogById(req.params.id);
+    if (!blog) {
       res.sendStatus(STATUS.NOT_FOUND_404);
       return;
     }
@@ -68,8 +75,9 @@ const blogsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
+    // We are reaching out to postsQueryRepository directly because of CQRS
     const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await postsService.getAllPostsForBlogById({
+      await postsQueryRepository.getAllPosts({
         blogId: req.params.id,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -85,11 +93,13 @@ const blogsController = {
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const newBlog: TBlogControllerViewModel = await blogsService.createBlog({
+    const newBlogId: string = await blogsService.createBlog({
       name,
       description,
       websiteUrl,
     });
+    const newBlog: TBlogControllerViewModel | null =
+      await blogsQueryRepository.getBlogById(newBlogId);
 
     res.status(STATUS.CREATED_201).json(newBlog);
   },
@@ -103,18 +113,19 @@ const blogsController = {
   ) => {
     const blogId = req.params.id;
     const { title, shortDescription, content } = req.body;
-    const newPost: TPostControllerViewModel | null =
-      await postsService.createPost({
-        title,
-        shortDescription,
-        content,
-        blogId,
-      });
-
-    if (!newPost) {
+    const newPostId: string | null = await postsService.createPost({
+      title,
+      shortDescription,
+      content,
+      blogId,
+    });
+    if (!newPostId) {
       res.sendStatus(STATUS.NOT_FOUND_404);
       return;
     }
+    const newPost: TPostControllerViewModel | null =
+      await postsQueryRepository.getPostById(newPostId);
+
     res.status(STATUS.CREATED_201).json(newPost);
   },
 

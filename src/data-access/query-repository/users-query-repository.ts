@@ -1,7 +1,20 @@
+import { ObjectId } from "mongodb";
+import { TUserControllerViewModel } from "../../api/models";
 import { SORT_DIRECTION } from "../../settings";
-import { TSortDirection } from "../../types";
+import { TResponseWithPagination, TSortDirection } from "../../types";
 import { userCollection } from "../db";
 import { TUserRepViewModel } from "../models";
+
+const mapUser = (user: TUserRepViewModel): TUserControllerViewModel => ({
+  id: user._id.toString(),
+  login: user.login,
+  email: user.email,
+  createdAt: user.createdAt,
+});
+
+const mapUsers = (
+  users: TUserRepViewModel[] | []
+): TUserControllerViewModel[] => users.map(mapUser);
 
 const usersQueryRepository = {
   getUsersCount: async ({
@@ -22,33 +35,60 @@ const usersQueryRepository = {
     );
   },
 
+  getUserById: async (id: string) => {
+    if (!ObjectId.isValid(id)) return null;
+    const user: TUserRepViewModel | null = await userCollection.findOne({
+      _id: new ObjectId(id),
+    });
+
+    return user ? mapUser(user) : null;
+  },
+
   getAllUsers: async ({
     searchEmailTerm,
     searchLoginTerm,
     sortBy,
     sortDirection,
-    usersToSkip,
+    pageNumber,
     pageSize,
   }: {
     searchEmailTerm: string | null;
     searchLoginTerm: string | null;
     sortBy: string;
     sortDirection: TSortDirection;
-    usersToSkip: number;
+    pageNumber: number;
     pageSize: number;
-  }): Promise<TUserRepViewModel[] | []> => {
+  }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> => {
+    // Pagination
+    const usersCount: number = await usersQueryRepository.getUsersCount({
+      searchEmailTerm,
+      searchLoginTerm,
+    });
+    const pagesCount =
+      usersCount && pageSize ? Math.ceil(usersCount / pageSize) : 0;
+    const usersToSkip = (pageNumber - 1) * pageSize;
+
+    // Filtration
     const filters: Record<string, RegExp>[] = [];
     if (searchEmailTerm)
       filters.push({ email: new RegExp(searchEmailTerm, "i") });
     if (searchLoginTerm)
       filters.push({ login: new RegExp(searchLoginTerm, "i") });
 
-    return await userCollection
+    const users: TUserRepViewModel[] | [] = await userCollection
       .find(filters.length ? { $or: filters } : {})
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(usersToSkip)
       .limit(pageSize)
       .toArray();
+
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: usersCount,
+      items: mapUsers(users),
+    };
   },
 
   getByLoginOrEmail: async (

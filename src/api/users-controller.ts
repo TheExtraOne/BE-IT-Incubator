@@ -14,11 +14,12 @@ import {
 } from "./models";
 import usersService from "../business-logic/users-service";
 import { TUserServiceViewModel } from "../business-logic/models";
+import usersQueryRepository from "../data-access/query-repository/users-query-repository";
 
 type TCreateUserReturnedValue = {
   has_error: boolean;
   errors: TFieldError[] | [];
-  createdUser: null | TUserServiceViewModel;
+  createdUserId: null | string;
 };
 
 const usersController = {
@@ -31,8 +32,9 @@ const usersController = {
       pageNumber = 1,
       pageSize = 10,
     } = req.query;
+    // We are reaching out to usersQueryRepository directly because of CQRS
     const users: TResponseWithPagination<TUserServiceViewModel[] | []> =
-      await usersService.getAllUsers({
+      await usersQueryRepository.getAllUsers({
         searchEmailTerm,
         searchLoginTerm,
         sortBy,
@@ -50,7 +52,7 @@ const usersController = {
   ) => {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const { has_error, errors, createdUser }: TCreateUserReturnedValue =
+    const { has_error, errors, createdUserId }: TCreateUserReturnedValue =
       await usersService.createUser({
         login,
         email,
@@ -63,6 +65,11 @@ const usersController = {
       });
       return;
     }
+
+    const createdUser = await usersQueryRepository.getUserById(
+      createdUserId ?? ""
+    );
+
     res.status(STATUS.CREATED_201).json(createdUser);
   },
 

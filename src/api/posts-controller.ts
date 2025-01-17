@@ -14,6 +14,7 @@ import {
   TPostControllerViewModel,
   TQueryPostModel,
 } from "./models";
+import postsQueryRepository from "../data-access/query-repository/posts-query-repository";
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
@@ -23,8 +24,11 @@ const postsController = {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
+
+    // We are reaching out to postsQueryRepository directly because of CQRS
     const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await postsService.getAllPosts({
+      await postsQueryRepository.getAllPosts({
+        blogId: null,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
         sortBy,
@@ -38,8 +42,9 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
+    // We are reaching out to postsQueryRepository directly because of CQRS
     const post: TPostControllerViewModel | null =
-      await postsService.getPostById(req.params.id);
+      await postsQueryRepository.getPostById(req.params.id);
 
     post
       ? res.status(STATUS.OK_200).json(post)
@@ -51,14 +56,15 @@ const postsController = {
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-
+    // Validating blogID in the middlewares
+    const newPostId: string | null = await postsService.createPost({
+      title,
+      shortDescription,
+      content,
+      blogId,
+    });
     const newPost: TPostControllerViewModel | null =
-      await postsService.createPost({
-        title,
-        shortDescription,
-        content,
-        blogId,
-      });
+      await postsQueryRepository.getPostById(newPostId ?? "");
 
     res.status(STATUS.CREATED_201).json(newPost);
   },

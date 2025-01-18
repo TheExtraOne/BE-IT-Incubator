@@ -1,4 +1,4 @@
-import { TSortDirection } from "../../types";
+import { TSortDirection } from "../../types/types";
 
 type TQueryPostModel = {
   /**

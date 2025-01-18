@@ -74,16 +74,16 @@ Testing (`tests`):
 
 ## Completed Improvements
 
-- ✅ Migrated to MongoDB native IDs
-- ✅ Implemented Query Repository pattern
-- ✅ Added complete User CRUD operations
-- ✅ Implemented pagination for users
-- ✅ Added sorting capabilities for users
-- ✅ Added unique login/email validation
-- ✅ Implemented password hashing
-- ✅ Added authentication system
-- ✅ Updated tests
+- ✅ Auth: Add JWT accessToken on log in
+- ✅ Added new endpoint auth/me
 
 ## TODO
 
-- [ ]
+- [ ] Add GET comment
+- [ ] Add PUT comment
+- [ ] Add DELETE comment
+- [ ] Add GET comments
+- [ ] Add POST comment
+- [ ] Bearer auth для creating\updating\deleting comments
+- [ ] Update tests
+- [ ] Update documentation

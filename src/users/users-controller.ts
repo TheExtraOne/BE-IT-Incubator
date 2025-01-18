@@ -6,7 +6,7 @@ import {
   TRequestWithParams,
   TRequestWithQuery,
   TResponseWithPagination,
-} from "../types";
+} from "../types/types";
 import usersService from "./users-service";
 import TQueryUserModel from "./models/QueryUserModel";
 import TUserServiceViewModel from "./models/UserServiceViewModel";
@@ -15,7 +15,7 @@ import TUserControllerInputModel from "./models/UserControllerInputModel";
 import TPathParamsUserModel from "./models/PathParamsUserModel";
 
 type TCreateUserReturnedValue = {
-  has_error: boolean;
+  hasError: boolean;
   errors: TFieldError[] | [];
   createdUserId: null | string;
 };
@@ -50,14 +50,14 @@ const usersController = {
   ) => {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const { has_error, errors, createdUserId }: TCreateUserReturnedValue =
+    const { hasError, errors, createdUserId }: TCreateUserReturnedValue =
       await usersService.createUser({
         login,
         email,
         password,
       });
 
-    if (has_error) {
+    if (hasError) {
       res.status(STATUS.BAD_REQUEST_400).json({
         errorsMessages: errors,
       });

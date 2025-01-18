@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { TFieldError } from "../types";
+import { TFieldError } from "../types/types";
 import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
 import usersQueryRepository from "./users-query-repository";
@@ -7,7 +7,7 @@ import TUserRepViewModel from "./models/UserRepViewModel";
 import usersRepository from "./users-repository";
 
 type TCreateUserReturnedValue = {
-  has_error: boolean;
+  hasError: boolean;
   errors: TFieldError[] | [];
   createdUserId: null | string;
 };
@@ -64,7 +64,7 @@ const usersService = {
     });
     if (errors.length) {
       return {
-        has_error: true,
+        hasError: true,
         errors,
         createdUserId: null,
       };
@@ -80,7 +80,7 @@ const usersService = {
     const createdUserId: string = await usersRepository.createUser(newUser);
 
     return {
-      has_error: false,
+      hasError: false,
       errors,
       createdUserId,
     };
@@ -95,12 +95,14 @@ const usersService = {
   }: {
     loginOrEmail: string;
     password: string;
-  }): Promise<boolean> => {
+  }): Promise<{ user: TUserRepViewModel | null; hasError: boolean }> => {
     const user: TUserRepViewModel | null =
       await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
-    if (!user) return false;
+    if (!user) return { user: null, hasError: true };
 
-    return await bcrypt.compare(password, user.passwordHash);
+    const is_correct = await bcrypt.compare(password, user.passwordHash);
+
+    return { user: is_correct ? user : null, hasError: !is_correct };
   },
 
   _generateHash: async ({ value, salt }: { value: string; salt: string }) =>

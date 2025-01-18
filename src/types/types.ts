@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { SORT_DIRECTION } from "./settings";
+import { SORT_DIRECTION } from "../settings";
 
 export type TRequestWithBody<T> = Request<{}, {}, T>;
 export type TRequestWithParams<T> = Request<T>;

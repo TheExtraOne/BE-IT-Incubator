@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { STATUS } from "../settings";
-import { TAPIErrorResult } from "../types";
+import { TAPIErrorResult } from "../types/types";
 
 type TExpressValidator = {
   type: string;

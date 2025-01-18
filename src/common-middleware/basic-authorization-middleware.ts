@@ -4,7 +4,7 @@ import { SETTINGS, STATUS } from "../settings";
 export const getEncodedCredentials = (data: string) =>
   Buffer.from(data, "utf8").toString("base64");
 
-const authorizationMiddleware = (
+const basicAuthorizationMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -25,4 +25,4 @@ const authorizationMiddleware = (
   next();
 };
 
-export default authorizationMiddleware;
+export default basicAuthorizationMiddleware;

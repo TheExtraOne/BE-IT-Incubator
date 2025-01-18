@@ -21,20 +21,22 @@ describe("POST /auth/login", () => {
   });
 
   describe("Login success/failure", () => {
-    it("should return 204 if credentials are correct", async () => {
+    it("should return 200 if credentials are correct", async () => {
       await req
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
         .expect(STATUS.CREATED_201);
 
-      await req
+      const res = await req
         .post(`${SETTINGS.PATH.AUTH}/login`)
         .send({
           loginOrEmail: correctUserBodyParams.login,
           password: correctUserBodyParams.password,
         })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(STATUS.OK_200);
+
+      expect(res.body).toEqual({ accessToken: expect.any(String) });
     });
 
     it("should return 401 if password is incorrect", async () => {

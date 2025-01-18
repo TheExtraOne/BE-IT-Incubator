@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   inputCheckErrorsMiddleware,
   queryInputValidator,
 } from "../common-middleware";
@@ -18,7 +18,7 @@ const getAllPostsMiddleware = [
 ];
 const getPostByIdMiddleware = [inputCheckErrorsMiddleware];
 const createPostMiddleware = [
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   bodyPostsInputValidator.titleValidation,
   bodyPostsInputValidator.shortDescriptionValidation,
   bodyPostsInputValidator.contentValidator,
@@ -26,14 +26,14 @@ const createPostMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 const updatePostByIdMiddleware = [
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   bodyPostsInputValidator.titleValidation,
   bodyPostsInputValidator.shortDescriptionValidation,
   bodyPostsInputValidator.contentValidator,
   bodyPostsInputValidator.blogIdValidator,
   inputCheckErrorsMiddleware,
 ];
-const deletePostByIdMiddleware = [authorizationMiddleware];
+const deletePostByIdMiddleware = [basicAuthorizationMiddleware];
 
 postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
 postsRouter.get("/:id", [...getPostByIdMiddleware], postsController.getPost);

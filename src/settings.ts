@@ -18,6 +18,7 @@ export const SETTINGS = {
     USERS: "users",
   },
   MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
+  JWT_SECRET: process.env.JWT_SECRET || "123Secret",
 };
 
 export const STATUS = {

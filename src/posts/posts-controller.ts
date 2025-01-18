@@ -7,7 +7,7 @@ import {
   TRequestWithParamsAndBody,
   TRequestWithQuery,
   TResponseWithPagination,
-} from "../types";
+} from "../types/types";
 import TQueryPostModel from "./models/QueryPostModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
 import postsQueryRepository from "./posts-query-repository";

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   inputCheckErrorsMiddleware,
   queryInputValidator,
 } from "../common-middleware";
@@ -14,7 +14,6 @@ const getAllBlogsMiddleWares = [
   ...Object.values(queryInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const getBlogByIdMiddleware = [inputCheckErrorsMiddleware];
 const getAllPostsForBlogIdMiddleware = [
   queryInputValidator.pageNumberValidator,
   queryInputValidator.pageSizeValidator,
@@ -23,26 +22,26 @@ const getAllPostsForBlogIdMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 const createPostForBlogIdMiddleware = [
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   bodyPostsInputValidator.contentValidator,
   bodyPostsInputValidator.shortDescriptionValidation,
   bodyPostsInputValidator.titleValidation,
   inputCheckErrorsMiddleware,
 ];
 const createBlogMiddleware = [
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
 const updateBlogById = [
-  authorizationMiddleware,
+  basicAuthorizationMiddleware,
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const deleteBlogById = [authorizationMiddleware];
+const deleteBlogById = [basicAuthorizationMiddleware];
 
 blogsRouter.get("/", [...getAllBlogsMiddleWares], blogsController.getBlogs);
-blogsRouter.get("/:id", [...getBlogByIdMiddleware], blogsController.getBlog);
+blogsRouter.get("/:id", blogsController.getBlog);
 blogsRouter.get(
   "/:id/posts",
   [...getAllPostsForBlogIdMiddleware],

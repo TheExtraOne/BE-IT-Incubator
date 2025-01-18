@@ -7,7 +7,7 @@ import {
   TRequestWithQuery,
   TRequestWithQueryAndParams,
   TResponseWithPagination,
-} from "../types";
+} from "../types/types";
 import postsService from "../posts/posts-service";
 import TQueryBlogModel from "./models/QueryBlogModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
@@ -109,7 +109,14 @@ const blogsController = {
     >,
     res: Response
   ) => {
+    // Checking that blogId exists
     const blogId = req.params.id;
+    const blog = await blogsQueryRepository.getBlogById(blogId);
+    if (!blog) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+
     const { title, shortDescription, content } = req.body;
     const newPostId: string | null = await postsService.createPost({
       title,
@@ -117,12 +124,8 @@ const blogsController = {
       content,
       blogId,
     });
-    if (!newPostId) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
-      return;
-    }
     const newPost: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(newPostId);
+      await postsQueryRepository.getPostById(newPostId!);
 
     res.status(STATUS.CREATED_201).json(newPost);
   },

@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
 import { blogCollection } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../types";
+import { TResponseWithPagination, TSortDirection } from "../types/types";
 import { SORT_DIRECTION } from "../settings";
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogControllerViewModel => ({

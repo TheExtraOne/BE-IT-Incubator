@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { SORT_DIRECTION, STATUS } from "../settings";
 import {
+  TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQueryAndParams,
   TResponseWithPagination,
@@ -11,6 +12,8 @@ import TCommentControllerViewModel from "./models/PostCommentControllerViewModel
 import commentsService from "./comments-service";
 import TQueryCommentsModel from "./models/QueryCommentsModel";
 import commentsQueryRepository from "./comments-query-repository";
+import TPathParamsCommentsModel from "./models/PathParamsCommentModel";
+import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 
 const commentsController = {
   createCommentForPostById: async (
@@ -53,36 +56,38 @@ const commentsController = {
     res.status(STATUS.OK_200).json(comments);
   },
 
-  //   getComment: async (
-  //     req: TRequestWithParams<TPathParamsPostModel>,
-  //     res: Response
-  //   ) => {
-  //     // We are reaching out to postsQueryRepository directly because of CQRS
-  //     const post: TPostControllerViewModel | null =
-  //       await postsQueryRepository.getPostById(req.params.id);
-  //     post
-  //       ? res.status(STATUS.OK_200).json(post)
-  //       : res.sendStatus(STATUS.NOT_FOUND_404);
-  //   },
-  //   updateComment: async (
-  //     req: TRequestWithParamsAndBody<
-  //       TPathParamsPostModel,
-  //       TPostControllerInputModel
-  //     >,
-  //     res: Response
-  //   ) => {
-  //     const { title, shortDescription, content, blogId } = req.body;
-  //     const success = await postsService.updatePostById({
-  //       id: req.params.id,
-  //       title,
-  //       shortDescription,
-  //       content,
-  //       blogId,
-  //     });
-  //     success
-  //       ? res.sendStatus(STATUS.NO_CONTENT_204)
-  //       : res.sendStatus(STATUS.NOT_FOUND_404);
-  //   },
+  getCommentById: async (
+    req: TRequestWithParams<TPathParamsCommentsModel>,
+    res: Response
+  ) => {
+    // We are reaching out to postsQueryRepository directly because of CQRS
+    const comment: TCommentServiceViewModel | null =
+      await commentsQueryRepository.getCommentById(req.params.id);
+
+    comment
+      ? res.status(STATUS.OK_200).json(comment)
+      : res.sendStatus(STATUS.NOT_FOUND_404);
+  },
+
+  // updateComment: async (
+  //   req: TRequestWithParamsAndBody<
+  //     TPathParamsPostModel,
+  //     TPostControllerInputModel
+  //   >,
+  //   res: Response
+  // ) => {
+  //   const { title, shortDescription, content, blogId } = req.body;
+  //   const success = await postsService.updatePostById({
+  //     id: req.params.id,
+  //     title,
+  //     shortDescription,
+  //     content,
+  //     blogId,
+  //   });
+  //   success
+  //     ? res.sendStatus(STATUS.NO_CONTENT_204)
+  //     : res.sendStatus(STATUS.NOT_FOUND_404);
+  // },
   //   deleteComment: async (
   //     req: TRequestWithParams<TPathParamsPostModel>,
   //     res: Response

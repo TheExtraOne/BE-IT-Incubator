@@ -10,6 +10,7 @@ export const SETTINGS = {
     USERS: "/users",
     TESTING: "/testing",
     AUTH: "/auth",
+    COMMENTS: "/comments",
   },
   DB_NAME: "blogs_and_posts",
   COLLECTION_NAMES: {

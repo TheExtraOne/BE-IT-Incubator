@@ -13,6 +13,10 @@ type TCommentRepViewModel = WithId<{
    * Date of creating in ISO format
    */
   createdAt: string;
+  /**
+   * id of the post
+   */
+  postId: string;
 }>;
 
 export default TCommentRepViewModel;

@@ -77,13 +77,13 @@ Testing (`tests`):
 - ✅ Auth: Add JWT accessToken on log in
 - ✅ Added new endpoint auth/me
 - ✅ Added new endpoint: POST comment
+- ✅ Added new endpoint: GET comments for postId
 
 ## TODO
 
 - [ ] Add GET comment
 - [ ] Add PUT comment
 - [ ] Add DELETE comment
-- [ ] Add GET comments
 - [ ] Bearer auth для creating\updating\deleting comments
 - [ ] Update tests
 - [ ] Update documentation

@@ -11,6 +11,7 @@ const commentsService = {
   createComment: async ({
     content,
     userId,
+    postId,
   }: TCommentsServiceInputModel): Promise<TCommentServiceViewModel | null> => {
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
@@ -26,6 +27,7 @@ const commentsService = {
       content,
       commentatorInfo,
       createdAt: new Date().toISOString(),
+      postId,
     };
 
     const commentId: string = await commentsRepository.createComment(

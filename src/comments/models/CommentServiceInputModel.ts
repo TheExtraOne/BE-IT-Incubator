@@ -7,6 +7,10 @@ type TCommentsServiceInputModel = {
    * id of the user
    */
   userId: string;
+  /**
+   * id of the post
+   */
+  postId: string;
 };
 
 export default TCommentsServiceInputModel;

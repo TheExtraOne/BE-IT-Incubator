@@ -18,7 +18,13 @@ const getAllPostsMiddleware = [
   queryInputValidator.sortDirectionValidator,
   inputCheckErrorsMiddleware,
 ];
-const getPostByIdMiddleware = [inputCheckErrorsMiddleware];
+const getAllCommentsForPostByIdMiddleware = [
+  queryInputValidator.pageNumberValidator,
+  queryInputValidator.pageSizeValidator,
+  queryInputValidator.sortByValidator,
+  queryInputValidator.sortDirectionValidator,
+  inputCheckErrorsMiddleware,
+];
 const createPostMiddleware = [
   basicAuthorizationMiddleware,
   bodyPostsInputValidator.titleValidation,
@@ -42,7 +48,12 @@ const createCommentForPosyById = [
 ];
 
 postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
-postsRouter.get("/:id", [...getPostByIdMiddleware], postsController.getPost);
+postsRouter.get("/:id", postsController.getPost);
+postsRouter.get(
+  "/:id/comments",
+  [...getAllCommentsForPostByIdMiddleware],
+  postsController.getAllCommentsForPostById
+);
 postsRouter.post(
   "/:id/comments",
   [...createCommentForPosyById],

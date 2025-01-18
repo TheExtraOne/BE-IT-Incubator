@@ -6,6 +6,7 @@ import {
   TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQuery,
+  TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../types/types";
 import TQueryPostModel from "./models/QueryPostModel";
@@ -13,9 +14,9 @@ import TPostControllerViewModel from "./models/PostControllerViewModel";
 import postsQueryRepository from "./posts-query-repository";
 import TPathParamsPostModel from "./models/PathParamsPostModel";
 import TPostControllerInputModel from "./models/PostControllerInputModel";
-import TPostCommentControllerInputModel from "./models/PostCommentControllerInputModel";
-import commentsService from "../comments/comments-service";
-import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
+import TPostCommentControllerInputModel from "../comments/models/PostCommentControllerInputModel";
+import commentsController from "../comments/comments-controller";
+import TQueryCommentsModel from "../comments/models/QueryCommentsModel";
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
@@ -52,6 +53,22 @@ const postsController = {
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
+  getAllCommentsForPostById: async (
+    req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
+    res: Response
+  ) => {
+    // userId is checked in the middlewares
+    // Check if postId exist
+    const post: TPostControllerViewModel | null =
+      await postsQueryRepository.getPostById(req.params.id);
+    if (!post) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+
+    commentsController.getAllCommentsForPostId(req, res);
+  },
+
   createPost: async (
     req: TRequestWithBody<TPostControllerInputModel>,
     res: Response
@@ -86,13 +103,7 @@ const postsController = {
       return;
     }
 
-    const newComment: TCommentControllerViewModel | null =
-      await commentsService.createComment({
-        content: req.body.content,
-        userId: req.userId!,
-      });
-
-    res.status(STATUS.CREATED_201).json(newComment);
+    commentsController.createCommentForPostById(req, res);
   },
 
   updatePost: async (

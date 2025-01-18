@@ -3,6 +3,7 @@ import { commentCollection } from "../db/db";
 import { SORT_DIRECTION } from "../settings";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 import TCommentControllerViewModel from "./models/CommentServiceViewModel";
+import { TResponseWithPagination, TSortDirection } from "../types/types";
 
 const mapComment = (
   comment: TCommentRepViewModel
@@ -13,28 +14,21 @@ const mapComment = (
   createdAt: comment.createdAt,
 });
 
-// const mapUsers = (
-//   users: TUserRepViewModel[] | []
-// ): TUserControllerViewModel[] => users.map(mapUser);
+const mapComments = (
+  comments: TCommentRepViewModel[] | []
+): TCommentControllerViewModel[] => comments.map(mapComment);
 
 const commentsQueryRepository = {
-  //   getUsersCount: async ({
-  //     searchEmailTerm,
-  //     searchLoginTerm,
-  //   }: {
-  //     searchEmailTerm: string | null;
-  //     searchLoginTerm: string | null;
-  //   }): Promise<number> => {
-  //     const filters: Record<string, RegExp>[] = [];
-  //     if (searchEmailTerm)
-  //       filters.push({ email: new RegExp(searchEmailTerm, "i") });
-  //     if (searchLoginTerm)
-  //       filters.push({ login: new RegExp(searchLoginTerm, "i") });
+  getCommentsCount: async ({
+    postId,
+  }: {
+    postId?: string;
+  }): Promise<number> => {
+    const filters: Record<string, string> | Record<string, never> = {};
+    if (postId) filters.postId = postId;
 
-  //     return await userCollection.countDocuments(
-  //       filters.length ? { $or: filters } : {}
-  //     );
-  //   },
+    return await commentCollection.countDocuments(filters);
+  },
 
   getCommentById: async (
     id: string
@@ -49,52 +43,41 @@ const commentsQueryRepository = {
     return comment ? mapComment(comment) : null;
   },
 
-  //   getAllUsers: async ({
-  //     searchEmailTerm,
-  //     searchLoginTerm,
-  //     sortBy,
-  //     sortDirection,
-  //     pageNumber,
-  //     pageSize,
-  //   }: {
-  //     searchEmailTerm: string | null;
-  //     searchLoginTerm: string | null;
-  //     sortBy: string;
-  //     sortDirection: TSortDirection;
-  //     pageNumber: number;
-  //     pageSize: number;
-  //   }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> => {
-  //     // Pagination
-  //     const usersCount: number = await usersQueryRepository.getUsersCount({
-  //       searchEmailTerm,
-  //       searchLoginTerm,
-  //     });
-  //     const pagesCount =
-  //       usersCount && pageSize ? Math.ceil(usersCount / pageSize) : 0;
-  //     const usersToSkip = (pageNumber - 1) * pageSize;
+  getAllCommentsForPostId: async ({
+    sortBy,
+    sortDirection,
+    pageNumber,
+    pageSize,
+    postId,
+  }: {
+    sortBy: string;
+    sortDirection: TSortDirection;
+    pageNumber: number;
+    pageSize: number;
+    postId: string;
+  }): Promise<TResponseWithPagination<TCommentControllerViewModel[] | []>> => {
+    // Pagination
+    const commentsCount: number =
+      await commentsQueryRepository.getCommentsCount({ postId });
+    const pagesCount =
+      commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
+    const commentsToSkip = (pageNumber - 1) * pageSize;
 
-  //     // Filtration
-  //     const filters: Record<string, RegExp>[] = [];
-  //     if (searchEmailTerm)
-  //       filters.push({ email: new RegExp(searchEmailTerm, "i") });
-  //     if (searchLoginTerm)
-  //       filters.push({ login: new RegExp(searchLoginTerm, "i") });
+    const comments: TCommentRepViewModel[] | [] = await commentCollection
+      .find({ postId })
+      .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
+      .skip(commentsToSkip)
+      .limit(pageSize)
+      .toArray();
 
-  //     const users: TUserRepViewModel[] | [] = await userCollection
-  //       .find(filters.length ? { $or: filters } : {})
-  //       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-  //       .skip(usersToSkip)
-  //       .limit(pageSize)
-  //       .toArray();
-
-  //     return {
-  //       pagesCount,
-  //       page: pageNumber,
-  //       pageSize,
-  //       totalCount: usersCount,
-  //       items: mapUsers(users),
-  //     };
-  //   },
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize,
+      totalCount: commentsCount,
+      items: mapComments(comments),
+    };
+  },
 };
 
 export default commentsQueryRepository;

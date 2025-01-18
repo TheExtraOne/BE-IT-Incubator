@@ -31,14 +31,14 @@ const commentsRepository = {
   //     return !!matchedCount;
   //   },
 
-  //   deletePostById: async (id: string): Promise<boolean> => {
-  //     if (!ObjectId.isValid(id)) return false;
-  //     const { deletedCount } = await postCollection.deleteOne({
-  //       _id: new ObjectId(id),
-  //     });
+  deleteCommentById: async (id: string): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
+    const { deletedCount } = await commentCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
-  //     return !!deletedCount;
-  //   },
+    return !!deletedCount;
+  },
 };
 
 export default commentsRepository;

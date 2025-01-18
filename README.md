@@ -79,11 +79,11 @@ Testing (`tests`):
 - ✅ Added new endpoint: POST comment
 - ✅ Added new endpoint: GET comments for postId
 - ✅ Added new endpoint: GET comment by Id
+- ✅ Added new endpoint: DELETE comment by Id
 
 ## TODO
 
 - [ ] Add PUT comment
-- [ ] Add DELETE comment
 - [ ] Bearer auth для creating\updating\deleting comments
 - [ ] Update tests
 - [ ] Update documentation

@@ -53,8 +53,8 @@ const commentsService = {
   //   }): Promise<boolean> =>
   //     await blogsRepository.updateBlogById({ id, name, description, websiteUrl }),
 
-  //   deleteBlogById: async (id: string): Promise<boolean> =>
-  //     await blogsRepository.deleteBlogById(id),
+  deleteCommentById: async (id: string): Promise<boolean> =>
+    await commentsRepository.deleteCommentById(id),
 };
 
 export default commentsService;

@@ -1,43 +1,8 @@
 import { Router } from "express";
 import commentsController from "./comments-controller";
+import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
 
 const commentsRouter = Router({});
-
-// const getAllPostsMiddleware = [
-//   queryInputValidator.pageNumberValidator,
-//   queryInputValidator.pageSizeValidator,
-//   queryInputValidator.sortByValidator,
-//   queryInputValidator.sortDirectionValidator,
-//   inputCheckErrorsMiddleware,
-// ];
-// const getAllCommentsForPostByIdMiddleware = [
-//   queryInputValidator.pageNumberValidator,
-//   queryInputValidator.pageSizeValidator,
-//   queryInputValidator.sortByValidator,
-//   queryInputValidator.sortDirectionValidator,
-//   inputCheckErrorsMiddleware,
-// ];
-// const createPostMiddleware = [
-//   basicAuthorizationMiddleware,
-//   bodyPostsInputValidator.titleValidation,
-//   bodyPostsInputValidator.shortDescriptionValidation,
-//   bodyPostsInputValidator.contentValidator,
-//   bodyPostsInputValidator.blogIdValidator,
-//   inputCheckErrorsMiddleware,
-// ];
-// const updatePostByIdMiddleware = [
-//   basicAuthorizationMiddleware,
-//   bodyPostsInputValidator.titleValidation,
-//   bodyPostsInputValidator.shortDescriptionValidation,
-//   bodyPostsInputValidator.contentValidator,
-//   bodyPostsInputValidator.blogIdValidator,
-//   inputCheckErrorsMiddleware,
-// ];
-// const createCommentForPosyById = [
-//   authJwtMiddleware,
-//   bodyPostCommentInputValidator.contentValidation,
-//   inputCheckErrorsMiddleware,
-// ];
 
 commentsRouter.get("/:id", commentsController.getCommentById);
 // postsRouter.put(
@@ -45,10 +10,10 @@ commentsRouter.get("/:id", commentsController.getCommentById);
 //   [...updatePostByIdMiddleware],
 //   postsController.updatePost
 // );
-// postsRouter.delete(
-//   "/:id",
-//   basicAuthorizationMiddleware,
-//   postsController.deletePost
-// );
+commentsRouter.delete(
+  "/:id",
+  authJwtMiddleware,
+  commentsController.deleteComment
+);
 
 export default commentsRouter;

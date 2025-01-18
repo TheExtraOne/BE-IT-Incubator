@@ -88,13 +88,28 @@ const commentsController = {
   //     ? res.sendStatus(STATUS.NO_CONTENT_204)
   //     : res.sendStatus(STATUS.NOT_FOUND_404);
   // },
-  //   deleteComment: async (
-  //     req: TRequestWithParams<TPathParamsPostModel>,
-  //     res: Response
-  //   ) => {
-  //     const success = await postsService.deletePostById(req.params.id);
-  //     res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
-  //   },
+
+  deleteComment: async (
+    req: TRequestWithParams<TPathParamsCommentsModel>,
+    res: Response
+  ) => {
+    // Check that comment exists
+    const comment: TCommentServiceViewModel | null =
+      await commentsQueryRepository.getCommentById(req.params.id);
+    if (!comment) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+
+    // Check that userId is the same in the comment's author
+    if (comment.commentatorInfo.userId !== req.userId) {
+      res.sendStatus(STATUS.FORBIDDEN_403);
+      return;
+    }
+
+    await commentsService.deleteCommentById(req.params.id);
+    res.sendStatus(STATUS.NO_CONTENT_204);
+  },
 };
 
 export default commentsController;

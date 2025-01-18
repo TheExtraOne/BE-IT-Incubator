@@ -76,6 +76,7 @@ Testing (`tests`):
 
 - ✅ Auth: Add JWT accessToken on log in
 - ✅ Added new endpoint auth/me
+- ✅ Added new endpoint: POST comment
 
 ## TODO
 
@@ -83,7 +84,6 @@ Testing (`tests`):
 - [ ] Add PUT comment
 - [ ] Add DELETE comment
 - [ ] Add GET comments
-- [ ] Add POST comment
 - [ ] Bearer auth для creating\updating\deleting comments
 - [ ] Update tests
 - [ ] Update documentation

@@ -3,10 +3,12 @@ import { SETTINGS } from "../settings";
 import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TUserRepViewModel from "../users/models/UserRepViewModel";
+import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
 export let userCollection: Collection<TUserRepViewModel>;
+export let commentCollection: Collection<TCommentRepViewModel>;
 export let client: MongoClient;
 
 export const connectToDb = async (url: string): Promise<boolean> => {
@@ -21,6 +23,9 @@ export const connectToDb = async (url: string): Promise<boolean> => {
   );
   userCollection = db.collection<TUserRepViewModel>(
     SETTINGS.COLLECTION_NAMES.USERS
+  );
+  commentCollection = db.collection<TCommentRepViewModel>(
+    SETTINGS.COLLECTION_NAMES.COMMENTS
   );
 
   try {

@@ -29,7 +29,7 @@ const authController = {
     }
 
     const token: string = await jwtService.createJWT(user!);
-    res.status(STATUS.OK_200).send({
+    res.status(STATUS.OK_200).json({
       accessToken: token,
     });
   },
@@ -39,7 +39,7 @@ const authController = {
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
 
-    res.status(STATUS.OK_200).send({
+    res.status(STATUS.OK_200).json({
       email: user?.email,
       login: user?.login,
       userId: user?.id,

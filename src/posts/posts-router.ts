@@ -6,6 +6,8 @@ import {
 } from "../common-middleware";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
 import postsController from "./posts-controller";
+import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
+import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
 
 const postsRouter = Router({});
 
@@ -33,10 +35,19 @@ const updatePostByIdMiddleware = [
   bodyPostsInputValidator.blogIdValidator,
   inputCheckErrorsMiddleware,
 ];
-const deletePostByIdMiddleware = [basicAuthorizationMiddleware];
+const createCommentForPosyById = [
+  authJwtMiddleware,
+  bodyPostCommentInputValidator.contentValidation,
+  inputCheckErrorsMiddleware,
+];
 
 postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
 postsRouter.get("/:id", [...getPostByIdMiddleware], postsController.getPost);
+postsRouter.post(
+  "/:id/comments",
+  [...createCommentForPosyById],
+  postsController.createCommentForPostById
+);
 postsRouter.post("/", [...createPostMiddleware], postsController.createPost);
 postsRouter.put(
   "/:id",
@@ -45,7 +56,7 @@ postsRouter.put(
 );
 postsRouter.delete(
   "/:id",
-  [...deletePostByIdMiddleware],
+  basicAuthorizationMiddleware,
   postsController.deletePost
 );
 

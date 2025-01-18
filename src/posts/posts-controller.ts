@@ -13,6 +13,9 @@ import TPostControllerViewModel from "./models/PostControllerViewModel";
 import postsQueryRepository from "./posts-query-repository";
 import TPathParamsPostModel from "./models/PathParamsPostModel";
 import TPostControllerInputModel from "./models/PostControllerInputModel";
+import TPostCommentControllerInputModel from "./models/PostCommentControllerInputModel";
+import commentsService from "../comments/comments-service";
+import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
@@ -65,6 +68,31 @@ const postsController = {
       await postsQueryRepository.getPostById(newPostId!);
 
     res.status(STATUS.CREATED_201).json(newPost);
+  },
+
+  createCommentForPostById: async (
+    req: TRequestWithParamsAndBody<
+      TPathParamsPostModel,
+      TPostCommentControllerInputModel
+    >,
+    res: Response
+  ) => {
+    // userId is checked in the middlewares
+    // Check if postId exist
+    const post: TPostControllerViewModel | null =
+      await postsQueryRepository.getPostById(req.params.id);
+    if (!post) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+
+    const newComment: TCommentControllerViewModel | null =
+      await commentsService.createComment({
+        content: req.body.content,
+        userId: req.userId!,
+      });
+
+    res.status(STATUS.CREATED_201).json(newComment);
   },
 
   updatePost: async (

@@ -40,18 +40,14 @@ const commentsService = {
     return createdComment;
   },
 
-  //   updateBlogById: async ({
-  //     id,
-  //     name,
-  //     description,
-  //     websiteUrl,
-  //   }: {
-  //     id: string;
-  //     name: string;
-  //     description: string;
-  //     websiteUrl: string;
-  //   }): Promise<boolean> =>
-  //     await blogsRepository.updateBlogById({ id, name, description, websiteUrl }),
+  updateCommentById: async ({
+    id,
+    content,
+  }: {
+    id: string;
+    content: string;
+  }): Promise<boolean> =>
+    await commentsRepository.updateCommentById({ id, content }),
 
   deleteCommentById: async (id: string): Promise<boolean> =>
     await commentsRepository.deleteCommentById(id),

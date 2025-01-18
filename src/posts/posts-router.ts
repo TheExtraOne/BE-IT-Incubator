@@ -7,7 +7,7 @@ import {
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
 import postsController from "./posts-controller";
 import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
-import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
+import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
 
 const postsRouter = Router({});
 

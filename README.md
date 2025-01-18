@@ -76,14 +76,13 @@ Testing (`tests`):
 
 - ✅ Auth: Add JWT accessToken on log in
 - ✅ Added new endpoint auth/me
-- ✅ Added new endpoint: POST comment
+- ✅ Added new endpoint: POST comment with Bearer auth
 - ✅ Added new endpoint: GET comments for postId
 - ✅ Added new endpoint: GET comment by Id
-- ✅ Added new endpoint: DELETE comment by Id
+- ✅ Added new endpoint: DELETE comment by Id with Bearer auth
+- ✅ Added new endpoint: PUT comment by Id with Bearer auth
 
 ## TODO
 
-- [ ] Add PUT comment
-- [ ] Bearer auth для creating\updating\deleting comments
 - [ ] Update tests
 - [ ] Update documentation

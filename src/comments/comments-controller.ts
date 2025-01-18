@@ -69,25 +69,32 @@ const commentsController = {
       : res.sendStatus(STATUS.NOT_FOUND_404);
   },
 
-  // updateComment: async (
-  //   req: TRequestWithParamsAndBody<
-  //     TPathParamsPostModel,
-  //     TPostControllerInputModel
-  //   >,
-  //   res: Response
-  // ) => {
-  //   const { title, shortDescription, content, blogId } = req.body;
-  //   const success = await postsService.updatePostById({
-  //     id: req.params.id,
-  //     title,
-  //     shortDescription,
-  //     content,
-  //     blogId,
-  //   });
-  //   success
-  //     ? res.sendStatus(STATUS.NO_CONTENT_204)
-  //     : res.sendStatus(STATUS.NOT_FOUND_404);
-  // },
+  updateComment: async (
+    req: TRequestWithParamsAndBody<
+      TPathParamsCommentsModel,
+      TPostCommentControllerInputModel
+    >,
+    res: Response
+  ) => {
+    // Check that comment exists
+    const comment: TCommentServiceViewModel | null =
+      await commentsQueryRepository.getCommentById(req.params.id);
+    if (!comment) {
+      res.sendStatus(STATUS.NOT_FOUND_404);
+      return;
+    }
+    // Check that user can modify comment
+    if (comment.commentatorInfo.userId !== req.userId) {
+      res.sendStatus(STATUS.FORBIDDEN_403);
+      return;
+    }
+
+    await commentsService.updateCommentById({
+      id: req.params.id,
+      content: req.body.content,
+    });
+    res.sendStatus(STATUS.NO_CONTENT_204);
+  },
 
   deleteComment: async (
     req: TRequestWithParams<TPathParamsCommentsModel>,

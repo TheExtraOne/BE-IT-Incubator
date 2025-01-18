@@ -1,15 +1,22 @@
 import { Router } from "express";
 import commentsController from "./comments-controller";
 import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
+import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
+import { inputCheckErrorsMiddleware } from "../common-middleware";
 
 const commentsRouter = Router({});
 
+const updateCommentMiddleware = [
+  authJwtMiddleware,
+  bodyPostCommentInputValidator.contentValidation,
+  inputCheckErrorsMiddleware,
+];
 commentsRouter.get("/:id", commentsController.getCommentById);
-// postsRouter.put(
-//   "/:id",
-//   [...updatePostByIdMiddleware],
-//   postsController.updatePost
-// );
+commentsRouter.put(
+  "/:id",
+  [...updateCommentMiddleware],
+  commentsController.updateComment
+);
 commentsRouter.delete(
   "/:id",
   authJwtMiddleware,

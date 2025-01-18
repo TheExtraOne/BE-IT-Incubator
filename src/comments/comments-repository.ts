@@ -9,27 +9,21 @@ const commentsRepository = {
     return insertedId.toString();
   },
 
-  //   updatePostById: async ({
-  //     id,
-  //     title,
-  //     shortDescription,
-  //     content,
-  //     blogId,
-  //   }: {
-  //     id: string;
-  //     title: string;
-  //     shortDescription: string;
-  //     content: string;
-  //     blogId: string;
-  //   }): Promise<boolean> => {
-  //     if (!ObjectId.isValid(id)) return false;
-  //     const { matchedCount } = await postCollection.updateOne(
-  //       { _id: new ObjectId(id) },
-  //       { $set: { title, shortDescription, content, blogId } }
-  //     );
+  updateCommentById: async ({
+    id,
+    content,
+  }: {
+    id: string;
+    content: string;
+  }): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
+    const { matchedCount } = await commentCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { content } }
+    );
 
-  //     return !!matchedCount;
-  //   },
+    return !!matchedCount;
+  },
 
   deleteCommentById: async (id: string): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;

@@ -43,16 +43,14 @@ const usersService = {
       salt: passwordSalt,
     });
 
-    const isLoginNonUnique: boolean =
-      await usersQueryRepository.isUniqueInDatabase({
-        fieldName: "login",
-        fieldValue: login,
-      });
-    const isEmailNonUnique: boolean =
-      await usersQueryRepository.isUniqueInDatabase({
-        fieldName: "email",
-        fieldValue: email,
-      });
+    const isLoginNonUnique: boolean = await usersRepository.isUniqueInDatabase({
+      fieldName: "login",
+      fieldValue: login,
+    });
+    const isEmailNonUnique: boolean = await usersRepository.isUniqueInDatabase({
+      fieldName: "email",
+      fieldValue: email,
+    });
     const errors: TExtension[] | [] = formError({
       hasEmailError: isEmailNonUnique,
       hasLoginError: isLoginNonUnique,
@@ -93,7 +91,7 @@ const usersService = {
     password: string;
   }): Promise<Result<TUserRepViewModel | null>> => {
     const user: TUserRepViewModel | null =
-      await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
+      await usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {
       return {

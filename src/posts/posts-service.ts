@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
-import blogsQueryRepository from "../blogs/blogs-query-repository";
 import TPostServiceInputModel from "./models/PostServiceInputModel";
-import TBlogControllerViewModel from "../blogs/models/BlogControllerViewModel";
 import TPostRepViewModel from "./models/PostRepViewModel";
 import postsRepository from "./posts-repository";
 import { Result } from "../common/types/types";
 import { RESULT_STATUS } from "../common/settings";
+import blogsRepository from "../blogs/blogs-repository";
+import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
 
 const postsService = {
   createPost: async ({
@@ -14,8 +14,10 @@ const postsService = {
     content,
     blogId,
   }: TPostServiceInputModel): Promise<Result<string | null>> => {
-    const blog: TBlogControllerViewModel | null =
-      await blogsQueryRepository.getBlogById(blogId);
+    const blog: TBlogRepViewModel | null = await blogsRepository.getBlogById(
+      blogId
+    );
+
     if (!blog) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -35,6 +37,7 @@ const postsService = {
       createdAt: new Date().toISOString(),
     };
     const createdPostId = await postsRepository.createPost(newPost);
+
     return {
       status: RESULT_STATUS.SUCCESS,
       data: createdPostId,

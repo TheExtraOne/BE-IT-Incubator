@@ -3,6 +3,15 @@ import TBlogRepViewModel from "./models/BlogRepViewModel";
 import { blogCollection } from "../db/db";
 
 const blogsRepository = {
+  getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {
+    if (!ObjectId.isValid(id)) return null;
+    const blog: TBlogRepViewModel | null = await blogCollection.findOne({
+      _id: new ObjectId(id),
+    });
+
+    return blog;
+  },
+
   createBlog: async (newBlog: TBlogRepViewModel): Promise<string> => {
     const { insertedId } = await blogCollection.insertOne(newBlog);
 

@@ -17,7 +17,7 @@ const mapUsers = (
 ): TUserControllerViewModel[] => users.map(mapUser);
 
 const usersQueryRepository = {
-  getUsersCount: async ({
+  _getUsersCount: async ({
     searchEmailTerm,
     searchLoginTerm,
   }: {
@@ -60,7 +60,7 @@ const usersQueryRepository = {
     pageSize: number;
   }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> => {
     // Pagination
-    const usersCount: number = await usersQueryRepository.getUsersCount({
+    const usersCount: number = await usersQueryRepository._getUsersCount({
       searchEmailTerm,
       searchLoginTerm,
     });
@@ -89,27 +89,6 @@ const usersQueryRepository = {
       totalCount: usersCount,
       items: mapUsers(users),
     };
-  },
-
-  getByLoginOrEmail: async (
-    loginOrEmail: string
-  ): Promise<TUserRepViewModel | null> =>
-    await userCollection.findOne({
-      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
-    }),
-
-  isUniqueInDatabase: async ({
-    fieldName,
-    fieldValue,
-  }: {
-    fieldName: string;
-    fieldValue: string;
-  }): Promise<boolean> => {
-    const users = await userCollection
-      .find({ [fieldName]: fieldValue })
-      .toArray();
-
-    return !!users.length;
   },
 };
 

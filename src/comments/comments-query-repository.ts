@@ -19,7 +19,7 @@ const mapComments = (
 ): TCommentControllerViewModel[] => comments.map(mapComment);
 
 const commentsQueryRepository = {
-  getCommentsCount: async ({
+  _getCommentsCount: async ({
     postId,
   }: {
     postId?: string;
@@ -58,7 +58,7 @@ const commentsQueryRepository = {
   }): Promise<TResponseWithPagination<TCommentControllerViewModel[] | []>> => {
     // Pagination
     const commentsCount: number =
-      await commentsQueryRepository.getCommentsCount({ postId });
+      await commentsQueryRepository._getCommentsCount({ postId });
     const pagesCount =
       commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
     const commentsToSkip = (pageNumber - 1) * pageSize;

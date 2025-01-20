@@ -33,6 +33,17 @@ const commentsRepository = {
 
     return !!deletedCount;
   },
+
+  getCommentById: async (id: string): Promise<TCommentRepViewModel | null> => {
+    if (!ObjectId.isValid(id)) return null;
+
+    const comment: TCommentRepViewModel | null =
+      await commentCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+    return comment;
+  },
 };
 
 export default commentsRepository;

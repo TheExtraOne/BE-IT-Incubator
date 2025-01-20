@@ -20,7 +20,7 @@ const mapPosts = (
 ): TPostControllerViewModel[] | [] => posts.map(mapPost);
 
 const postsQueryRepository = {
-  getPostsCount: async (
+  _getPostsCount: async (
     filter: Record<string, string> | undefined = {}
   ): Promise<number> => await postCollection.countDocuments(filter),
 
@@ -40,7 +40,7 @@ const postsQueryRepository = {
     let filter: Record<string, string> | Record<string, never> = {};
     if (blogId) filter = { blogId };
 
-    const postsCount = await postsQueryRepository.getPostsCount(filter);
+    const postsCount = await postsQueryRepository._getPostsCount(filter);
     const pagesCount =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;

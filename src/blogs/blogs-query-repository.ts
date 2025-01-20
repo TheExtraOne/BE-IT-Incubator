@@ -19,7 +19,7 @@ const mapBlogs = (
 ): TBlogControllerViewModel[] => blogs.map(mapBlog);
 
 const blogsQueryRepository = {
-  getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
+  _getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
     const filter: Record<string, RegExp> | Record<string, never> = {};
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
@@ -44,7 +44,9 @@ const blogsQueryRepository = {
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
     // Pagination
-    const blogsCount = await blogsQueryRepository.getBlogsCount(searchNameTerm);
+    const blogsCount = await blogsQueryRepository._getBlogsCount(
+      searchNameTerm
+    );
     const pagesCount =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
@@ -67,6 +69,7 @@ const blogsQueryRepository = {
 
   getBlogById: async (id: string): Promise<TBlogControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
+
     const blog: TBlogRepViewModel | null = await blogCollection.findOne({
       _id: new ObjectId(id),
     });

@@ -1,13 +1,22 @@
 import { ObjectId } from "mongodb";
 import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
-import usersQueryRepository from "../users/users-query-repository";
 import commentsRepository from "./comments-repository";
-import commentsQueryRepository from "./comments-query-repository";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
-import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
+import TUserRepViewModel from "../users/models/UserRepViewModel";
+import usersRepository from "../users/users-repository";
+import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
+
+const mapComment = (
+  comment: TCommentRepViewModel
+): TCommentControllerViewModel => ({
+  id: comment._id.toString(),
+  content: comment.content,
+  commentatorInfo: comment.commentatorInfo,
+  createdAt: comment.createdAt,
+});
 
 const commentsService = {
   createComment: async ({
@@ -17,8 +26,10 @@ const commentsService = {
   }: TCommentsServiceInputModel): Promise<
     Result<TCommentServiceViewModel | null>
   > => {
-    const user: TUserControllerViewModel | null =
-      await usersQueryRepository.getUserById(userId!);
+    const user: TUserRepViewModel | null = await usersRepository.getUserById(
+      userId!
+    );
+
     if (!user) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -45,12 +56,12 @@ const commentsService = {
       newComment
     );
 
-    const createdComment: TCommentServiceViewModel | null =
-      await commentsQueryRepository.getCommentById(commentId);
+    const createdComment: TCommentRepViewModel | null =
+      await commentsRepository.getCommentById(commentId);
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: createdComment,
+      data: mapComment(createdComment!),
       extensions: [],
     };
   },

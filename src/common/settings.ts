@@ -21,6 +21,7 @@ export const SETTINGS = {
   },
   MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
   JWT_SECRET: process.env.JWT_SECRET || "123Secret",
+  MAIL_PASSWORD: process.env.MAIL_RU_PASS,
 };
 
 export const HTTP_STATUS = {

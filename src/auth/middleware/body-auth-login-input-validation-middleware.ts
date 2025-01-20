@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-const bodyAuthInputValidator = {
+const bodyAuthLoginInputValidator = {
   loginOrEmailValidation: body("loginOrEmail")
     .isString()
     .withMessage("Incorrect type")
@@ -16,4 +16,4 @@ const bodyAuthInputValidator = {
     .withMessage("Password is a required field"),
 };
 
-export default bodyAuthInputValidator;
+export default bodyAuthLoginInputValidator;

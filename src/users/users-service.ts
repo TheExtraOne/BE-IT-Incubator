@@ -2,36 +2,53 @@ import { ObjectId } from "mongodb";
 import { Result, TExtension } from "../common/types/types";
 import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
-import usersQueryRepository from "./users-query-repository";
 import TUserRepViewModel from "./models/UserRepViewModel";
 import usersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
 
-const formError = ({
-  hasLoginError,
-  hasEmailError,
-}: {
-  hasLoginError: boolean;
-  hasEmailError: boolean;
-}): TExtension[] | [] => {
-  const errors: TExtension[] = [];
-  if (hasLoginError) {
-    errors.push({
-      message: "Login already exists",
-      field: "login",
-    });
-  }
-  if (hasEmailError) {
-    errors.push({
-      message: "Email already exists",
-      field: "email",
-    });
-  }
-
-  return errors;
-};
-
 const usersService = {
+  checkIsLoginUnique: async (login: string): Promise<boolean> => {
+    return await usersRepository.isUniqueInDatabase({
+      fieldName: "login",
+      fieldValue: login,
+    });
+  },
+
+  checkIsEmailUnique: async (email: string): Promise<boolean> => {
+    return await usersRepository.isUniqueInDatabase({
+      fieldName: "email",
+      fieldValue: email,
+    });
+  },
+
+  checkIfFieldIsUnique: async ({
+    email,
+    login,
+  }: {
+    email: string | null;
+    login: string | null;
+  }): Promise<TExtension[] | []> => {
+    const errors: TExtension[] = [];
+    if (login) {
+      const isLoginUnique = await usersService.checkIsLoginUnique(login);
+      !isLoginUnique &&
+        errors.push({
+          message: "Login already exists",
+          field: "login",
+        });
+    }
+    if (email) {
+      const isEmailUnique = await usersService.checkIsEmailUnique(email);
+      !isEmailUnique &&
+        errors.push({
+          message: "Email already exists",
+          field: "email",
+        });
+    }
+
+    return errors;
+  },
+
   createUser: async ({
     login,
     password,
@@ -43,17 +60,9 @@ const usersService = {
       salt: passwordSalt,
     });
 
-    const isLoginNonUnique: boolean = await usersRepository.isUniqueInDatabase({
-      fieldName: "login",
-      fieldValue: login,
-    });
-    const isEmailNonUnique: boolean = await usersRepository.isUniqueInDatabase({
-      fieldName: "email",
-      fieldValue: email,
-    });
-    const errors: TExtension[] | [] = formError({
-      hasEmailError: isEmailNonUnique,
-      hasLoginError: isLoginNonUnique,
+    const errors = await usersService.checkIfFieldIsUnique({
+      login,
+      email,
     });
     if (errors.length) {
       return {

@@ -1,16 +1,18 @@
 import { Response, Request } from "express";
 import usersService from "../users/users-service";
 import { HTTP_STATUS, RESULT_STATUS } from "../common/settings";
-import TAuthControllerInputModel from "./models/AuthControllerInputModel";
+import TAuthLoginControllerInputModel from "./models/AuthLoginControllerInputModel";
 import TUserRepViewModel from "../users/models/UserRepViewModel";
 import jwtService from "../jwt/jwt-service";
 import usersQueryRepository from "../users/users-query-repository";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 import { Result, TRequestWithBody } from "../common/types/types";
+import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationControllerInputModel";
+import authService from "./auth-service";
 
 const authController = {
   loginUser: async (
-    req: TRequestWithBody<TAuthControllerInputModel>,
+    req: TRequestWithBody<TAuthLoginControllerInputModel>,
     res: Response
   ) => {
     const { loginOrEmail, password } = req.body;
@@ -46,6 +48,27 @@ const authController = {
       login: user.login,
       userId: user.id,
     });
+  },
+
+  registerUser: async (
+    req: TRequestWithBody<TAuthRegistrationControllerInputModel>,
+    res: Response
+  ) => {
+    const { login, email, password } = req.body;
+
+    const result: Result = await authService.registerUser({
+      login,
+      email,
+      password,
+    });
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res.status(HTTP_STATUS.BAD_REQUEST_400).json({
+        errorsMessages: result.extensions,
+      });
+      return;
+    }
+
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 };
 

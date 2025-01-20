@@ -142,19 +142,15 @@ Testing (`__tests__/e2e/`):
 ## Completed Features
 
 - ✅ JWT authentication with accessToken on login
-- ✅ Protected /auth/me endpoint
-- ✅ Comments system implementation:
-  - ✅ POST comment with Bearer auth
-  - ✅ GET comments for postId
-  - ✅ GET comment by Id
-  - ✅ DELETE comment by Id with Bearer auth
-  - ✅ PUT comment by Id with Bearer auth
-- ✅ Updated e2e tests for all new endpoints
-- ✅ Query repositories implementation
-- ✅ Separation of command and query repositories
+- ✅ Add nodemailer library for sending emails
 
 ## TODO
 
+- [ ] Add endpoint for registration (Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere)
+- [ ] Add endpoint for registration confirmation
+- [ ] Add endpoint for registration-email-resending
+- [ ] Cover changes with tests
+- [ ] Update documentation
 - [ ] Add refresh token functionality
 - [ ] Implement rate limiting
 - [ ] Add API documentation with Swagger/OpenAPI

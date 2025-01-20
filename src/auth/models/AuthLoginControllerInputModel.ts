@@ -1,4 +1,4 @@
-type TAuthControllerInputModel = {
+type TAuthLoginControllerInputModel = {
   /**
    * loginOrEmail of the user
    */
@@ -9,4 +9,4 @@ type TAuthControllerInputModel = {
   password: string;
 };
 
-export default TAuthControllerInputModel;
+export default TAuthLoginControllerInputModel;

@@ -34,11 +34,9 @@ const usersRepository = {
     fieldName: string;
     fieldValue: string;
   }): Promise<boolean> => {
-    const users = await userCollection
-      .find({ [fieldName]: fieldValue })
-      .toArray();
+    const user = await userCollection.findOne({ [fieldName]: fieldValue });
 
-    return !!users.length;
+    return !user;
   },
 
   getByLoginOrEmail: async (

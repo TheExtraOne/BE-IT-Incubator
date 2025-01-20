@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
+import { SORT_DIRECTION, HTTP_STATUS, RESULT_STATUS } from "../common/settings";
 import {
-  TFieldError,
+  Result,
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithQuery,
@@ -13,12 +13,6 @@ import TUserServiceViewModel from "./models/UserServiceViewModel";
 import usersQueryRepository from "./users-query-repository";
 import TUserControllerInputModel from "./models/UserControllerInputModel";
 import TPathParamsUserModel from "./models/PathParamsUserModel";
-
-type TCreateUserReturnedValue = {
-  hasError: boolean;
-  errors: TFieldError[] | [];
-  createdUserId: null | string;
-};
 
 const usersController = {
   getUsers: async (req: TRequestWithQuery<TQueryUserModel>, res: Response) => {
@@ -50,21 +44,20 @@ const usersController = {
   ) => {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const { hasError, errors, createdUserId }: TCreateUserReturnedValue =
-      await usersService.createUser({
-        login,
-        email,
-        password,
-      });
+    const result: Result<string | null> = await usersService.createUser({
+      login,
+      email,
+      password,
+    });
 
-    if (hasError) {
+    if (result.status !== RESULT_STATUS.SUCCESS) {
       res.status(HTTP_STATUS.BAD_REQUEST_400).json({
-        errorsMessages: errors,
+        errorsMessages: result.extensions,
       });
       return;
     }
 
-    const createdUser = await usersQueryRepository.getUserById(createdUserId!);
+    const createdUser = await usersQueryRepository.getUserById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdUser);
   },

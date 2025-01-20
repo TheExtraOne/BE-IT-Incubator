@@ -1,6 +1,7 @@
 import { Response } from "express";
-import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
+import { SORT_DIRECTION, HTTP_STATUS, RESULT_STATUS } from "../common/settings";
 import {
+  Result,
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithParamsAndBody,
@@ -118,14 +119,19 @@ const blogsController = {
     }
 
     const { title, shortDescription, content } = req.body;
-    const newPostId: string | null = await postsService.createPost({
+    const result: Result<string | null> = await postsService.createPost({
       title,
       shortDescription,
       content,
       blogId,
     });
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+
     const newPost: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(newPostId!);
+      await postsQueryRepository.getPostById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(newPost);
   },

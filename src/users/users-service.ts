@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Result, TFieldError } from "../common/types/types";
+import { Result, TExtension } from "../common/types/types";
 import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
 import usersQueryRepository from "./users-query-repository";
@@ -7,20 +7,14 @@ import TUserRepViewModel from "./models/UserRepViewModel";
 import usersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
 
-type TCreateUserReturnedValue = {
-  hasError: boolean;
-  errors: TFieldError[] | [];
-  createdUserId: null | string;
-};
-
 const formError = ({
   hasLoginError,
   hasEmailError,
 }: {
   hasLoginError: boolean;
   hasEmailError: boolean;
-}): TFieldError[] | [] => {
-  const errors: TFieldError[] = [];
+}): TExtension[] | [] => {
+  const errors: TExtension[] = [];
   if (hasLoginError) {
     errors.push({
       message: "Login already exists",
@@ -42,7 +36,7 @@ const usersService = {
     login,
     password,
     email,
-  }: TUserServiceInputModel): Promise<TCreateUserReturnedValue> => {
+  }: TUserServiceInputModel): Promise<Result<string | null>> => {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await usersService._generateHash({
       value: password,
@@ -59,15 +53,16 @@ const usersService = {
         fieldName: "email",
         fieldValue: email,
       });
-    const errors: TFieldError[] | [] = formError({
+    const errors: TExtension[] | [] = formError({
       hasEmailError: isEmailNonUnique,
       hasLoginError: isLoginNonUnique,
     });
     if (errors.length) {
       return {
-        hasError: true,
-        errors,
-        createdUserId: null,
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Bad request",
+        extensions: [...errors],
       };
     }
 
@@ -81,9 +76,9 @@ const usersService = {
     const createdUserId: string = await usersRepository.createUser(newUser);
 
     return {
-      hasError: false,
-      errors,
-      createdUserId,
+      status: RESULT_STATUS.SUCCESS,
+      data: createdUserId,
+      extensions: [],
     };
   },
 

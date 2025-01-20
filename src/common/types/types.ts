@@ -7,12 +7,8 @@ export type TRequestWithParamsAndBody<T, B> = Request<T, {}, B>;
 export type TRequestWithQueryAndParams<T, B> = Request<B, {}, {}, T>;
 export type TRequestWithQuery<T> = Request<{}, {}, {}, T>;
 
-export type TFieldError = {
-  message: string | null;
-  field: string | null;
-};
 export type TAPIErrorResult = {
-  errorsMessages: TFieldError[] | null;
+  errorsMessages: TExtension[] | null;
 };
 
 export type TResponseWithPagination<T> = {
@@ -25,7 +21,7 @@ export type TResponseWithPagination<T> = {
 
 export type TSortDirection = SORT_DIRECTION.ASC | SORT_DIRECTION.DESC;
 
-type ExtensionType = {
+export type TExtension = {
   field: string | null;
   message: string;
 };
@@ -33,6 +29,6 @@ type ExtensionType = {
 export type Result<T = null> = {
   status: RESULT_STATUS;
   errorMessage?: string;
-  extensions: ExtensionType[];
+  extensions: TExtension[];
   data: T;
 };

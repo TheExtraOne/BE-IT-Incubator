@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { HTTP_STATUS } from "../../common/settings";
+import { HTTP_STATUS, RESULT_STATUS } from "../../common/settings";
 import jwtService from "../jwt-service";
+import { Result } from "../../common/types/types";
 
 const authJwtMiddleware = async (
   req: Request,
@@ -15,13 +16,15 @@ const authJwtMiddleware = async (
 
   const token: string = bearerJWT.split(" ")[1];
 
-  const userId: string | null = await jwtService.getUserIdByToken(token);
+  const result: Result<string | null> = await jwtService.getUserIdByToken(
+    token
+  );
 
-  if (!userId) {
+  if (result.status !== RESULT_STATUS.SUCCESS) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
-  req.userId = userId;
+  req.userId = result.data;
 
   next();
 };

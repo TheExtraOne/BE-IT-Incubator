@@ -14,18 +14,18 @@ const authController = {
     res: Response
   ) => {
     const { loginOrEmail, password } = req.body;
-    const user: Result<TUserRepViewModel | null> =
+    const result: Result<TUserRepViewModel | null> =
       await usersService.checkUserCredentials({
         loginOrEmail,
         password,
       });
 
-    if (user.status !== RESULT_STATUS.SUCCESS) {
+    if (result.status !== RESULT_STATUS.SUCCESS) {
       res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
       return;
     }
 
-    const token: string = await jwtService.createJWT(user.data!);
+    const token: string = await jwtService.createJWT(result.data!);
     res.status(HTTP_STATUS.OK_200).json({
       accessToken: token,
     });
@@ -36,10 +36,15 @@ const authController = {
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
 
+    if (!user) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+
     res.status(HTTP_STATUS.OK_200).json({
-      email: user?.email,
-      login: user?.login,
-      userId: user?.id,
+      email: user.email,
+      login: user.login,
+      userId: user.id,
     });
   },
 };

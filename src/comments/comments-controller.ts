@@ -1,6 +1,7 @@
 import { Response } from "express";
-import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
+import { SORT_DIRECTION, HTTP_STATUS, RESULT_STATUS } from "../common/settings";
 import {
+  Result,
   TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQueryAndParams,
@@ -23,13 +24,18 @@ const commentsController = {
     >,
     res: Response
   ) => {
-    const newComment: TCommentControllerViewModel | null =
+    const result: Result<TCommentServiceViewModel | null> =
       await commentsService.createComment({
         content: req.body.content,
         userId: req.userId!,
         postId: req.params.id,
       });
-    res.status(HTTP_STATUS.CREATED_201).json(newComment);
+
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+    res.status(HTTP_STATUS.CREATED_201).json(result.data);
   },
 
   getAllCommentsForPostId: async (

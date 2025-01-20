@@ -6,16 +6,27 @@ import commentsQueryRepository from "./comments-query-repository";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
+import { RESULT_STATUS } from "../common/settings";
+import { Result } from "../common/types/types";
 
 const commentsService = {
   createComment: async ({
     content,
     userId,
     postId,
-  }: TCommentsServiceInputModel): Promise<TCommentServiceViewModel | null> => {
+  }: TCommentsServiceInputModel): Promise<
+    Result<TCommentServiceViewModel | null>
+  > => {
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
-    if (!user) return null;
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "userId", message: "Not Found" }],
+      };
+    }
 
     const commentatorInfo = {
       userId: userId,
@@ -37,7 +48,11 @@ const commentsService = {
     const createdComment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(commentId);
 
-    return createdComment;
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: createdComment,
+      extensions: [],
+    };
   },
 
   updateCommentById: async ({

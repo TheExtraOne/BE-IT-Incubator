@@ -4,6 +4,8 @@ import TPostServiceInputModel from "./models/PostServiceInputModel";
 import TBlogControllerViewModel from "../blogs/models/BlogControllerViewModel";
 import TPostRepViewModel from "./models/PostRepViewModel";
 import postsRepository from "./posts-repository";
+import { Result } from "../common/types/types";
+import { RESULT_STATUS } from "../common/settings";
 
 const postsService = {
   createPost: async ({
@@ -11,10 +13,17 @@ const postsService = {
     shortDescription,
     content,
     blogId,
-  }: TPostServiceInputModel): Promise<string | null> => {
+  }: TPostServiceInputModel): Promise<Result<string | null>> => {
     const blog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(blogId);
-    if (!blog) return null;
+    if (!blog) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "blogId", message: "Not found" }],
+      };
+    }
 
     const newPost: TPostRepViewModel = {
       _id: new ObjectId(),
@@ -25,7 +34,12 @@ const postsService = {
       blogName: blog.name,
       createdAt: new Date().toISOString(),
     };
-    return await postsRepository.createPost(newPost);
+    const createdPostId = await postsRepository.createPost(newPost);
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: createdPostId,
+      extensions: [],
+    };
   },
 
   updatePostById: async ({

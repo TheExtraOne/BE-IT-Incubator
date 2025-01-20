@@ -34,42 +34,69 @@ The `src` directory contains the core components of our application:
 src/
 ├── app.ts                 # Express app configuration
 ├── index.ts              # Application entry point
-├── settings.ts           # Application settings
 ├── auth/                 # Authentication and authorization
 │   ├── auth-controller.ts
 │   ├── auth-router.ts
-│   └── middleware/
+│   ├── middleware/
+│   └── models/
 ├── blogs/                # Blog management
 │   ├── blogs-controller.ts
 │   ├── blogs-service.ts
 │   ├── blogs-repository.ts
+│   ├── blogs-query-repository.ts
+│   ├── blogs-router.ts
+│   ├── middlewares/
 │   └── models/
 ├── comments/            # Comments functionality
 │   ├── comments-controller.ts
 │   ├── comments-service.ts
 │   ├── comments-repository.ts
+│   ├── comments-query-repository.ts
+│   ├── comments-router.ts
+│   ├── middleware/
 │   └── models/
-├── common-middleware/   # Shared middleware components
-├── jwt/                # JWT implementation
-├── posts/              # Posts management
+├── common/             # Shared components
+│   ├── settings.ts
+│   ├── middlewares/
+│   └── types/
+├── db/                # Database configuration
+│   └── db.ts
+├── jwt/              # JWT implementation
+│   ├── jwt-service.ts
+│   └── middleware/
+├── posts/            # Posts management
 │   ├── posts-controller.ts
 │   ├── posts-service.ts
 │   ├── posts-repository.ts
+│   ├── posts-query-repository.ts
+│   ├── posts-router.ts
+│   ├── middleware/
 │   └── models/
-├── users/              # User management
+├── users/            # User management
 │   ├── users-controller.ts
 │   ├── users-service.ts
 │   ├── users-repository.ts
+│   ├── users-query-repository.ts
+│   ├── users-router.ts
+│   ├── middleware/
 │   └── models/
-└── testing/            # Testing utilities
+└── testing/          # Testing utilities
+    ├── testing-repository.ts
+    └── testing-router.ts
 ```
 
 Testing (`__tests__/e2e/`):
 
-- End-to-end tests using Jest and Supertest
-- Separate test suites for blogs, posts, comments, and users CRUD operations
-- MongoDB Memory Server for testing
-- Coverage reporting capability
+- Comprehensive end-to-end tests using Jest (v29.7.0) and Supertest (v7.0.0)
+- Organized test suites by feature:
+  - Auth: Login and registration flows
+  - Blogs: CRUD operations and blog-specific posts
+  - Posts: CRUD operations and post comments
+  - Comments: Creation, updates, and deletion
+  - Users: Account management and queries
+- MongoDB Memory Server (v10.1.3) for isolated testing
+- Coverage reporting with jest:coverage command
+- Helper utilities for test setup and teardown
 
 ## Features
 
@@ -128,7 +155,6 @@ Testing (`__tests__/e2e/`):
 
 ## TODO
 
-- [ ] Update service response in case of error
 - [ ] Add refresh token functionality
 - [ ] Implement rate limiting
 - [ ] Add API documentation with Swagger/OpenAPI

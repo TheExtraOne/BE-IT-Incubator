@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, userCredentials } from "../helpers";
 import { client, connectToDb } from "../../../src/db/db";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -23,14 +23,14 @@ describe("GET /users", () => {
 
   describe("Users retrieval", () => {
     it("should return 401 if unauthorized", async () => {
-      await req.get(SETTINGS.PATH.USERS).expect(STATUS.UNAUTHORIZED_401);
+      await req.get(SETTINGS.PATH.USERS).expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 200 and an empty array of items if the db is empty", async () => {
       const res = await req
         .get(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         items: [],
@@ -46,12 +46,12 @@ describe("GET /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([
         {
@@ -70,7 +70,7 @@ describe("GET /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
       await req
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
@@ -79,7 +79,7 @@ describe("GET /users", () => {
           login: "admin2",
           email: "test2@test.com",
         })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
       await req
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
@@ -88,12 +88,12 @@ describe("GET /users", () => {
           login: "admin3",
           email: "test3@test.com",
         })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?pageNumber=2&pageSize=2`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       // will be the first because of default sorting based on createdAt field
       expect(res.body).toEqual({
@@ -119,12 +119,12 @@ describe("GET /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?searchLoginTerm=super`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([
         {
@@ -141,12 +141,12 @@ describe("GET /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?searchEmailTerm=example`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([
         {
@@ -163,12 +163,12 @@ describe("GET /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?searchLoginTerm=notexist`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([]);
     });
@@ -179,7 +179,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?pageNumber=1.5`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -193,7 +193,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?pageNumber=0`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -207,7 +207,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?pageSize=1.5`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -221,7 +221,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?pageSize=0`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -235,7 +235,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?sortBy=`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -249,7 +249,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?searchLoginTerm=`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -263,7 +263,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?searchEmailTerm=`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -277,7 +277,7 @@ describe("GET /users", () => {
       const res = await req
         .get(`${SETTINGS.PATH.USERS}?sortDirection=invalid`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {

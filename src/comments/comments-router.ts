@@ -2,7 +2,7 @@ import { Router } from "express";
 import commentsController from "./comments-controller";
 import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
 import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
-import { inputCheckErrorsMiddleware } from "../common-middleware";
+import { inputCheckErrorsMiddleware } from "../common/middlewares";
 
 const commentsRouter = Router({});
 

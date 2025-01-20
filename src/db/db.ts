@@ -1,5 +1,5 @@
 import { Collection, Db, MongoClient } from "mongodb";
-import { SETTINGS } from "../settings";
+import { SETTINGS } from "../common/settings";
 import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TUserRepViewModel from "../users/models/UserRepViewModel";

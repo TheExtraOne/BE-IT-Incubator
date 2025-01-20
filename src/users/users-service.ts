@@ -1,10 +1,11 @@
 import { ObjectId } from "mongodb";
-import { TFieldError } from "../types/types";
+import { Result, TFieldError } from "../common/types/types";
 import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
 import usersQueryRepository from "./users-query-repository";
 import TUserRepViewModel from "./models/UserRepViewModel";
 import usersRepository from "./users-repository";
+import { RESULT_STATUS } from "../common/settings";
 
 type TCreateUserReturnedValue = {
   hasError: boolean;
@@ -95,13 +96,34 @@ const usersService = {
   }: {
     loginOrEmail: string;
     password: string;
-  }): Promise<TUserRepViewModel | null> => {
+  }): Promise<Result<TUserRepViewModel | null>> => {
     const user: TUserRepViewModel | null =
       await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
-    if (!user) return null;
 
-    const is_correct = await bcrypt.compare(password, user.passwordHash);
-    return is_correct ? user : null;
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "loginOrEmail", message: "Not Found" }],
+      };
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordCorrect) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Bad Request",
+        extensions: [{ field: "password", message: "Wrong password" }],
+      };
+    }
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: user,
+      extensions: [],
+    };
   },
 
   _generateHash: async ({ value, salt }: { value: string; salt: string }) =>

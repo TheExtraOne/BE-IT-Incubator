@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   incorrectId,
   req,
@@ -30,7 +30,7 @@ describe("PUT /comments", () => {
       .post(SETTINGS.PATH.USERS)
       .set({ Authorization: userCredentials.correct })
       .send(correctUserBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     const {
       body: { accessToken: token },
@@ -40,7 +40,7 @@ describe("PUT /comments", () => {
         loginOrEmail: correctUserBodyParams.login,
         password: correctUserBodyParams.password,
       })
-      .expect(STATUS.OK_200);
+      .expect(HTTP_STATUS.OK_200);
 
     accessToken = token;
 
@@ -51,7 +51,7 @@ describe("PUT /comments", () => {
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     // Create a post
     const {
@@ -60,7 +60,7 @@ describe("PUT /comments", () => {
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     postId = id;
 
@@ -71,7 +71,7 @@ describe("PUT /comments", () => {
       .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .send({ content: "Test comment content" })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     commentId = cId;
   });
@@ -90,7 +90,7 @@ describe("PUT /comments", () => {
       await req
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .send({ content: "Brand new updated content" })
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 404 if comment does not exist", async () => {
@@ -98,7 +98,7 @@ describe("PUT /comments", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Brand new updated content" })
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 400 if content is empty", async () => {
@@ -106,7 +106,7 @@ describe("PUT /comments", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body).toEqual({
         errorsMessages: [
@@ -123,7 +123,7 @@ describe("PUT /comments", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "New content" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body).toEqual({
         errorsMessages: [
@@ -145,7 +145,7 @@ describe("PUT /comments", () => {
           password: "password2",
           email: "user2@example.com",
         })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const otherUserToken = (
         await req
@@ -154,14 +154,14 @@ describe("PUT /comments", () => {
             loginOrEmail: "user2",
             password: "password2",
           })
-          .expect(STATUS.OK_200)
+          .expect(HTTP_STATUS.OK_200)
       ).body.accessToken;
 
       await req
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${otherUserToken}` })
         .send({ content: "Updated by other user" })
-        .expect(STATUS.FORBIDDEN_403);
+        .expect(HTTP_STATUS.FORBIDDEN_403);
     });
 
     it("should return 204 and update comment if input is valid", async () => {
@@ -171,12 +171,12 @@ describe("PUT /comments", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: newContent })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Verify the comment was updated
       const res = await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.content).toBe(newContent);
     });

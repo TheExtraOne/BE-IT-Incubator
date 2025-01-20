@@ -5,7 +5,7 @@ import {
   basicAuthorizationMiddleware,
   inputCheckErrorsMiddleware,
   queryInputValidator,
-} from "../common-middleware";
+} from "../common/middlewares";
 
 const usersRouter = Router({});
 

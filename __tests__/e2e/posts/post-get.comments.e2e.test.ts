@@ -1,5 +1,5 @@
 import { client, connectToDb } from "../../../src/db/db";
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
@@ -29,7 +29,7 @@ describe("GET /posts/:id/comments", () => {
       .post(SETTINGS.PATH.USERS)
       .set({ Authorization: userCredentials.correct })
       .send(correctUserBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     const {
       body: { accessToken: token },
@@ -39,7 +39,7 @@ describe("GET /posts/:id/comments", () => {
         loginOrEmail: correctUserBodyParams.login,
         password: correctUserBodyParams.password,
       })
-      .expect(STATUS.OK_200);
+      .expect(HTTP_STATUS.OK_200);
 
     accessToken = token;
 
@@ -50,7 +50,7 @@ describe("GET /posts/:id/comments", () => {
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     // Create a post
     const {
@@ -59,7 +59,7 @@ describe("GET /posts/:id/comments", () => {
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     postId = id;
   });
@@ -75,7 +75,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when pageNumber is not an integer", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?pageNumber=1.5`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -88,7 +88,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?pageNumber=0`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -101,7 +101,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?pageSize=1.5`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -114,7 +114,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?pageSize=0`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -127,7 +127,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?sortBy=`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -140,7 +140,7 @@ describe("GET /posts/:id/comments", () => {
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments?sortDirection=invalid`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -155,13 +155,13 @@ describe("GET /posts/:id/comments", () => {
     it("should return 404 if post id does not exist", async () => {
       await req
         .get(`${SETTINGS.PATH.POSTS}/${incorrectId}/comments`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 200 and empty array if post has no comments", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         items: [],
@@ -178,11 +178,11 @@ describe("GET /posts/:id/comments", () => {
         .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Test comment content" })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toHaveLength(1);
       expect(res.body.items[0]).toEqual({
@@ -202,25 +202,25 @@ describe("GET /posts/:id/comments", () => {
         .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Test comment content 1" })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       await req
         .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Test comment content 2" })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       await req
         .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Test comment content 3" })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(
           `${SETTINGS.PATH.POSTS}/${postId}/comments?pageNumber=2&pageSize=2`
         )
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         items: [

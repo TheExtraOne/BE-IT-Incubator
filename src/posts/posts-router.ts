@@ -3,7 +3,7 @@ import {
   basicAuthorizationMiddleware,
   inputCheckErrorsMiddleware,
   queryInputValidator,
-} from "../common-middleware";
+} from "../common/middlewares";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
 import postsController from "./posts-controller";
 import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";

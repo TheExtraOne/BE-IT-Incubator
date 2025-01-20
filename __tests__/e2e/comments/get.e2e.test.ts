@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   incorrectId,
   req,
@@ -30,7 +30,7 @@ describe("GET /comments", () => {
       .post(SETTINGS.PATH.USERS)
       .set({ Authorization: userCredentials.correct })
       .send(correctUserBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     const {
       body: { accessToken: token },
@@ -40,7 +40,7 @@ describe("GET /comments", () => {
         loginOrEmail: correctUserBodyParams.login,
         password: correctUserBodyParams.password,
       })
-      .expect(STATUS.OK_200);
+      .expect(HTTP_STATUS.OK_200);
 
     accessToken = token;
 
@@ -51,7 +51,7 @@ describe("GET /comments", () => {
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     // Create a post
     const {
@@ -60,7 +60,7 @@ describe("GET /comments", () => {
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     postId = id;
 
@@ -71,7 +71,7 @@ describe("GET /comments", () => {
       .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .send({ content: "Test comment content" })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     commentId = cId;
   });
@@ -89,7 +89,7 @@ describe("GET /comments", () => {
     it("should return 404 if comment id does not exist", async () => {
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 404 if comment was deleted", async () => {
@@ -97,18 +97,18 @@ describe("GET /comments", () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Try to get the deleted comment
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 200 and comment data if comment exists", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         id: commentId,

@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 import TPostRepViewModel from "./models/PostRepViewModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
 import { postCollection } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../types/types";
-import { SORT_DIRECTION } from "../settings";
+import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { SORT_DIRECTION } from "../common/settings";
 
 const mapPost = (post: TPostRepViewModel): TPostControllerViewModel => ({
   id: post._id.toString(),

@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   incorrectId,
   req,
@@ -30,7 +30,7 @@ describe("DELETE /comments", () => {
       .post(SETTINGS.PATH.USERS)
       .set({ Authorization: userCredentials.correct })
       .send(correctUserBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     const {
       body: { accessToken: token },
@@ -40,7 +40,7 @@ describe("DELETE /comments", () => {
         loginOrEmail: correctUserBodyParams.login,
         password: correctUserBodyParams.password,
       })
-      .expect(STATUS.OK_200);
+      .expect(HTTP_STATUS.OK_200);
 
     accessToken = token;
 
@@ -51,7 +51,7 @@ describe("DELETE /comments", () => {
       .post(SETTINGS.PATH.BLOGS)
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     // Create a post
     const {
@@ -60,7 +60,7 @@ describe("DELETE /comments", () => {
       .post(SETTINGS.PATH.POSTS)
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     postId = id;
 
@@ -71,7 +71,7 @@ describe("DELETE /comments", () => {
       .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .send({ content: "Test comment content" })
-      .expect(STATUS.CREATED_201);
+      .expect(HTTP_STATUS.CREATED_201);
 
     commentId = cId;
   });
@@ -89,14 +89,14 @@ describe("DELETE /comments", () => {
     it("should return 401 if no authorization token provided", async () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 404 if comment does not exist", async () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 403 if trying to delete someone else's comment", async () => {
@@ -109,7 +109,7 @@ describe("DELETE /comments", () => {
           password: "password2",
           email: "user2@example.com",
         })
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const otherUserToken = (
         await req
@@ -118,25 +118,25 @@ describe("DELETE /comments", () => {
             loginOrEmail: "user2",
             password: "password2",
           })
-          .expect(STATUS.OK_200)
+          .expect(HTTP_STATUS.OK_200)
       ).body.accessToken;
 
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${otherUserToken}` })
-        .expect(STATUS.FORBIDDEN_403);
+        .expect(HTTP_STATUS.FORBIDDEN_403);
     });
 
     it("should return 204 and delete comment if authorized", async () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Verify comment was deleted
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
   });
 });

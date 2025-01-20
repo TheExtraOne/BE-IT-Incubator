@@ -23,7 +23,7 @@ export const SETTINGS = {
   JWT_SECRET: process.env.JWT_SECRET || "123Secret",
 };
 
-export const STATUS = {
+export const HTTP_STATUS = {
   OK_200: 200,
   CREATED_201: 201,
   NO_CONTENT_204: 204,
@@ -31,9 +31,18 @@ export const STATUS = {
   NOT_FOUND_404: 404,
   UNAUTHORIZED_401: 401,
   FORBIDDEN_403: 403,
+  SERVER_ERROR_500: 500,
 };
 
 export enum SORT_DIRECTION {
   ASC = "asc",
   DESC = "desc",
+}
+
+export enum RESULT_STATUS {
+  SUCCESS = "success",
+  NOT_FOUND = "notFound",
+  FORBIDDEN = "forbidden",
+  UNAUTHORIZED = "unauthorized",
+  BAD_REQUEST = "badRequest",
 }

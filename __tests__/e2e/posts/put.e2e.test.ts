@@ -6,7 +6,7 @@ import {
   req,
   userCredentials,
 } from "../helpers";
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("PUT /posts", () => {
@@ -70,11 +70,11 @@ describe("PUT /posts", () => {
       await req
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .send(newBodyParams)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -84,11 +84,11 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.incorrect })
         .send(newBodyParams)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -101,11 +101,11 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .send(newBodyParams)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -115,11 +115,11 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(newBodyParams)
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         ...newBodyParams,
@@ -139,7 +139,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [{ field: "title", message: "Incorrect type" }],
@@ -147,7 +147,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -159,7 +159,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -169,7 +169,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -184,7 +184,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -194,7 +194,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -210,7 +210,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -220,7 +220,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -235,7 +235,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -248,7 +248,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -263,7 +263,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -276,7 +276,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -292,7 +292,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [{ field: "content", message: "Incorrect type" }],
@@ -300,7 +300,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -315,7 +315,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -328,7 +328,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -346,7 +346,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -359,7 +359,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -375,7 +375,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [{ field: "blogId", message: "Incorrect type" }],
@@ -383,7 +383,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -398,7 +398,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -411,7 +411,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -426,7 +426,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -439,7 +439,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });
@@ -456,7 +456,7 @@ describe("PUT /posts", () => {
         .put(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
         .send(bodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body).toEqual({
         errorsMessages: [
@@ -473,7 +473,7 @@ describe("PUT /posts", () => {
 
       const res = await req
         .get(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
     });

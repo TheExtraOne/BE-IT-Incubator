@@ -1,12 +1,12 @@
 import { Response } from "express";
-import { SORT_DIRECTION, STATUS } from "../settings";
+import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
 import {
   TFieldError,
   TRequestWithBody,
   TRequestWithParams,
   TRequestWithQuery,
   TResponseWithPagination,
-} from "../types/types";
+} from "../common/types/types";
 import usersService from "./users-service";
 import TQueryUserModel from "./models/QueryUserModel";
 import TUserServiceViewModel from "./models/UserServiceViewModel";
@@ -41,7 +41,7 @@ const usersController = {
         pageSize: +pageSize,
       });
 
-    res.status(STATUS.OK_200).json(users);
+    res.status(HTTP_STATUS.OK_200).json(users);
   },
 
   createUser: async (
@@ -58,7 +58,7 @@ const usersController = {
       });
 
     if (hasError) {
-      res.status(STATUS.BAD_REQUEST_400).json({
+      res.status(HTTP_STATUS.BAD_REQUEST_400).json({
         errorsMessages: errors,
       });
       return;
@@ -66,7 +66,7 @@ const usersController = {
 
     const createdUser = await usersQueryRepository.getUserById(createdUserId!);
 
-    res.status(STATUS.CREATED_201).json(createdUser);
+    res.status(HTTP_STATUS.CREATED_201).json(createdUser);
   },
 
   deleteUser: async (
@@ -78,7 +78,7 @@ const usersController = {
     );
 
     res.sendStatus(
-      is_successful ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404
+      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
     );
   },
 };

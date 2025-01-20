@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { SETTINGS, STATUS } from "./settings";
+import { SETTINGS, HTTP_STATUS } from "./common/settings";
 import blogsRouter from "./blogs/blogs-router";
 import postsRouter from "./posts/posts-router";
 import usersRouter from "./users/users-router";
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (_req: Request, res: Response) => {
-  res.status(STATUS.OK_200).json("All good");
+  res.status(HTTP_STATUS.OK_200).json("All good");
 });
 
 app.use(SETTINGS.PATH.BLOGS, blogsRouter);

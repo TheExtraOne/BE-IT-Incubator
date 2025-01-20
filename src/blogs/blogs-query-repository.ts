@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
 import { blogCollection } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../types/types";
-import { SORT_DIRECTION } from "../settings";
+import { SORT_DIRECTION } from "../common/settings";
+import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 
 const mapBlog = (blog: TBlogRepViewModel): TBlogControllerViewModel => ({
   id: blog._id.toString(),

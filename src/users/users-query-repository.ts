@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 import TUserRepViewModel from "./models/UserRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { userCollection } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../types/types";
-import { SORT_DIRECTION } from "../settings";
+import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { SORT_DIRECTION } from "../common/settings";
 
 const mapUser = (user: TUserRepViewModel): TUserControllerViewModel => ({
   id: user._id.toString(),

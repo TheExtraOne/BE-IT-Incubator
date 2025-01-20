@@ -1,5 +1,5 @@
 import { client, connectToDb } from "../../../src/db/db";
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
@@ -50,18 +50,18 @@ describe("DELETE /posts", () => {
     it("should return 401 if user is not authorized (authorized no headers)", async () => {
       await req
         .delete(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
 
-      const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
     });
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
         .delete(`${SETTINGS.PATH.POSTS}/${id}`)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
 
-      const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
     });
   });
@@ -71,9 +71,9 @@ describe("DELETE /posts", () => {
       await req
         .delete(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
 
-      const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
     });
 
@@ -81,9 +81,9 @@ describe("DELETE /posts", () => {
       await req
         .delete(`${SETTINGS.PATH.POSTS}/${id}`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
     });
   });

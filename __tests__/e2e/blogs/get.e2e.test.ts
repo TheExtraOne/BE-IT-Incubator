@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   incorrectId,
@@ -28,7 +28,7 @@ describe("GET /blogs", () => {
 
   describe("Blogs retrieval", () => {
     it("should return 200 and an empty array of items if the db is empty", async () => {
-      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         items: [],
@@ -44,9 +44,9 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
-      const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUS.OK_200);
+      const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([
         {
@@ -61,7 +61,7 @@ describe("GET /blogs", () => {
     it("should return 404 in case if id was passed, but the db is empty", async () => {
       await req
         .get(`${SETTINGS.PATH.BLOGS}/678619d10375b7522f04da0e`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 404 in case if id is not matching the db", async () => {
@@ -69,11 +69,11 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       await req
         .get(`${SETTINGS.PATH.BLOGS}/${incorrectId}`)
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
     it("should return 200 and blog (with id, name, description, websiteUrl,createdAt and isMembership) in case if id is matching the db", async () => {
@@ -83,11 +83,11 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const { body } = await req
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(body).toEqual({
         ...correctBlogBodyParams,
@@ -104,21 +104,21 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
       await req
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
       await req
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?pageNumber=2&pageSize=2`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({
         items: [
@@ -143,11 +143,11 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=ru`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([
         {
@@ -164,11 +164,11 @@ describe("GET /blogs", () => {
         .post(SETTINGS.PATH.BLOGS)
         .set({ Authorization: userCredentials.correct })
         .send(correctBlogBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=doka`)
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([]);
     });
@@ -178,7 +178,7 @@ describe("GET /blogs", () => {
     it("should return 400 when pageNumber is not an integer", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?pageNumber=1.5`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -191,7 +191,7 @@ describe("GET /blogs", () => {
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?pageNumber=0`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -204,7 +204,7 @@ describe("GET /blogs", () => {
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?pageSize=1.5`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -217,7 +217,7 @@ describe("GET /blogs", () => {
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?pageSize=0`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -230,7 +230,7 @@ describe("GET /blogs", () => {
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?sortBy=`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -243,7 +243,7 @@ describe("GET /blogs", () => {
     it("should return 400 when searchNameTerm is empty", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?searchNameTerm=`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -256,7 +256,7 @@ describe("GET /blogs", () => {
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
         .get(`${SETTINGS.PATH.BLOGS}?sortDirection=invalid`)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {

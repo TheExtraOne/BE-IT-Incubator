@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import TUserRepViewModel from "../users/models/UserRepViewModel";
-import { SETTINGS } from "../settings";
+import { SETTINGS } from "../common/settings";
 
 export type TCreateJWTResponse = {
   resultCode: number;

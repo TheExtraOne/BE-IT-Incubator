@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { commentCollection } from "../db/db";
-import { SORT_DIRECTION } from "../settings";
+import { SORT_DIRECTION } from "../common/settings";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 import TCommentControllerViewModel from "./models/CommentServiceViewModel";
-import { TResponseWithPagination, TSortDirection } from "../types/types";
+import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 
 const mapComment = (
   comment: TCommentRepViewModel

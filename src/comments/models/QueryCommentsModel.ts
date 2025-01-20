@@ -1,4 +1,4 @@
-import { TSortDirection } from "../../types/types";
+import { TSortDirection } from "../../common/types/types";
 
 type TQueryCommentsModel = {
   /**

@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { SORT_DIRECTION } from "../settings";
+import { RESULT_STATUS, SORT_DIRECTION } from "../settings";
 
 export type TRequestWithBody<T> = Request<{}, {}, T>;
 export type TRequestWithParams<T> = Request<T>;
@@ -24,3 +24,15 @@ export type TResponseWithPagination<T> = {
 };
 
 export type TSortDirection = SORT_DIRECTION.ASC | SORT_DIRECTION.DESC;
+
+type ExtensionType = {
+  field: string | null;
+  message: string;
+};
+
+export type Result<T = null> = {
+  status: RESULT_STATUS;
+  errorMessage?: string;
+  extensions: ExtensionType[];
+  data: T;
+};

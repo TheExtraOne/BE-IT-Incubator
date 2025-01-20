@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { SETTINGS, STATUS } from "../settings";
+import { SETTINGS, HTTP_STATUS } from "../settings";
 
 export const getEncodedCredentials = (data: string) =>
   Buffer.from(data, "utf8").toString("base64");
@@ -18,7 +18,7 @@ const basicAuthorizationMiddleware = (
     !userEncodedCredentials ||
     userEncodedCredentials !== encodedCredentials
   ) {
-    res.sendStatus(STATUS.UNAUTHORIZED_401);
+    res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
 

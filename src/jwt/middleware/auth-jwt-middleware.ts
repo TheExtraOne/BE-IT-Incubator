@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { STATUS } from "../../settings";
+import { HTTP_STATUS } from "../../common/settings";
 import jwtService from "../jwt-service";
 
 const authJwtMiddleware = async (
@@ -9,7 +9,7 @@ const authJwtMiddleware = async (
 ) => {
   const bearerJWT = req.headers.authorization;
   if (!bearerJWT) {
-    res.sendStatus(STATUS.UNAUTHORIZED_401);
+    res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
 
@@ -18,7 +18,7 @@ const authJwtMiddleware = async (
   const userId: string | null = await jwtService.getUserIdByToken(token);
 
   if (!userId) {
-    res.sendStatus(STATUS.UNAUTHORIZED_401);
+    res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
   req.userId = userId;

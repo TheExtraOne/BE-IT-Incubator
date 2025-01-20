@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctUserBodyParams,
   incorrectId,
@@ -30,14 +30,14 @@ describe("DELETE /users/:id", () => {
     it("should return 401 if unauthorized", async () => {
       await req
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 401 if wrong credentials", async () => {
       await req
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
         .set({ Authorization: userCredentials.incorrect })
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
   });
 
@@ -46,7 +46,7 @@ describe("DELETE /users/:id", () => {
       await req
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.NOT_FOUND_404);
+        .expect(HTTP_STATUS.NOT_FOUND_404);
     });
   });
 
@@ -58,17 +58,17 @@ describe("DELETE /users/:id", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       await req
         .delete(`${SETTINGS.PATH.USERS}/${id}`)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.NO_CONTENT_204);
 
       const res = await req
         .get(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([]);
     });

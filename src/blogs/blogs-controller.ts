@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { SORT_DIRECTION, STATUS } from "../settings";
+import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
 import {
   TRequestWithBody,
   TRequestWithParams,
@@ -7,7 +7,7 @@ import {
   TRequestWithQuery,
   TRequestWithQueryAndParams,
   TResponseWithPagination,
-} from "../types/types";
+} from "../common/types/types";
 import postsService from "../posts/posts-service";
 import TQueryBlogModel from "./models/QueryBlogModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
@@ -39,7 +39,7 @@ const blogsController = {
         sortDirection,
       });
 
-    res.status(STATUS.OK_200).json(blogs);
+    res.status(HTTP_STATUS.OK_200).json(blogs);
   },
 
   getBlog: async (
@@ -51,8 +51,8 @@ const blogsController = {
       await blogsQueryRepository.getBlogById(req.params.id);
 
     blog
-      ? res.status(STATUS.OK_200).json(blog)
-      : res.sendStatus(STATUS.NOT_FOUND_404);
+      ? res.status(HTTP_STATUS.OK_200).json(blog)
+      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
   },
 
   getAllPostsForBlogById: async (
@@ -63,7 +63,7 @@ const blogsController = {
     const blog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(req.params.id);
     if (!blog) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
@@ -83,7 +83,7 @@ const blogsController = {
         sortDirection,
       });
 
-    res.status(STATUS.OK_200).json(posts);
+    res.status(HTTP_STATUS.OK_200).json(posts);
   },
 
   createBlog: async (
@@ -99,7 +99,7 @@ const blogsController = {
     const newBlog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(newBlogId);
 
-    res.status(STATUS.CREATED_201).json(newBlog);
+    res.status(HTTP_STATUS.CREATED_201).json(newBlog);
   },
 
   createPostForBlogId: async (
@@ -113,7 +113,7 @@ const blogsController = {
     const blogId = req.params.id;
     const blog = await blogsQueryRepository.getBlogById(blogId);
     if (!blog) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
@@ -127,7 +127,7 @@ const blogsController = {
     const newPost: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(newPostId!);
 
-    res.status(STATUS.CREATED_201).json(newPost);
+    res.status(HTTP_STATUS.CREATED_201).json(newPost);
   },
 
   updateBlog: async (
@@ -146,7 +146,7 @@ const blogsController = {
     });
 
     res.sendStatus(
-      is_successful ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404
+      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
     );
   },
 
@@ -157,7 +157,7 @@ const blogsController = {
     const is_successful = await blogsService.deleteBlogById(req.params.id);
 
     res.sendStatus(
-      is_successful ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404
+      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
     );
   },
 };

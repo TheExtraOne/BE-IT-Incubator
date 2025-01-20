@@ -1,6 +1,6 @@
 import app from "./app";
 import { connectToDb } from "./db/db";
-import { SETTINGS } from "./settings";
+import { SETTINGS } from "./common/settings";
 
 const startApp = async () => {
   const isSuccessful = await connectToDb(SETTINGS.MONGO_URL);

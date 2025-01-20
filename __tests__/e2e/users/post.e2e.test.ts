@@ -1,4 +1,4 @@
-import { SETTINGS, STATUS } from "../../../src/settings";
+import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, userCredentials } from "../helpers";
 import { client, connectToDb } from "../../../src/db/db";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -26,7 +26,7 @@ describe("POST /users", () => {
       await req
         .post(SETTINGS.PATH.USERS)
         .send(correctUserBodyParams)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 401 if wrong credentials", async () => {
@@ -34,7 +34,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.incorrect })
         .send(correctUserBodyParams)
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
   });
 
@@ -44,7 +44,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, login: "" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -59,7 +59,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, login: "ab" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -74,7 +74,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, login: "abcdefghijk" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -89,7 +89,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, email: "" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -104,7 +104,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, email: "invalid-email" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -119,7 +119,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, password: "" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -134,7 +134,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, password: "12345" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -149,7 +149,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send({ ...correctUserBodyParams, password: "123456789012345678901" })
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {
@@ -166,7 +166,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -178,7 +178,7 @@ describe("POST /users", () => {
       const getRes = await req
         .get(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(getRes.body.items).toEqual([
         {
@@ -195,13 +195,13 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.BAD_REQUEST_400);
+        .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(res.body.errorsMessages).toEqual([
         {

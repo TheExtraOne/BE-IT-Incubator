@@ -1,11 +1,11 @@
 import { Response } from "express";
-import { SORT_DIRECTION, STATUS } from "../settings";
+import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
 import {
   TRequestWithParams,
   TRequestWithParamsAndBody,
   TRequestWithQueryAndParams,
   TResponseWithPagination,
-} from "../types/types";
+} from "../common/types/types";
 import TPostCommentControllerInputModel from "./models/PostCommentControllerInputModel";
 import TPathParamsPostModel from "../posts/models/PathParamsPostModel";
 import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
@@ -29,7 +29,7 @@ const commentsController = {
         userId: req.userId!,
         postId: req.params.id,
       });
-    res.status(STATUS.CREATED_201).json(newComment);
+    res.status(HTTP_STATUS.CREATED_201).json(newComment);
   },
 
   getAllCommentsForPostId: async (
@@ -53,7 +53,7 @@ const commentsController = {
       sortDirection,
       postId: req.params.id,
     });
-    res.status(STATUS.OK_200).json(comments);
+    res.status(HTTP_STATUS.OK_200).json(comments);
   },
 
   getCommentById: async (
@@ -65,8 +65,8 @@ const commentsController = {
       await commentsQueryRepository.getCommentById(req.params.id);
 
     comment
-      ? res.status(STATUS.OK_200).json(comment)
-      : res.sendStatus(STATUS.NOT_FOUND_404);
+      ? res.status(HTTP_STATUS.OK_200).json(comment)
+      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
   },
 
   updateComment: async (
@@ -80,12 +80,12 @@ const commentsController = {
     const comment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(req.params.id);
     if (!comment) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
     // Check that user can modify comment
     if (comment.commentatorInfo.userId !== req.userId) {
-      res.sendStatus(STATUS.FORBIDDEN_403);
+      res.sendStatus(HTTP_STATUS.FORBIDDEN_403);
       return;
     }
 
@@ -93,7 +93,7 @@ const commentsController = {
       id: req.params.id,
       content: req.body.content,
     });
-    res.sendStatus(STATUS.NO_CONTENT_204);
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 
   deleteComment: async (
@@ -104,18 +104,18 @@ const commentsController = {
     const comment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(req.params.id);
     if (!comment) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
     // Check that userId is the same in the comment's author
     if (comment.commentatorInfo.userId !== req.userId) {
-      res.sendStatus(STATUS.FORBIDDEN_403);
+      res.sendStatus(HTTP_STATUS.FORBIDDEN_403);
       return;
     }
 
     await commentsService.deleteCommentById(req.params.id);
-    res.sendStatus(STATUS.NO_CONTENT_204);
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 };
 

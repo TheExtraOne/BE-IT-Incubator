@@ -1,32 +1,32 @@
 import { Response, Request } from "express";
 import usersService from "../users/users-service";
-import { STATUS } from "../settings";
+import { HTTP_STATUS, RESULT_STATUS } from "../common/settings";
 import TAuthControllerInputModel from "./models/AuthControllerInputModel";
 import TUserRepViewModel from "../users/models/UserRepViewModel";
 import jwtService from "../jwt/jwt-service";
-import { TRequestWithBody } from "../types/types";
 import usersQueryRepository from "../users/users-query-repository";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
+import { Result, TRequestWithBody } from "../common/types/types";
 
 const authController = {
-  authorizeUser: async (
+  loginUser: async (
     req: TRequestWithBody<TAuthControllerInputModel>,
     res: Response
   ) => {
     const { loginOrEmail, password } = req.body;
-    const user: TUserRepViewModel | null =
+    const user: Result<TUserRepViewModel | null> =
       await usersService.checkUserCredentials({
         loginOrEmail,
         password,
       });
 
-    if (!user) {
-      res.sendStatus(STATUS.UNAUTHORIZED_401);
+    if (user.status !== RESULT_STATUS.SUCCESS) {
+      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
       return;
     }
 
-    const token: string = await jwtService.createJWT(user!);
-    res.status(STATUS.OK_200).json({
+    const token: string = await jwtService.createJWT(user.data!);
+    res.status(HTTP_STATUS.OK_200).json({
       accessToken: token,
     });
   },
@@ -36,7 +36,7 @@ const authController = {
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
 
-    res.status(STATUS.OK_200).json({
+    res.status(HTTP_STATUS.OK_200).json({
       email: user?.email,
       login: user?.login,
       userId: user?.id,

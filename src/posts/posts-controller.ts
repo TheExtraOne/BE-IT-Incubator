@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { SORT_DIRECTION, STATUS } from "../settings";
+import { SORT_DIRECTION, HTTP_STATUS } from "../common/settings";
 import postsService from "./posts-service";
 import {
   TRequestWithBody,
@@ -8,7 +8,7 @@ import {
   TRequestWithQuery,
   TRequestWithQueryAndParams,
   TResponseWithPagination,
-} from "../types/types";
+} from "../common/types/types";
 import TQueryPostModel from "./models/QueryPostModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
 import postsQueryRepository from "./posts-query-repository";
@@ -37,7 +37,7 @@ const postsController = {
         sortDirection,
       });
 
-    res.status(STATUS.OK_200).json(posts);
+    res.status(HTTP_STATUS.OK_200).json(posts);
   },
 
   getPost: async (
@@ -49,8 +49,8 @@ const postsController = {
       await postsQueryRepository.getPostById(req.params.id);
 
     post
-      ? res.status(STATUS.OK_200).json(post)
-      : res.sendStatus(STATUS.NOT_FOUND_404);
+      ? res.status(HTTP_STATUS.OK_200).json(post)
+      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
   },
 
   getAllCommentsForPostById: async (
@@ -62,7 +62,7 @@ const postsController = {
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
     if (!post) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
@@ -84,7 +84,7 @@ const postsController = {
     const newPost: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(newPostId!);
 
-    res.status(STATUS.CREATED_201).json(newPost);
+    res.status(HTTP_STATUS.CREATED_201).json(newPost);
   },
 
   createCommentForPostById: async (
@@ -99,7 +99,7 @@ const postsController = {
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
     if (!post) {
-      res.sendStatus(STATUS.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
@@ -123,8 +123,8 @@ const postsController = {
     });
 
     success
-      ? res.sendStatus(STATUS.NO_CONTENT_204)
-      : res.sendStatus(STATUS.NOT_FOUND_404);
+      ? res.sendStatus(HTTP_STATUS.NO_CONTENT_204)
+      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
   },
 
   deletePost: async (
@@ -133,7 +133,9 @@ const postsController = {
   ) => {
     const success = await postsService.deletePostById(req.params.id);
 
-    res.sendStatus(success ? STATUS.NO_CONTENT_204 : STATUS.NOT_FOUND_404);
+    res.sendStatus(
+      success ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
+    );
   },
 };
 

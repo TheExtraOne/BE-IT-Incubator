@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import { STATUS } from "../settings";
+import { HTTP_STATUS } from "../settings";
 import { TAPIErrorResult } from "../types/types";
 
 type TExpressValidator = {
@@ -28,7 +28,7 @@ const inputCheckErrorsMiddleware = (
       message: error.msg,
     }));
 
-    res.status(STATUS.BAD_REQUEST_400).json({
+    res.status(HTTP_STATUS.BAD_REQUEST_400).json({
       errorsMessages: response,
     });
 

@@ -1,5 +1,5 @@
+import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
 import { client, connectToDb } from "../../../src/db/db";
-import { SETTINGS, STATUS } from "../../../src/settings";
 import { correctUserBodyParams, req, userCredentials } from "../helpers";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
@@ -26,7 +26,7 @@ describe("POST /auth/login", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       const res = await req
         .post(`${SETTINGS.PATH.AUTH}/login`)
@@ -34,7 +34,7 @@ describe("POST /auth/login", () => {
           loginOrEmail: correctUserBodyParams.login,
           password: correctUserBodyParams.password,
         })
-        .expect(STATUS.OK_200);
+        .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
     });
@@ -44,7 +44,7 @@ describe("POST /auth/login", () => {
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(STATUS.CREATED_201);
+        .expect(HTTP_STATUS.CREATED_201);
 
       await req
         .post(`${SETTINGS.PATH.AUTH}/login`)
@@ -52,7 +52,7 @@ describe("POST /auth/login", () => {
           loginOrEmail: correctUserBodyParams.login,
           password: "wrongPassword",
         })
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 401 if user doesn't exist", async () => {
@@ -62,7 +62,7 @@ describe("POST /auth/login", () => {
           loginOrEmail: "nonexistentUser",
           password: "anyPassword",
         })
-        .expect(STATUS.UNAUTHORIZED_401);
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
   });
 
@@ -75,7 +75,7 @@ describe("POST /auth/login", () => {
             loginOrEmail: null,
             password: "password123",
           })
-          .expect(STATUS.BAD_REQUEST_400);
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
 
         expect(body).toEqual({
           errorsMessages: [
@@ -91,7 +91,7 @@ describe("POST /auth/login", () => {
             loginOrEmail: "   ",
             password: "password123",
           })
-          .expect(STATUS.BAD_REQUEST_400);
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
 
         expect(body).toEqual({
           errorsMessages: [
@@ -112,7 +112,7 @@ describe("POST /auth/login", () => {
             loginOrEmail: "user123",
             password: null,
           })
-          .expect(STATUS.BAD_REQUEST_400);
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
 
         expect(body).toEqual({
           errorsMessages: [{ field: "password", message: "Incorrect type" }],
@@ -126,7 +126,7 @@ describe("POST /auth/login", () => {
             loginOrEmail: "user123",
             password: "   ",
           })
-          .expect(STATUS.BAD_REQUEST_400);
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
 
         expect(body).toEqual({
           errorsMessages: [
@@ -144,7 +144,7 @@ describe("POST /auth/login", () => {
             loginOrEmail: null,
             password: "",
           })
-          .expect(STATUS.BAD_REQUEST_400);
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
 
         expect(body).toEqual({
           errorsMessages: [

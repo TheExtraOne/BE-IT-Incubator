@@ -14,16 +14,13 @@ const authController = {
     res: Response
   ) => {
     const { loginOrEmail, password } = req.body;
-    const {
-      user,
-      hasError,
-    }: { user: TUserRepViewModel | null; hasError: boolean } =
+    const user: TUserRepViewModel | null =
       await usersService.checkUserCredentials({
         loginOrEmail,
         password,
       });
 
-    if (hasError) {
+    if (!user) {
       res.sendStatus(STATUS.UNAUTHORIZED_401);
       return;
     }

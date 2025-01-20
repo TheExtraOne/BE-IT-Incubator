@@ -95,14 +95,13 @@ const usersService = {
   }: {
     loginOrEmail: string;
     password: string;
-  }): Promise<{ user: TUserRepViewModel | null; hasError: boolean }> => {
+  }): Promise<TUserRepViewModel | null> => {
     const user: TUserRepViewModel | null =
       await usersQueryRepository.getByLoginOrEmail(loginOrEmail);
-    if (!user) return { user: null, hasError: true };
+    if (!user) return null;
 
     const is_correct = await bcrypt.compare(password, user.passwordHash);
-
-    return { user: is_correct ? user : null, hasError: !is_correct };
+    return is_correct ? user : null;
   },
 
   _generateHash: async ({ value, salt }: { value: string; salt: string }) =>

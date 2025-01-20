@@ -42,7 +42,7 @@ describe("POST /blogs", () => {
       expect(body.items.length).toBe(0);
     });
   });
-  describe("Post creation", () => {
+  describe("Blog creation", () => {
     it("should return 201 with new blog if login, password and body params are correct. New blog should contain id, name, description and websiteUrl", async () => {
       const { body } = await req
         .post(SETTINGS.PATH.BLOGS)

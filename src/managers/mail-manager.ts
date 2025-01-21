@@ -15,6 +15,9 @@ const mailManager = {
       message: `<h1>Thank for your registration</h1>
                 <p>To finish registration please follow the link below:
                   <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
+                </p>
+                <p>Or use the link below:
+                  <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>https://somesite.com/confirm-email?code=${confirmationCode}</a>
                 </p>`,
     });
 

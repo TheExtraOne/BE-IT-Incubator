@@ -1,19 +1,21 @@
 import { ObjectId } from "mongodb";
-import TUserRepViewModel from "./models/UserRepViewModel";
 import { userCollection } from "../db/db";
+import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
 
 const usersRepository = {
-  getUserById: async (id: string): Promise<TUserRepViewModel | null> => {
+  getUserById: async (id: string): Promise<TUserAccountRepViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const user: TUserRepViewModel | null = await userCollection.findOne({
+    const user: TUserAccountRepViewModel | null = await userCollection.findOne({
       _id: new ObjectId(id),
     });
 
     return user;
   },
 
-  createUser: async (newUser: TUserRepViewModel): Promise<string> => {
-    const { insertedId } = await userCollection.insertOne(newUser);
+  createUserAccount: async (
+    newUserAccount: TUserAccountRepViewModel
+  ): Promise<string> => {
+    const { insertedId } = await userCollection.insertOne(newUserAccount);
 
     return insertedId.toString();
   },
@@ -41,9 +43,12 @@ const usersRepository = {
 
   getByLoginOrEmail: async (
     loginOrEmail: string
-  ): Promise<TUserRepViewModel | null> =>
+  ): Promise<TUserAccountRepViewModel | null> =>
     await userCollection.findOne({
-      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+      $or: [
+        { "accountData.userName": loginOrEmail },
+        { "accountData.email": loginOrEmail },
+      ],
     }),
 };
 

@@ -2,7 +2,6 @@ import { Response, Request } from "express";
 import usersService from "../users/users-service";
 import { HTTP_STATUS, RESULT_STATUS } from "../common/settings";
 import TAuthLoginControllerInputModel from "./models/AuthLoginControllerInputModel";
-import TUserRepViewModel from "../users/models/UserRepViewModel";
 import jwtService from "../jwt/jwt-service";
 import usersQueryRepository from "../users/users-query-repository";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
@@ -16,7 +15,7 @@ const authController = {
     res: Response
   ) => {
     const { loginOrEmail, password } = req.body;
-    const result: Result<TUserRepViewModel | null> =
+    const result: Result<TUserControllerViewModel | null> =
       await usersService.checkUserCredentials({
         loginOrEmail,
         password,
@@ -56,7 +55,7 @@ const authController = {
   ) => {
     const { login, email, password } = req.body;
 
-    const result: Result = await authService.registerUser({
+    const result: Result<string | null> = await authService.registerUser({
       login,
       email,
       password,

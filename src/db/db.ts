@@ -2,12 +2,12 @@ import { Collection, Db, MongoClient } from "mongodb";
 import { SETTINGS } from "../common/settings";
 import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import TPostRepViewModel from "../posts/models/PostRepViewModel";
-import TUserRepViewModel from "../users/models/UserRepViewModel";
 import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
+import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
-export let userCollection: Collection<TUserRepViewModel>;
+export let userCollection: Collection<TUserAccountRepViewModel>;
 export let commentCollection: Collection<TCommentRepViewModel>;
 export let client: MongoClient;
 
@@ -21,7 +21,7 @@ export const connectToDb = async (url: string): Promise<boolean> => {
   postCollection = db.collection<TPostRepViewModel>(
     SETTINGS.COLLECTION_NAMES.POSTS
   );
-  userCollection = db.collection<TUserRepViewModel>(
+  userCollection = db.collection<TUserAccountRepViewModel>(
     SETTINGS.COLLECTION_NAMES.USERS
   );
   commentCollection = db.collection<TCommentRepViewModel>(

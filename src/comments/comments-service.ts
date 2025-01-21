@@ -5,9 +5,9 @@ import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
-import TUserRepViewModel from "../users/models/UserRepViewModel";
 import usersRepository from "../users/users-repository";
 import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
+import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 
 const mapComment = (
   comment: TCommentRepViewModel
@@ -26,9 +26,8 @@ const commentsService = {
   }: TCommentsServiceInputModel): Promise<
     Result<TCommentServiceViewModel | null>
   > => {
-    const user: TUserRepViewModel | null = await usersRepository.getUserById(
-      userId!
-    );
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getUserById(userId!);
 
     if (!user) {
       return {
@@ -41,7 +40,7 @@ const commentsService = {
 
     const commentatorInfo = {
       userId: userId,
-      userLogin: user.login,
+      userLogin: user.accountData.userName,
     };
 
     const newComment: TCommentRepViewModel = {

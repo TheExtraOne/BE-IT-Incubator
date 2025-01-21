@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import TUserRepViewModel from "../users/models/UserRepViewModel";
 import { RESULT_STATUS, SETTINGS } from "../common/settings";
 import { Result } from "../common/types/types";
+import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 
 export type TCreateJWTResponse = {
   resultCode: number;
@@ -11,8 +11,8 @@ export type TCreateJWTResponse = {
 };
 
 const jwtService = {
-  createJWT: async (user: TUserRepViewModel): Promise<string> => {
-    const token: string = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, {
+  createJWT: async (user: TUserControllerViewModel): Promise<string> => {
+    const token: string = jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, {
       expiresIn: "1h",
     });
 

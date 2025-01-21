@@ -29,7 +29,7 @@ const usersController = {
       await usersQueryRepository.getAllUsers({
         searchEmailTerm,
         searchLoginTerm,
-        sortBy,
+        sortBy: `accountData.${sortBy}`,
         sortDirection,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -44,7 +44,7 @@ const usersController = {
   ) => {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const result: Result<string | null> = await usersService.createUser({
+    const result: Result<string | null> = await usersService.createUserAccount({
       login,
       email,
       password,

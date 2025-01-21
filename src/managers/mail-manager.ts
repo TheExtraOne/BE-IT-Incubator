@@ -1,28 +1,24 @@
-import { RESULT_STATUS } from "../common/settings";
 import emailAdapter from "../adapters/email-adapter";
 import { Result } from "../common/types/types";
 
 const mailManager = {
   sendRegistrationMail: async ({
-    login,
     email,
-    password,
+    confirmationCode,
   }: {
-    login: string;
+    confirmationCode: string;
     email: string;
-    password: string;
-  }): Promise<Result> => {
-    await emailAdapter.sendEmail({
+  }): Promise<Result<string | null>> => {
+    const result: Result<string | null> = await emailAdapter.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
-      message: "<b>Hello BE world!</b>",
+      message: `<h1>Thank for your registration</h1>
+                <p>To finish registration please follow the link below:
+                  <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
+                </p>`,
     });
 
-    return {
-      status: RESULT_STATUS.SUCCESS,
-      extensions: [],
-      data: null,
-    };
+    return result;
   },
 };
 

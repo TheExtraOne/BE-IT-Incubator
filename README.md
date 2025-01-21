@@ -143,10 +143,12 @@ Testing (`__tests__/e2e/`):
 
 - ✅ JWT authentication with accessToken on login
 - ✅ Add nodemailer library for sending emails
+- ✅ Add uuid library
+- ✅ Change user structure in mongoDB
 
 ## TODO
 
-- [ ] Add endpoint for registration (Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere)
+- [ ] Add endpoint for registration
 - [ ] Add endpoint for registration confirmation
 - [ ] Add endpoint for registration-email-resending
 - [ ] Cover changes with tests

@@ -2,21 +2,31 @@ import { ObjectId } from "mongodb";
 import { Result, TExtension } from "../common/types/types";
 import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
-import TUserRepViewModel from "./models/UserRepViewModel";
 import usersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
+import { v4 as uuidv4 } from "uuid";
+import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
+import TUserControllerViewModel from "./models/UserControllerViewModel";
+import { add } from "date-fns";
+
+const mapUser = (user: TUserAccountRepViewModel): TUserControllerViewModel => ({
+  id: user._id.toString(),
+  login: user.accountData.userName,
+  email: user.accountData.email,
+  createdAt: user.accountData.createdAt,
+});
 
 const usersService = {
   checkIsLoginUnique: async (login: string): Promise<boolean> => {
     return await usersRepository.isUniqueInDatabase({
-      fieldName: "login",
+      fieldName: "accountData.userName",
       fieldValue: login,
     });
   },
 
   checkIsEmailUnique: async (email: string): Promise<boolean> => {
     return await usersRepository.isUniqueInDatabase({
-      fieldName: "email",
+      fieldName: "accountData.email",
       fieldValue: email,
     });
   },
@@ -49,7 +59,7 @@ const usersService = {
     return errors;
   },
 
-  createUser: async ({
+  createUserAccount: async ({
     login,
     password,
     email,
@@ -73,14 +83,24 @@ const usersService = {
       };
     }
 
-    const newUser: TUserRepViewModel = {
+    const newUserAccount: TUserAccountRepViewModel = {
       _id: new ObjectId(),
-      login,
-      passwordHash,
-      email,
-      createdAt: new Date().toISOString(),
+      accountData: {
+        userName: login,
+        passwordHash,
+        email,
+        createdAt: new Date().toISOString(),
+      },
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
+        isConfirmed: false,
+      },
     };
-    const createdUserId: string = await usersRepository.createUser(newUser);
+
+    const createdUserId: string = await usersRepository.createUserAccount(
+      newUserAccount
+    );
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -98,8 +118,8 @@ const usersService = {
   }: {
     loginOrEmail: string;
     password: string;
-  }): Promise<Result<TUserRepViewModel | null>> => {
-    const user: TUserRepViewModel | null =
+  }): Promise<Result<TUserControllerViewModel | null>> => {
+    const user: TUserAccountRepViewModel | null =
       await usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -111,7 +131,10 @@ const usersService = {
       };
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.accountData.passwordHash
+    );
     if (!isPasswordCorrect) {
       return {
         status: RESULT_STATUS.BAD_REQUEST,
@@ -123,7 +146,7 @@ const usersService = {
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: user,
+      data: mapUser(user),
       extensions: [],
     };
   },

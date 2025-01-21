@@ -27,7 +27,7 @@ export const correctPostBodyParams = {
 export const correctUserBodyParams = {
   login: "superAdmin",
   password: "se1cu2re3",
-  email: "example@example.com",
+  email: "example@gmail.com",
 };
 
 export const incorrectId = "678615a90e0dbf0c27c3e1fa";

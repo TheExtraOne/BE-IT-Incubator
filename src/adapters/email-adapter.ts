@@ -29,7 +29,7 @@ const emailAdapter = {
         subject,
         html: message,
       });
-      console.log("info", info);
+
       return {
         status: RESULT_STATUS.SUCCESS,
         data: info.messageId,

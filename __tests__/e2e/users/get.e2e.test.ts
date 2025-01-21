@@ -101,7 +101,7 @@ describe("GET /users", () => {
           {
             id: expect.any(String),
             login: "superAdmin",
-            email: "example@example.com",
+            email: "example@gmail.com",
             createdAt: expect.any(String),
           },
         ],

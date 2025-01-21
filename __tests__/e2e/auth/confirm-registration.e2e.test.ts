@@ -57,7 +57,7 @@ describe("POST /auth/registration-confirmation", () => {
       expect(response.body).toEqual({
         errorsMessages: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "User with such confirmationCode does not exist",
           },
         ],
@@ -84,7 +84,7 @@ describe("POST /auth/registration-confirmation", () => {
       expect(response.body).toEqual({
         errorsMessages: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "Already confirmed",
           },
         ],
@@ -117,7 +117,7 @@ describe("POST /auth/registration-confirmation", () => {
       expect(response.body).toEqual({
         errorsMessages: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "Already expired",
           },
         ],

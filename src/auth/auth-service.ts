@@ -108,7 +108,7 @@ const authService = {
         errorMessage: "Not Found",
         extensions: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "User with such confirmationCode does not exist",
           },
         ],
@@ -122,7 +122,7 @@ const authService = {
         errorMessage: "Already confirmed",
         extensions: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "Already confirmed",
           },
         ],
@@ -136,7 +136,7 @@ const authService = {
         errorMessage: "Confirmation code expired",
         extensions: [
           {
-            field: "confirmationCode",
+            field: "code",
             message: "Already expired",
           },
         ],

@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { userCollection } from "../db/db";
-import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
+import TUserAccountRepViewModel, {
+  TEmailConfirmation,
+} from "./models/UserAccountRepViewModel";
 
 const usersRepository = {
   getUserById: async (id: string): Promise<TUserAccountRepViewModel | null> => {
@@ -74,6 +76,22 @@ const usersRepository = {
       { $set: { "emailConfirmation.isConfirmed": isRegistrationConfirmed } }
     );
 
+    return !!matchedCount;
+  },
+
+  updateUserEmailConfirmationByEmail: async ({
+    emailConfirmation,
+    email,
+  }: {
+    emailConfirmation: TEmailConfirmation;
+    email: string;
+  }): Promise<boolean> => {
+    const { matchedCount } = await userCollection.updateOne(
+      { "accountData.email": email },
+      {
+        $set: { emailConfirmation: emailConfirmation },
+      }
+    );
     return !!matchedCount;
   },
 };

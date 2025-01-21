@@ -4,6 +4,8 @@ import { Result } from "../common/types/types";
 import mailManager from "../managers/mail-manager";
 import usersRepository from "../users/users-repository";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
+import { v4 as uuidv4 } from "uuid";
+import { add } from "date-fns";
 
 const authService = {
   registerUser: async ({
@@ -40,6 +42,59 @@ const authService = {
       await usersService.deleteUserById(createdUserId!);
 
     return result_mail;
+  },
+
+  resendRegistrationEmail: async (
+    email: string
+  ): Promise<Result<string | null>> => {
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getByLoginOrEmail(email);
+    // Check if user with such email exist
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [
+          {
+            field: "email",
+            message: "Not Found",
+          },
+        ],
+      };
+    }
+    // Check if email is already confirmed
+    if (user.emailConfirmation.isConfirmed) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Bad Request",
+        extensions: [
+          {
+            field: "email",
+            message: "Email is already confirmed",
+          },
+        ],
+      };
+    }
+    // Generate new confirmation code
+    const emailConfirmation = {
+      confirmationCode: uuidv4(),
+      expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
+      isConfirmed: false,
+    };
+    await usersRepository.updateUserEmailConfirmationByEmail({
+      emailConfirmation,
+      email,
+    });
+
+    // Send email with new confirmation code
+    const result = await mailManager.sendRegistrationMail({
+      email,
+      confirmationCode: emailConfirmation.confirmationCode,
+    });
+
+    return result;
   },
 
   confirmRegistration: async (confirmationCode: string): Promise<Result> => {

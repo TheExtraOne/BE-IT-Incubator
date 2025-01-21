@@ -1,5 +1,19 @@
 import { WithId, OptionalUnlessRequiredId } from "mongodb";
 
+export type TEmailConfirmation = {
+  /**
+   * confirmationCode of the user, generated with uuid
+   */
+  confirmationCode: string;
+  /**
+   * expirationDate of the confirmationCode
+   */
+  expirationDate: Date;
+  /**
+   * if user confirmed email
+   */
+  isConfirmed: boolean;
+};
 type TUserAccountRepViewModel = WithId<{
   accountData: {
     /**
@@ -19,20 +33,7 @@ type TUserAccountRepViewModel = WithId<{
      */
     createdAt: string;
   };
-  emailConfirmation: {
-    /**
-     * confirmationCode of the user, generated with uuid
-     */
-    confirmationCode: string;
-    /**
-     * expirationDate of the confirmationCode
-     */
-    expirationDate: Date;
-    /**
-     * if user confirmed email
-     */
-    isConfirmed: boolean;
-  };
+  emailConfirmation: TEmailConfirmation;
 }>;
 
 export default TUserAccountRepViewModel;

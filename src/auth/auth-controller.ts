@@ -70,6 +70,23 @@ const authController = {
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 
+  resendRegistrationEmail: async (
+    req: TRequestWithBody<{ email: string }>,
+    res: Response
+  ) => {
+    const { email } = req.body;
+    const result: Result<string | null> =
+      await authService.resendRegistrationEmail(email);
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res
+        .status(HTTP_STATUS.BAD_REQUEST_400)
+        .json({ errorsMessages: result.extensions });
+      return;
+    }
+
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  },
+
   confirmRegistration: async (
     req: TRequestWithBody<{ code: string }>,
     res: Response

@@ -23,12 +23,21 @@ const postConfirmationInputMiddleware = [
   bodyAuthConfirmationInputValidator.confirmationCodeValidation,
   inputCheckErrorsMiddleware,
 ];
+const postEmailResendingInputMiddleware = [
+  bodyAuthRegistrationInputValidator.emailValidation,
+  inputCheckErrorsMiddleware,
+];
 
 authRouter.post("/login", [...postLoginMiddleware], authController.loginUser);
 authRouter.post(
   "/registration",
   [...postRegistrationMiddleware],
   authController.registerUser
+);
+authRouter.post(
+  "/registration-email-resending",
+  [...postEmailResendingInputMiddleware],
+  authController.resendRegistrationEmail
 );
 authRouter.post(
   "/registration-confirmation",

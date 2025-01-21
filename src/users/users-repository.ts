@@ -12,6 +12,16 @@ const usersRepository = {
     return user;
   },
 
+  getUserByConfirmationCode: async (
+    confirmationCode: string
+  ): Promise<TUserAccountRepViewModel | null> => {
+    const user: TUserAccountRepViewModel | null = await userCollection.findOne({
+      "emailConfirmation.confirmationCode": confirmationCode,
+    });
+
+    return user;
+  },
+
   createUserAccount: async (
     newUserAccount: TUserAccountRepViewModel
   ): Promise<string> => {
@@ -50,6 +60,22 @@ const usersRepository = {
         { "accountData.email": loginOrEmail },
       ],
     }),
+
+  updateUserRegistrationConfirmationById: async ({
+    id,
+    isRegistrationConfirmed = true,
+  }: {
+    id: string;
+    isRegistrationConfirmed?: boolean;
+  }): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
+    const { matchedCount } = await userCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { "emailConfirmation.isConfirmed": isRegistrationConfirmed } }
+    );
+
+    return !!matchedCount;
+  },
 };
 
 export default usersRepository;

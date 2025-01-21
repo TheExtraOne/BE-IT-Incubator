@@ -145,11 +145,11 @@ Testing (`__tests__/e2e/`):
 - ✅ Add nodemailer library for sending emails
 - ✅ Add uuid library
 - ✅ Change user structure in mongoDB
+- ✅ Add endpoint for registration confirmation
 
 ## TODO
 
 - [ ] Add endpoint for registration
-- [ ] Add endpoint for registration confirmation
 - [ ] Add endpoint for registration-email-resending
 - [ ] Cover changes with tests
 - [ ] Update documentation

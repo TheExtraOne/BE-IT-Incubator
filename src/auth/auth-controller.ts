@@ -69,6 +69,23 @@ const authController = {
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
+
+  confirmRegistration: async (
+    req: TRequestWithBody<{ code: string }>,
+    res: Response
+  ) => {
+    const { code: confirmationCode } = req.body;
+    const result: Result = await authService.confirmRegistration(
+      confirmationCode
+    );
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res
+        .status(HTTP_STATUS.BAD_REQUEST_400)
+        .json({ errorsMessages: result.extensions });
+      return;
+    }
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  },
 };
 
 export default authController;

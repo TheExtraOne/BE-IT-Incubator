@@ -40,6 +40,63 @@ const authService = {
 
     return result_mail;
   },
+
+  confirmRegistration: async (confirmationCode: string): Promise<Result> => {
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getUserByConfirmationCode(confirmationCode);
+    // Check if user with such confirmationCode exist
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [
+          {
+            field: "confirmationCode",
+            message: "User with such confirmationCode does not exist",
+          },
+        ],
+      };
+    }
+    // Check if confirmationCode has already been applied
+    if (user.emailConfirmation.isConfirmed) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Already confirmed",
+        extensions: [
+          {
+            field: "confirmationCode",
+            message: "Already confirmed",
+          },
+        ],
+      };
+    }
+    // Check if confirmationCode expired
+    if (user.emailConfirmation.expirationDate < new Date()) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Confirmation code expired",
+        extensions: [
+          {
+            field: "confirmationCode",
+            message: "Already expired",
+          },
+        ],
+      };
+    }
+    // If ok, then updating user flag
+    await usersRepository.updateUserRegistrationConfirmationById({
+      id: String(user._id),
+    });
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 };
 
 export default authService;

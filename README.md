@@ -1,158 +1,131 @@
-# Blogger platform
+# Blogger Platform
 
-This repository is a Blogger Platform REST API. The project follows a clean architecture pattern with clear separation of concerns across presentation, business, and data access layers, making it maintainable and scalable. Features: full CRUD operations for blogs, posts, comments, and users, JWT authentication system, pagination with sorting capabilities, blog-specific post management, search functionality, query parameter validation, basic authorization, cross-origin resource sharing.
+A robust REST API platform for blogging with TypeScript and Express.js. Features comprehensive CRUD operations for blogs, posts, comments, and users, along with JWT authentication, email confirmation, and advanced query capabilities.
 
 ## Technical Stack
 
-- Node.js/Express.js (v4.21.2) for the web framework
-- TypeScript (v5.7.2) for type safety
-- MongoDB (v6.12.0) for data persistence
-- Express-validator (v7.2.1) for request validation
-- JWT for secure authentication
-- CORS enabled for cross-origin requests
-- Environment configuration using dotenv
-- Password hashing for secure authentication
+- **Backend Framework**: Node.js/Express.js (v4.21.2)
+- **Language**: TypeScript (v5.7.2)
+- **Database**: MongoDB (v6.12.0)
+- **Validation**: Express-validator (v7.2.1)
+- **Authentication**: JWT, bcryptjs
+- **Email Service**: Nodemailer (v6.9.16)
+- **Utils**: UUID (v11.0.5), date-fns (v4.1.0)
+- **Security**: CORS enabled, Password hashing
+- **Testing**: Jest (v29.7.0), Supertest (v7.0.0)
 
 ## Development Setup
 
-- Watch mode with TypeScript compiler
-- Nodemon for development with debugging
-- Jest for isolated test running
-- Comprehensive type definitions for all dependencies
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   yarn install
+   ```
+3. Set up environment variables (see Environment Variables section)
+4. Run development server:
+   ```bash
+   yarn watch
+   yarn dev
+   ```
 
-## Environment variables
+## Environment Variables
 
-- **PORT**: The port for the API gateway (3000)
-- **MONGO_URL**: Connection string to MongoDb
-- **LOGIN_PASSWORD**: Credentials for authorization
+Create a `.env` file in the root directory with:
+
+- `PORT`: API gateway port (default: 3000)
+- `MONGO_URL`: MongoDB connection string
+- `LOGIN_PASSWORD`: Authorization credentials
+- Additional email configuration for Nodemailer
 
 ## Project Structure
 
-The `src` directory contains the core components of our application:
-
 ```
 src/
-├── app.ts                 # Express app configuration
-├── index.ts              # Application entry point
-├── auth/                 # Authentication and authorization
-│   ├── auth-controller.ts
-│   ├── auth-router.ts
-│   ├── middleware/
-│   └── models/
+├── app.ts                 # Express configuration
+├── index.ts              # Entry point
+├── auth/                 # Authentication
 ├── blogs/                # Blog management
-│   ├── blogs-controller.ts
-│   ├── blogs-service.ts
-│   ├── blogs-repository.ts
-│   ├── blogs-query-repository.ts
-│   ├── blogs-router.ts
-│   ├── middlewares/
-│   └── models/
-├── comments/            # Comments functionality
-│   ├── comments-controller.ts
-│   ├── comments-service.ts
-│   ├── comments-repository.ts
-│   ├── comments-query-repository.ts
-│   ├── comments-router.ts
-│   ├── middleware/
-│   └── models/
-├── common/             # Shared components
-│   ├── settings.ts
-│   ├── middlewares/
-│   └── types/
-├── db/                # Database configuration
-│   └── db.ts
-├── jwt/              # JWT implementation
-│   ├── jwt-service.ts
-│   └── middleware/
+├── comments/            # Comments system
+├── common/             # Shared utilities
+├── db/                # Database config
+├── jwt/              # JWT services
 ├── posts/            # Posts management
-│   ├── posts-controller.ts
-│   ├── posts-service.ts
-│   ├── posts-repository.ts
-│   ├── posts-query-repository.ts
-│   ├── posts-router.ts
-│   ├── middleware/
-│   └── models/
 ├── users/            # User management
-│   ├── users-controller.ts
-│   ├── users-service.ts
-│   ├── users-repository.ts
-│   ├── users-query-repository.ts
-│   ├── users-router.ts
-│   ├── middleware/
-│   └── models/
-└── testing/          # Testing utilities
-    ├── testing-repository.ts
-    └── testing-router.ts
+└── testing/          # Test utilities
 ```
-
-Testing (`__tests__/e2e/`):
-
-- Comprehensive end-to-end tests using Jest (v29.7.0) and Supertest (v7.0.0)
-- Organized test suites by feature:
-  - Auth: Login and registration flows
-  - Blogs: CRUD operations and blog-specific posts
-  - Posts: CRUD operations and post comments
-  - Comments: Creation, updates, and deletion
-  - Users: Account management and queries
-- MongoDB Memory Server (v10.1.3) for isolated testing
-- Coverage reporting with jest:coverage command
-- Helper utilities for test setup and teardown
 
 ## Features
 
-### Authentication
+### Core Functionality
 
-- Secure user registration with password hashing
-- JWT-based authentication with access tokens
-- Basic authorization support
-- Protected endpoints with Bearer authentication
-- /auth/me endpoint for current user information
+- ✅ Complete CRUD operations for blogs, posts, comments, and users
+- ✅ JWT authentication with access tokens
+- ✅ Email-based registration confirmation
+- ✅ Blog-specific post management
+- ✅ Comments system with authentication
+- ✅ Advanced search and filtering
+- ✅ Pagination and sorting capabilities
 
-### Users Management
+### Authentication & Security
 
-- Complete CRUD operations
-- Pagination support
-- Sorting capabilities
-- Unique login/email validation
+- ✅ Secure password hashing
+- ✅ JWT-based authentication
+- ✅ Protected endpoints
+- ✅ Basic authorization
+- ✅ Email confirmation system
+
+### Testing & Quality
+
+- ✅ Comprehensive E2E tests
+- ✅ Isolated test environment with MongoDB Memory Server
+- ✅ Coverage reporting
+- ✅ TypeScript type safety
+
+## API Features
+
+### Users
+
+- User registration with email confirmation
+- Secure authentication
+- Profile management
+- User search and filtering
 
 ### Blogs & Posts
 
-- Full CRUD operations
-- Blog-specific post management
-- Search functionality
+- Blog creation and management
+- Post creation within blogs
+- Advanced search functionality
+- Sorting and pagination
+- Query parameter validation
+
+### Comments
+
+- Comment creation on posts
+- Comment management
 - Pagination and sorting
-- Query parameter validation
-- Comments support for posts
-
-### Comments System
-
-- Create comments on posts with Bearer authentication
-- Retrieve comments for specific posts
-- Update and delete comments with authentication
-- Comment pagination and sorting
-- Query parameter validation
+- Authentication-based actions
 
 ## Development Scripts
 
-- `yarn watch`: TypeScript compilation in watch mode
-- `yarn dev`: Run development server with debugging
-- `yarn jest`: Run tests in isolation
-- `yarn jest:coverage`: Generate test coverage reports
+- `yarn watch`: TypeScript compilation (watch mode)
+- `yarn dev`: Development server with debugging
+- `yarn jest`: Run tests
+- `yarn jest:coverage`: Generate test coverage
 
-## Completed Features
+## Upcoming Features
 
-- ✅ JWT authentication with accessToken on login
-- ✅ Add nodemailer library for sending emails
-- ✅ Add uuid library
-- ✅ Change user structure in mongoDB
-- ✅ Add endpoint for registration confirmation
+- [ ] Registration endpoint implementation
+- [ ] Email resending functionality
+- [ ] Refresh token system
+- [ ] Rate limiting
+- [ ] API documentation (Swagger/OpenAPI)
+- [ ] Enhanced security features
+- [ ] Performance optimizations
 
-## TODO
+## Contributing
 
-- [ ] Add endpoint for registration
-- [ ] Add endpoint for registration-email-resending
-- [ ] Cover changes with tests
-- [ ] Update documentation
-- [ ] Add refresh token functionality
-- [ ] Implement rate limiting
-- [ ] Add API documentation with Swagger/OpenAPI
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request

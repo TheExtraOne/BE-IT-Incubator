@@ -16,10 +16,9 @@ describe("POST /auth/registration-confirmation", () => {
 
   beforeEach(async () => {
     await req
-      .post(SETTINGS.PATH.USERS)
-      .set({ Authorization: userCredentials.correct })
+      .post(`${SETTINGS.PATH.AUTH}/registration`)
       .send(correctUserBodyParams)
-      .expect(HTTP_STATUS.CREATED_201);
+      .expect(HTTP_STATUS.NO_CONTENT_204);
   });
   afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
 

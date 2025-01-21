@@ -63,6 +63,7 @@ const usersService = {
     login,
     password,
     email,
+    isConfirmed = false,
   }: TUserServiceInputModel): Promise<Result<string | null>> => {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await usersService._generateHash({
@@ -94,7 +95,7 @@ const usersService = {
       emailConfirmation: {
         confirmationCode: uuidv4(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
-        isConfirmed: false,
+        isConfirmed,
       },
     };
 
@@ -141,6 +142,15 @@ const usersService = {
         data: null,
         errorMessage: "Bad Request",
         extensions: [{ field: "password", message: "Wrong password" }],
+      };
+    }
+
+    if (!user.emailConfirmation.isConfirmed) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Email is not confirmed",
+        extensions: [{ field: "email", message: "Email is not confirmed" }],
       };
     }
 

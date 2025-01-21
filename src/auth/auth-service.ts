@@ -21,6 +21,7 @@ const authService = {
         login,
         password,
         email,
+        isConfirmed: false,
       });
     if (result_user_creation.status !== RESULT_STATUS.SUCCESS)
       return result_user_creation;

@@ -48,6 +48,7 @@ const usersController = {
       login,
       email,
       password,
+      isConfirmed: true,
     });
 
     if (result.status !== RESULT_STATUS.SUCCESS) {

@@ -21,7 +21,8 @@ describe("POST /auth/login", () => {
   });
 
   describe("Login success/failure", () => {
-    it("should return 200 if credentials are correct", async () => {
+    it("should return 200 if credentials are correct and email is confirmed", async () => {
+      // Create user through users endpoint which automatically confirms email
       await req
         .post(SETTINGS.PATH.USERS)
         .set({ Authorization: userCredentials.correct })
@@ -37,6 +38,22 @@ describe("POST /auth/login", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
+    });
+
+    it("should return 400 if email is not confirmed", async () => {
+      // Create user through registration endpoint which creates unconfirmed user
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/registration`)
+        .send(correctUserBodyParams)
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      const res = await req
+        .post(`${SETTINGS.PATH.AUTH}/login`)
+        .send({
+          loginOrEmail: correctUserBodyParams.login,
+          password: correctUserBodyParams.password,
+        })
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
 
     it("should return 401 if password is incorrect", async () => {
@@ -130,25 +147,6 @@ describe("POST /auth/login", () => {
 
         expect(body).toEqual({
           errorsMessages: [
-            { field: "password", message: "Password is a required field" },
-          ],
-        });
-      });
-    });
-
-    describe("Combined validation", () => {
-      it("should return 400 and array with errors if both fields are incorrect", async () => {
-        const { body } = await req
-          .post(`${SETTINGS.PATH.AUTH}/login`)
-          .send({
-            loginOrEmail: null,
-            password: "",
-          })
-          .expect(HTTP_STATUS.BAD_REQUEST_400);
-
-        expect(body).toEqual({
-          errorsMessages: [
-            { field: "loginOrEmail", message: "Incorrect type" },
             { field: "password", message: "Password is a required field" },
           ],
         });

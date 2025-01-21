@@ -11,6 +11,10 @@ type TUserServiceInputModel = {
    * email of the user
    */
   email: string;
+  /**
+   * flag that indicates if the user confirmed his email
+   */
+  isConfirmed?: boolean;
 };
 
 export default TUserServiceInputModel;

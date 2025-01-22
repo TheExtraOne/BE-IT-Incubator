@@ -32,16 +32,28 @@ const authService = {
     const createdUser: TUserAccountRepViewModel | null =
       await usersRepository.getUserById(createdUserId!);
 
-    const result_mail: Result<string | null> =
-      await mailManager.sendRegistrationMail({
+    mailManager
+      .sendRegistrationMail({
         email,
         confirmationCode: createdUser?.emailConfirmation.confirmationCode!,
-      });
+      })
+      .catch((error) => console.log(error));
 
-    if (result_mail.status !== RESULT_STATUS.SUCCESS)
-      await usersService.deleteUserById(createdUserId!);
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+    // const result_mail: Result<string | null> =
+    //   await mailManager.sendRegistrationMail({
+    //     email,
+    //     confirmationCode: createdUser?.emailConfirmation.confirmationCode!,
+    //   });
 
-    return result_mail;
+    // if (result_mail.status !== RESULT_STATUS.SUCCESS)
+    //   await usersService.deleteUserById(createdUserId!);
+
+    // return result_mail;
   },
 
   resendRegistrationEmail: async (

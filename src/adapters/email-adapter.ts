@@ -12,8 +12,6 @@ const emailAdapter = {
     subject: string;
     message: string;
   }): Promise<Result<string | null>> => {
-    // Input data is accepted. Email with confirmation code will be send to passed email address.
-    // Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere
     try {
       const transporter = nodemailer.createTransport({
         service: "Mail.ru",

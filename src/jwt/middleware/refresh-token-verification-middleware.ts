@@ -8,7 +8,7 @@ const refreshTokenVerificationMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies["refreshToken"];
+  const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;

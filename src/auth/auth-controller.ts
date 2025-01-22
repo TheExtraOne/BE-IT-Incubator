@@ -40,7 +40,7 @@ const authController = {
   },
 
   logoutUser: async (req: Request, res: Response) => {
-    const refreshToken = req.cookies["refreshToken"];
+    const refreshToken = req.cookies.refreshToken;
 
     // Extract from refreshToken user ID
     const result: Result<string | null> = await jwtService.getUserIdByToken({
@@ -53,6 +53,15 @@ const authController = {
     }
 
     const userId = result.data;
+    // Check if token is in a blacklist
+    const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({
+      id: userId!,
+      token: refreshToken,
+    });
+    if (isTokenInvalid) {
+      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
+      return;
+    }
     // Add old refreshToken to the black list of user
     usersService
       .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
@@ -134,8 +143,9 @@ const authController = {
   },
 
   refreshToken: async (req: Request, res: Response) => {
+    // TODO: extract userID from headers here and in logout
     // Checking expiration of refreshToken in the middlewares
-    const refreshToken = req.cookies["refreshToken"];
+    const refreshToken = req.cookies.refreshToken;
 
     // Extract from refreshToken user ID
     const result: Result<string | null> = await jwtService.getUserIdByToken({
@@ -176,7 +186,7 @@ const authController = {
       httpOnly: true,
       secure: true,
     });
-    res.status(HTTP_STATUS.OK_200).json({ newAccessToken });
+    res.status(HTTP_STATUS.OK_200).json({ accessToken: newAccessToken });
   },
 };
 

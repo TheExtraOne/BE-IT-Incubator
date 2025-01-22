@@ -33,12 +33,11 @@ const createBlogMiddleware = [
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const updateBlogById = [
+const updateBlogByIdMiddleware = [
   basicAuthorizationMiddleware,
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
-const deleteBlogById = [basicAuthorizationMiddleware];
 
 blogsRouter.get("/", [...getAllBlogsMiddleWares], blogsController.getBlogs);
 blogsRouter.get("/:id", blogsController.getBlog);
@@ -53,7 +52,15 @@ blogsRouter.post(
   blogsController.createPostForBlogId
 );
 blogsRouter.post("/", [...createBlogMiddleware], blogsController.createBlog);
-blogsRouter.put("/:id", [...updateBlogById], blogsController.updateBlog);
-blogsRouter.delete("/:id", [...deleteBlogById], blogsController.deleteBlog);
+blogsRouter.put(
+  "/:id",
+  [...updateBlogByIdMiddleware],
+  blogsController.updateBlog
+);
+blogsRouter.delete(
+  "/:id",
+  basicAuthorizationMiddleware,
+  blogsController.deleteBlog
+);
 
 export default blogsRouter;

@@ -11,6 +11,7 @@ const updateCommentMiddleware = [
   bodyPostCommentInputValidator.contentValidation,
   inputCheckErrorsMiddleware,
 ];
+
 commentsRouter.get("/:id", commentsController.getCommentById);
 commentsRouter.put(
   "/:id",

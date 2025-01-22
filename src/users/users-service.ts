@@ -59,6 +59,20 @@ const usersService = {
     return errors;
   },
 
+  checkIfTokenIsInInvalidList: async ({
+    id,
+    token,
+  }: {
+    id: string;
+    token: string;
+  }) => {
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getUserById(id);
+    if (!user) return false;
+
+    return user.refreshTokensInvalidList.includes(token);
+  },
+
   createUserAccount: async ({
     login,
     password,
@@ -97,6 +111,7 @@ const usersService = {
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed,
       },
+      refreshTokensInvalidList: [],
     };
 
     const createdUserId: string = await usersRepository.createUserAccount(
@@ -109,6 +124,15 @@ const usersService = {
       extensions: [],
     };
   },
+
+  updateRefreshTokensInvalidListById: async ({
+    id,
+    token,
+  }: {
+    id: string;
+    token: string;
+  }): Promise<boolean> =>
+    await usersRepository.updateRefreshTokensInvalidListById({ id, token }),
 
   deleteUserById: async (id: string): Promise<boolean> =>
     await usersRepository.deleteUserById(id),

@@ -5,21 +5,22 @@ import authController from "./auth-controller";
 import accessTokenVerificationMiddleware from "../jwt/middleware/access-token-verification-middleware";
 import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registration-input-validation-middleware";
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
+import refreshTokenVerificationMiddleware from "../jwt/middleware/refresh-token-verification-middleware";
 
 const authRouter = Router({});
 
-const postLoginMiddleware = [
+const loginMiddleware = [
   bodyAuthLoginInputValidator.loginOrEmailValidation,
   bodyAuthLoginInputValidator.passwordValidation,
   inputCheckErrorsMiddleware,
 ];
-const postRegistrationMiddleware = [
+const registrationMiddleware = [
   bodyAuthRegistrationInputValidator.emailValidation,
   bodyAuthRegistrationInputValidator.loginValidation,
   bodyAuthRegistrationInputValidator.passwordValidation,
   inputCheckErrorsMiddleware,
 ];
-const postConfirmationInputMiddleware = [
+const confirmationMiddleware = [
   bodyAuthConfirmationInputValidator.confirmationCodeValidation,
   inputCheckErrorsMiddleware,
 ];
@@ -27,11 +28,15 @@ const postEmailResendingInputMiddleware = [
   bodyAuthRegistrationInputValidator.emailValidation,
   inputCheckErrorsMiddleware,
 ];
+const postRefreshTokenCookieMiddleware = [
+  refreshTokenVerificationMiddleware,
+  inputCheckErrorsMiddleware,
+];
 
-authRouter.post("/login", [...postLoginMiddleware], authController.loginUser);
+authRouter.post("/login", [...loginMiddleware], authController.loginUser);
 authRouter.post(
   "/registration",
-  [...postRegistrationMiddleware],
+  [...registrationMiddleware],
   authController.registerUser
 );
 authRouter.post(
@@ -41,8 +46,13 @@ authRouter.post(
 );
 authRouter.post(
   "/registration-confirmation",
-  [...postConfirmationInputMiddleware],
+  [...confirmationMiddleware],
   authController.confirmRegistration
+);
+authRouter.post(
+  "/refresh-token",
+  [...postRefreshTokenCookieMiddleware],
+  authController.refreshToken
 );
 authRouter.get(
   "/me",

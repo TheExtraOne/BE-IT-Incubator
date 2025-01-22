@@ -26,13 +26,12 @@ const createUserMiddleWare = [
   bodyUserInputValidator.passwordValidation,
   inputCheckErrorsMiddleware,
 ];
-const deleteUserMiddleWare = [basicAuthorizationMiddleware];
 
 usersRouter.get("/", [...getAllUsersMiddleware], usersController.getUsers);
 usersRouter.post("/", [...createUserMiddleWare], usersController.createUser);
 usersRouter.delete(
   "/:id",
-  [...deleteUserMiddleWare],
+  basicAuthorizationMiddleware,
   usersController.deleteUser
 );
 

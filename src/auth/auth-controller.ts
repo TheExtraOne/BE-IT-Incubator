@@ -110,6 +110,52 @@ const authController = {
     }
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
+
+  refreshToken: async (req: Request, res: Response) => {
+    // Checking expiration of refreshToken in the middlewares
+    const refreshToken = req.cookies["refreshToken"];
+
+    // Extract from refreshToken user ID
+    const result: Result<string | null> = await jwtService.getUserIdByToken({
+      token: refreshToken,
+      type: TOKEN_TYPE.R_TOKEN,
+    });
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
+      return;
+    }
+    const userId = result.data;
+
+    // Check if token is in a blacklist
+    const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({
+      id: userId!,
+      token: refreshToken,
+    });
+    if (isTokenInvalid) {
+      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
+      return;
+    }
+
+    // Add old refreshToken to the black list of user
+    usersService
+      .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
+      .catch((err) => console.log(err));
+
+    // Generate new tokens
+    const newAccessToken: string = await jwtService.createJWT({
+      userId: userId!,
+      type: TOKEN_TYPE.AC_TOKEN,
+    });
+    const newRefreshToken: string = await jwtService.createJWT({
+      userId: userId!,
+      type: TOKEN_TYPE.R_TOKEN,
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    res.status(HTTP_STATUS.OK_200).json({ newAccessToken });
+  },
 };
 
 export default authController;

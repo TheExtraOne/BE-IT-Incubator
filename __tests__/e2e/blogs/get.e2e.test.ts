@@ -3,28 +3,16 @@ import {
   correctBlogBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
-import { client, connectToDb } from "../../../src/db/db";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("GET /blogs", () => {
-  let server: MongoMemoryServer;
+  beforeAll(async () => await testDb.setup());
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  afterEach(async () => await testDb.clear());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
-
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterAll(async () => await testDb.teardown());
 
   describe("Blogs retrieval", () => {
     it("should return 200 and an empty array of items if the db is empty", async () => {

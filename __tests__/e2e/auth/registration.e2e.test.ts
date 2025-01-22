@@ -1,25 +1,13 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import { client, connectToDb } from "../../../src/db/db";
-import { correctUserBodyParams, req } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
 import usersRepository from "../../../src/users/users-repository";
+import { correctUserBodyParams, req, testDb } from "../helpers";
 
 describe("POST /auth/registration", () => {
-  let server: MongoMemoryServer;
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
 
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterAll(async () => await testDb.teardown());
 
   describe("Registration success/failure", () => {
     it("should return 204 and create user if input is valid", async () => {

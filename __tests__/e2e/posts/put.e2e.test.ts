@@ -1,28 +1,24 @@
-import { client, connectToDb } from "../../../src/db/db";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("PUT /posts", () => {
   let id: string;
   let blogName: string;
   let unchangedResponse: Record<string, string>;
   let newBodyParams: Record<string, string>;
-  let server: MongoMemoryServer;
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     const {
@@ -56,13 +52,6 @@ describe("PUT /posts", () => {
       content: "New content",
       blogId,
     };
-  });
-
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Authorization", () => {

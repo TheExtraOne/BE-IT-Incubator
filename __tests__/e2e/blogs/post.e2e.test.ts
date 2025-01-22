@@ -1,24 +1,17 @@
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
-import { correctBlogBodyParams, req, userCredentials } from "../helpers";
-import { client, connectToDb } from "../../../src/db/db";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import {
+  correctBlogBodyParams,
+  req,
+  testDb,
+  userCredentials,
+} from "../helpers";
 
 describe("POST /blogs", () => {
-  let server: MongoMemoryServer;
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
 
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterAll(async () => await testDb.teardown());
 
   describe("Authorization", () => {
     it("should return 401 if user is not authorized (authorized no headers)", async () => {

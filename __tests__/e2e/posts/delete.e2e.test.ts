@@ -1,25 +1,21 @@
-import { client, connectToDb } from "../../../src/db/db";
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("DELETE /posts", () => {
   let id: string;
-  let server: MongoMemoryServer;
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     const {
@@ -37,13 +33,6 @@ describe("DELETE /posts", () => {
       .send({ ...correctPostBodyParams, blogId });
 
     id = postId;
-  });
-
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Authorization", () => {

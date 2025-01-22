@@ -1,18 +1,10 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import { client, connectToDb, userCollection } from "../../../src/db/db";
-import { correctUserBodyParams, req, userCredentials } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { correctUserBodyParams, req, testDb } from "../helpers";
 import usersRepository from "../../../src/users/users-repository";
+import { userCollection } from "../../../src/db/db";
 
 describe("POST /auth/registration-confirmation", () => {
-  let server: MongoMemoryServer;
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  beforeAll(async () => await testDb.setup());
 
   beforeEach(async () => {
     await req
@@ -20,12 +12,10 @@ describe("POST /auth/registration-confirmation", () => {
       .send(correctUserBodyParams)
       .expect(HTTP_STATUS.NO_CONTENT_204);
   });
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
 
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   describe("Registration confirmation success/failure", () => {
     it("should return 204 if confirmation code is valid", async () => {

@@ -4,22 +4,18 @@ import {
   correctPostBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
-import { client, connectToDb } from "../../../src/db/db";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("POST /posts", () => {
   let blogId: string;
-  let server: MongoMemoryServer;
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     const {
@@ -30,12 +26,6 @@ describe("POST /posts", () => {
       .send(correctBlogBodyParams);
 
     blogId = id;
-  });
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Authorization", () => {

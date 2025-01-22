@@ -1,24 +1,17 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import { client, connectToDb } from "../../../src/db/db";
-import { correctUserBodyParams, req, userCredentials } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import {
+  correctUserBodyParams,
+  req,
+  userCredentials,
+  testDb,
+} from "../helpers";
 
 describe("POST /auth/login", () => {
-  let server: MongoMemoryServer;
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
 
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterAll(async () => await testDb.teardown());
 
   describe("Login success/failure", () => {
     it("should return 200 if credentials are correct and email is confirmed", async () => {

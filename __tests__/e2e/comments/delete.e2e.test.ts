@@ -6,21 +6,19 @@ import {
   correctPostBodyParams,
   correctUserBodyParams,
   correctBlogBodyParams,
+  testDb,
 } from "../helpers";
-import { client, connectToDb } from "../../../src/db/db";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("DELETE /comments", () => {
-  let server: MongoMemoryServer;
   let accessToken: string;
   let postId: string;
   let commentId: string;
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    await connectToDb(uri);
-  });
+  beforeAll(async () => await testDb.setup());
+
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
@@ -74,15 +72,6 @@ describe("DELETE /comments", () => {
       .expect(HTTP_STATUS.CREATED_201);
 
     commentId = cId;
-  });
-
-  afterEach(async () => {
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Comment deletion", () => {

@@ -3,6 +3,8 @@ import { SETTINGS } from "../../src/common/settings";
 import app from "../../src/app";
 import TBlogControllerInputModel from "../../src/blogs/models/BlogControllerInputModel";
 import { getEncodedCredentials } from "../../src/common/middlewares/basic-authorization-middleware";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { client, connectToDb } from "../../src/db/db";
 
 export const userCredentials = {
   correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN_CREDENTIALS)}`,
@@ -31,3 +33,27 @@ export const correctUserBodyParams = {
 };
 
 export const incorrectId = "678615a90e0dbf0c27c3e1fa";
+
+let mongoServer: MongoMemoryServer | null = null;
+
+//Test database setup and teardown utilities
+export const testDb = {
+  setup: async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await connectToDb(uri);
+    await testDb.clear();
+  },
+
+  clear: async () => {
+    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
+  },
+
+  teardown: async () => {
+    await client.close();
+    if (mongoServer) {
+      await mongoServer.stop();
+      mongoServer = null;
+    }
+  },
+};

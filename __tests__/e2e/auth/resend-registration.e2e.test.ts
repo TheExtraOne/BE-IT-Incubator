@@ -1,25 +1,20 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import { client, connectToDb } from "../../../src/db/db";
-import { correctUserBodyParams, req } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { correctUserBodyParams, req, testDb } from "../helpers";
 import usersRepository from "../../../src/users/users-repository";
 
 describe("POST /auth/registration-email-resending", () => {
-  let server: MongoMemoryServer;
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
+  beforeEach(async () => {
+    await req
+      .post(`${SETTINGS.PATH.AUTH}/registration`)
+      .send(correctUserBodyParams)
+      .expect(HTTP_STATUS.NO_CONTENT_204);
   });
 
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
+  afterEach(async () => await testDb.clear());
 
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
-  });
+  afterAll(async () => await testDb.teardown());
 
   describe("Email resending success/failure", () => {
     it("should return 204 if email exists and not confirmed", async () => {

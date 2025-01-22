@@ -1,4 +1,3 @@
-import { client, connectToDb } from "../../../src/db/db";
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
@@ -6,22 +5,19 @@ import {
   correctUserBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("GET /posts/:id/comments", () => {
-  let server: MongoMemoryServer;
   let postId: string;
   let accessToken: string;
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  beforeAll(async () => await testDb.setup());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterEach(async () => await testDb.clear());
+
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     // Create a user and get access token
@@ -62,13 +58,6 @@ describe("GET /posts/:id/comments", () => {
       .expect(HTTP_STATUS.CREATED_201);
 
     postId = id;
-  });
-
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Query parameters validation", () => {

@@ -1,13 +1,12 @@
 import TBlogControllerInputModel from "../../../src/blogs/models/BlogControllerInputModel";
-import { client, connectToDb } from "../../../src/db/db";
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   incorrectId,
   req,
+  testDb,
   userCredentials,
 } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 const newBodyParams: TBlogControllerInputModel = {
   name: "New name",
@@ -24,15 +23,11 @@ const unchangedResponse = {
 
 describe("PUT /blogs", () => {
   let id: string;
-  let server: MongoMemoryServer;
+  beforeAll(async () => await testDb.setup());
 
-  beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+  afterEach(async () => await testDb.clear());
 
-    await connectToDb(uri);
-    await req.delete(`${SETTINGS.PATH.TESTING}/all-data`);
-  });
+  afterAll(async () => await testDb.teardown());
 
   beforeEach(async () => {
     const {
@@ -43,13 +38,6 @@ describe("PUT /blogs", () => {
       .send(correctBlogBodyParams);
 
     id = blogId;
-  });
-
-  afterEach(async () => await req.delete(`${SETTINGS.PATH.TESTING}/all-data`));
-
-  afterAll(async () => {
-    await client.close();
-    await server.stop();
   });
 
   describe("Authorization", () => {

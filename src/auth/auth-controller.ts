@@ -39,6 +39,28 @@ const authController = {
     res.status(HTTP_STATUS.OK_200).json({ accessToken });
   },
 
+  logoutUser: async (req: Request, res: Response) => {
+    const refreshToken = req.cookies["refreshToken"];
+
+    // Extract from refreshToken user ID
+    const result: Result<string | null> = await jwtService.getUserIdByToken({
+      token: refreshToken,
+      type: TOKEN_TYPE.R_TOKEN,
+    });
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
+      return;
+    }
+
+    const userId = result.data;
+    // Add old refreshToken to the black list of user
+    usersService
+      .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
+      .catch((err) => console.log(err));
+
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  },
+
   getUserInformation: async (req: Request, res: Response) => {
     const userId: string | null = req.userId;
     const user: TUserControllerViewModel | null =

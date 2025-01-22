@@ -54,6 +54,11 @@ authRouter.post(
   [...postRefreshTokenCookieMiddleware],
   authController.refreshToken
 );
+authRouter.post(
+  "/logout",
+  [...postRefreshTokenCookieMiddleware],
+  authController.logoutUser
+);
 authRouter.get(
   "/me",
   accessTokenVerificationMiddleware,

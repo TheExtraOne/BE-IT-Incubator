@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { HTTP_STATUS, RESULT_STATUS } from "../../common/settings";
+import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import jwtService from "../jwt-service";
 import { Result } from "../../common/types/types";
 
-const authJwtMiddleware = async (
+const accessTokenVerificationMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,11 +14,11 @@ const authJwtMiddleware = async (
     return;
   }
 
-  const token: string = bearerJWT.split(" ")[1];
-
-  const result: Result<string | null> = await jwtService.getUserIdByToken(
-    token
-  );
+  const accessToken: string = bearerJWT.split(" ")[1];
+  const result: Result<string | null> = await jwtService.getUserIdByToken({
+    token: accessToken,
+    type: TOKEN_TYPE.AC_TOKEN,
+  });
 
   if (result.status !== RESULT_STATUS.SUCCESS) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
@@ -29,4 +29,4 @@ const authJwtMiddleware = async (
   next();
 };
 
-export default authJwtMiddleware;
+export default accessTokenVerificationMiddleware;

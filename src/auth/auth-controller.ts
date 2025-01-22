@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import usersService from "../users/users-service";
-import { HTTP_STATUS, RESULT_STATUS } from "../common/settings";
+import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../common/settings";
 import TAuthLoginControllerInputModel from "./models/AuthLoginControllerInputModel";
 import jwtService from "../jwt/jwt-service";
 import usersQueryRepository from "../users/users-query-repository";
@@ -26,10 +26,17 @@ const authController = {
       return;
     }
 
-    const token: string = await jwtService.createJWT(result.data!);
-    res.status(HTTP_STATUS.OK_200).json({
-      accessToken: token,
+    const accessToken: string = await jwtService.createJWT({
+      userId: result.data?.id!,
+      type: TOKEN_TYPE.AC_TOKEN,
     });
+    const refreshToken: string = await jwtService.createJWT({
+      userId: result.data?.id!,
+      type: TOKEN_TYPE.R_TOKEN,
+    });
+
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    res.status(HTTP_STATUS.OK_200).json({ accessToken });
   },
 
   getUserInformation: async (req: Request, res: Response) => {

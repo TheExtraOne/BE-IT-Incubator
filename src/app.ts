@@ -7,9 +7,11 @@ import usersRouter from "./users/users-router";
 import testingRouter from "./testing/testing-router";
 import authRouter from "./auth/auth-router";
 import commentsRouter from "./comments/comments-router";
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 app.get("/", (_req: Request, res: Response) => {

@@ -44,16 +44,6 @@ const authService = {
       data: null,
       extensions: [],
     };
-    // const result_mail: Result<string | null> =
-    //   await mailManager.sendRegistrationMail({
-    //     email,
-    //     confirmationCode: createdUser?.emailConfirmation.confirmationCode!,
-    //   });
-
-    // if (result_mail.status !== RESULT_STATUS.SUCCESS)
-    //   await usersService.deleteUserById(createdUserId!);
-
-    // return result_mail;
   },
 
   resendRegistrationEmail: async (

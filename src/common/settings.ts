@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config();
 
 export const SETTINGS = {
-  ADMIN_CREDENTIALS: process.env.LOGIN_PASSWORD || "admin:qwerty",
+  ADMIN_CREDENTIALS: process.env.LOGIN_PASSWORD as string,
   PORT: process.env.PORT || 3003,
   PATH: {
     BLOGS: "/blogs",
@@ -20,8 +20,13 @@ export const SETTINGS = {
     COMMENTS: "comments",
   },
   MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
-  JWT_SECRET: process.env.JWT_SECRET || "123Secret",
-  MAIL_PASSWORD: process.env.MAIL_RU_PASS,
+  JWT_SECRET: process.env.JWT_SECRET as string,
+  JWT_EXPIRY: process.env.JWT_EXPIRY as string,
+  AC_SECRET: process.env.AC_SECRET as string,
+  AC_EXPIRY: process.env.AC_EXPIRY as string,
+  RT_SECRET: process.env.RT_SECRET as string,
+  RT_EXPIRY: process.env.RT_EXPIRY as string,
+  MAIL_PASSWORD: process.env.MAIL_RU_PASS as string,
 };
 
 export const HTTP_STATUS = {
@@ -41,9 +46,14 @@ export enum SORT_DIRECTION {
 }
 
 export enum RESULT_STATUS {
-  SUCCESS = "success",
-  NOT_FOUND = "notFound",
-  FORBIDDEN = "forbidden",
-  UNAUTHORIZED = "unauthorized",
-  BAD_REQUEST = "badRequest",
+  SUCCESS = "SUCCESS",
+  NOT_FOUND = "NOT_FOUND",
+  FORBIDDEN = "FORBIDDEN",
+  UNAUTHORIZED = "UNAUTHORIZED",
+  BAD_REQUEST = "BAD_REQUEST",
+}
+
+export enum TOKEN_TYPE {
+  AC_TOKEN = "AC_TOKEN",
+  R_TOKEN = "REFRESH_TOKEN",
 }

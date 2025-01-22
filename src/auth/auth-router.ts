@@ -2,7 +2,7 @@ import { Router } from "express";
 import bodyAuthLoginInputValidator from "./middleware/body-auth-login-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
 import authController from "./auth-controller";
-import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
+import accessTokenVerificationMiddleware from "../jwt/middleware/access-token-verification-middleware";
 import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registration-input-validation-middleware";
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
 
@@ -44,6 +44,10 @@ authRouter.post(
   [...postConfirmationInputMiddleware],
   authController.confirmRegistration
 );
-authRouter.get("/me", authJwtMiddleware, authController.getUserInformation);
+authRouter.get(
+  "/me",
+  accessTokenVerificationMiddleware,
+  authController.getUserInformation
+);
 
 export default authRouter;

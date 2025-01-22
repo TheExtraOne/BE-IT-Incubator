@@ -19,6 +19,9 @@ const emailAdapter = {
           user: "kate_blogs_posts_it_incubator@mail.ru",
           pass: SETTINGS.MAIL_PASSWORD,
         },
+        // tls: {
+        //   rejectUnauthorized: false,
+        // },
       });
 
       const info = await transporter.sendMail({

@@ -1,6 +1,10 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import { correctUserBodyParams, req, testDb } from "../helpers";
-import usersRepository from "../../../src/users/users-repository";
+import {
+  correctUserBodyParams,
+  req,
+  testDb,
+  userCredentials,
+} from "../helpers";
 
 describe("POST /auth/registration-email-resending", () => {
   beforeAll(async () => await testDb.setup());
@@ -18,13 +22,6 @@ describe("POST /auth/registration-email-resending", () => {
 
   describe("Email resending success/failure", () => {
     it("should return 204 if email exists and not confirmed", async () => {
-      // Create unconfirmed user first
-      await req
-        .post(`${SETTINGS.PATH.AUTH}/registration`)
-        .send(correctUserBodyParams)
-        .expect(HTTP_STATUS.NO_CONTENT_204);
-
-      // Try to resend confirmation email
       await req
         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
         .send({ email: correctUserBodyParams.email })
@@ -48,23 +45,13 @@ describe("POST /auth/registration-email-resending", () => {
     });
 
     it("should return 400 if email is already confirmed", async () => {
-      // Create user
+      await testDb.clear();
+      // Creating user by admin => email already confirmed
       await req
-        .post(`${SETTINGS.PATH.AUTH}/registration`)
+        .post(SETTINGS.PATH.USERS)
+        .set({ Authorization: userCredentials.correct })
         .send(correctUserBodyParams)
-        .expect(HTTP_STATUS.NO_CONTENT_204);
-
-      // Get confirmation code
-      const user = await usersRepository.getByLoginOrEmail(
-        correctUserBodyParams.login
-      );
-      const confirmationCode = user!.emailConfirmation.confirmationCode;
-
-      // Confirm email
-      await req
-        .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
-        .send({ code: confirmationCode })
-        .expect(HTTP_STATUS.NO_CONTENT_204);
+        .expect(HTTP_STATUS.CREATED_201);
 
       // Try to resend confirmation
       const response = await req

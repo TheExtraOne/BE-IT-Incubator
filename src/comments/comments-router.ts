@@ -1,13 +1,13 @@
 import { Router } from "express";
 import commentsController from "./comments-controller";
-import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
+import accessTokenVerificationMiddleware from "../jwt/middleware/access-token-verification-middleware";
 import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
 
 const commentsRouter = Router({});
 
 const updateCommentMiddleware = [
-  authJwtMiddleware,
+  accessTokenVerificationMiddleware,
   bodyPostCommentInputValidator.contentValidation,
   inputCheckErrorsMiddleware,
 ];
@@ -19,7 +19,7 @@ commentsRouter.put(
 );
 commentsRouter.delete(
   "/:id",
-  authJwtMiddleware,
+  accessTokenVerificationMiddleware,
   commentsController.deleteComment
 );
 

@@ -6,7 +6,7 @@ import {
 } from "../common/middlewares";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
 import postsController from "./posts-controller";
-import authJwtMiddleware from "../jwt/middleware/auth-jwt-middleware";
+import accessTokenVerificationMiddleware from "../jwt/middleware/access-token-verification-middleware";
 import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
 
 const postsRouter = Router({});
@@ -42,7 +42,7 @@ const updatePostByIdMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 const createCommentForPosyById = [
-  authJwtMiddleware,
+  accessTokenVerificationMiddleware,
   bodyPostCommentInputValidator.contentValidation,
   inputCheckErrorsMiddleware,
 ];

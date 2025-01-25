@@ -28,10 +28,6 @@ const postEmailResendingInputMiddleware = [
   bodyAuthRegistrationInputValidator.emailValidation,
   inputCheckErrorsMiddleware,
 ];
-const postRefreshTokenCookieMiddleware = [
-  refreshTokenVerificationMiddleware,
-  inputCheckErrorsMiddleware,
-];
 
 authRouter.post("/login", [...loginMiddleware], authController.loginUser);
 authRouter.post(
@@ -51,12 +47,12 @@ authRouter.post(
 );
 authRouter.post(
   "/refresh-token",
-  [...postRefreshTokenCookieMiddleware],
+  refreshTokenVerificationMiddleware,
   authController.refreshToken
 );
 authRouter.post(
   "/logout",
-  [...postRefreshTokenCookieMiddleware],
+  refreshTokenVerificationMiddleware,
   authController.logoutUser
 );
 authRouter.get(

@@ -94,7 +94,7 @@ const usersService = {
         status: RESULT_STATUS.BAD_REQUEST,
         data: null,
         errorMessage: "Bad request",
-        extensions: [...errors],
+        extensions: errors,
       };
     }
 

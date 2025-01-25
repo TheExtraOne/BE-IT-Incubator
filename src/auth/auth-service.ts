@@ -17,18 +17,16 @@ const authService = {
     email: string;
     password: string;
   }): Promise<Result<string | null>> => {
-    // Creating user, check if login and email are unique is inside userService.createUser
-    const result_user_creation: Result<string | null> =
-      await usersService.createUserAccount({
-        login,
-        password,
-        email,
-        isConfirmed: false,
-      });
-    if (result_user_creation.status !== RESULT_STATUS.SUCCESS)
-      return result_user_creation;
+    // Creating user, check if login and email are unique is inside userService
+    const result: Result<string | null> = await usersService.createUserAccount({
+      login,
+      password,
+      email,
+      isConfirmed: false,
+    });
+    if (result.status !== RESULT_STATUS.SUCCESS) return result;
 
-    const createdUserId: string | null = result_user_creation.data;
+    const createdUserId: string | null = result.data;
     const createdUser: TUserAccountRepViewModel | null =
       await usersRepository.getUserById(createdUserId!);
 

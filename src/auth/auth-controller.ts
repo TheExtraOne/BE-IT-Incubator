@@ -14,6 +14,7 @@ const authController = {
     req: TRequestWithBody<TAuthLoginControllerInputModel>,
     res: Response
   ) => {
+    // Login/mail and password validation is in the middleware
     const { loginOrEmail, password } = req.body;
     const result: Result<TUserControllerViewModel | null> =
       await usersService.checkUserCredentials({
@@ -41,18 +42,8 @@ const authController = {
 
   logoutUser: async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-
-    // Extract from refreshToken user ID
-    const result: Result<string | null> = await jwtService.getUserIdByToken({
-      token: refreshToken,
-      type: TOKEN_TYPE.R_TOKEN,
-    });
-    if (result.status !== RESULT_STATUS.SUCCESS) {
-      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
-      return;
-    }
-
-    const userId = result.data;
+    // Extracting userId from req <- put it there in the middlewares from access token
+    const userId = req.userId;
     // Check if token is in a blacklist
     const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({
       id: userId!,
@@ -62,7 +53,7 @@ const authController = {
       res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
       return;
     }
-    // Add old refreshToken to the black list of user
+    // Add old refreshToken to the black list
     usersService
       .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
       .catch((err) => console.log(err));
@@ -71,7 +62,7 @@ const authController = {
   },
 
   getUserInformation: async (req: Request, res: Response) => {
-    const userId: string | null = req.userId;
+    const userId = req.userId;
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
 
@@ -143,20 +134,10 @@ const authController = {
   },
 
   refreshToken: async (req: Request, res: Response) => {
-    // TODO: extract userID from headers here and in logout
     // Checking expiration of refreshToken in the middlewares
     const refreshToken = req.cookies.refreshToken;
-
-    // Extract from refreshToken user ID
-    const result: Result<string | null> = await jwtService.getUserIdByToken({
-      token: refreshToken,
-      type: TOKEN_TYPE.R_TOKEN,
-    });
-    if (result.status !== RESULT_STATUS.SUCCESS) {
-      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
-      return;
-    }
-    const userId = result.data;
+    // Extracting userId from req <- put it there in the middlewares from access token
+    const userId = req.userId;
 
     // Check if token is in a blacklist
     const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({

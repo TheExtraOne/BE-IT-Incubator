@@ -105,7 +105,7 @@ const usersRepository = {
     const { matchedCount } = await userCollection.updateOne(
       { "accountData.email": email },
       {
-        $set: { emailConfirmation: emailConfirmation },
+        $set: { emailConfirmation },
       }
     );
     return !!matchedCount;

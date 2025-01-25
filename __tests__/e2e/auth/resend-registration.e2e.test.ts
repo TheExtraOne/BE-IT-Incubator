@@ -1,4 +1,9 @@
-import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
+import emailAdapter from "../../../src/adapters/email-adapter";
+import {
+  HTTP_STATUS,
+  RESULT_STATUS,
+  SETTINGS,
+} from "../../../src/common/settings";
 import {
   correctUserBodyParams,
   req,
@@ -19,6 +24,16 @@ describe("POST /auth/registration-email-resending", () => {
   afterEach(async () => await testDb.clear());
 
   afterAll(async () => await testDb.teardown());
+
+  emailAdapter.sendEmail = jest
+    .fn()
+    .mockImplementation((userEmail: string, subject: string, message: string) =>
+      Promise.resolve({
+        status: RESULT_STATUS.SUCCESS,
+        data: "mailId",
+        extensions: [],
+      })
+    );
 
   describe("Email resending success/failure", () => {
     it("should return 204 if email exists and not confirmed", async () => {

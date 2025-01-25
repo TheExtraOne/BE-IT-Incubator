@@ -1,4 +1,9 @@
-import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
+import emailAdapter from "../../../src/adapters/email-adapter";
+import {
+  HTTP_STATUS,
+  RESULT_STATUS,
+  SETTINGS,
+} from "../../../src/common/settings";
 import usersRepository from "../../../src/users/users-repository";
 import { correctUserBodyParams, req, testDb } from "../helpers";
 
@@ -8,6 +13,16 @@ describe("POST /auth/registration", () => {
   afterEach(async () => await testDb.clear());
 
   afterAll(async () => await testDb.teardown());
+
+  emailAdapter.sendEmail = jest
+    .fn()
+    .mockImplementation((userEmail: string, subject: string, message: string) =>
+      Promise.resolve({
+        status: RESULT_STATUS.SUCCESS,
+        data: "mailId",
+        extensions: [],
+      })
+    );
 
   describe("Registration success/failure", () => {
     it("should return 204 and create user if input is valid", async () => {
@@ -25,6 +40,7 @@ describe("POST /auth/registration", () => {
       expect(user!.accountData.email).toBe(correctUserBodyParams.email);
       expect(user!.emailConfirmation.isConfirmed).toBe(false);
       expect(user!.emailConfirmation.confirmationCode).toBeTruthy();
+      expect(emailAdapter.sendEmail).toBeCalled();
     });
 
     it("should return 400 if login or/and email already exists", async () => {

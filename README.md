@@ -114,7 +114,6 @@ src/
 
 ## Upcoming Features
 
-- [ ] Refresh token system
 - [ ] Rate limiting
 - [ ] API documentation (Swagger/OpenAPI)
 - [ ] Enhanced security features

@@ -5,12 +5,14 @@ import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import TRefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
+import TRateLimitingRepViewModel from "../adapters/models/RateLimitingRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
 export let userCollection: Collection<TUserAccountRepViewModel>;
 export let commentCollection: Collection<TCommentRepViewModel>;
 export let refreshTokensMetaCollection: Collection<TRefreshTokensMetaRepViewModel>;
+export let rateLimitingCollection: Collection<TRateLimitingRepViewModel>;
 export let client: MongoClient;
 
 export const connectToDb = async (url: string): Promise<boolean> => {
@@ -31,6 +33,9 @@ export const connectToDb = async (url: string): Promise<boolean> => {
   );
   refreshTokensMetaCollection = db.collection<TRefreshTokensMetaRepViewModel>(
     SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS_META
+  );
+  rateLimitingCollection = db.collection<TRateLimitingRepViewModel>(
+    SETTINGS.COLLECTION_NAMES.RATE_LIMITING
   );
 
   try {

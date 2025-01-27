@@ -20,6 +20,7 @@ export const SETTINGS = {
     USERS: "users",
     COMMENTS: "comments",
     REFRESH_TOKENS_META: "refresh_tokens_meta",
+    RATE_LIMITING: "rate_limiting",
   },
   MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
   JWT_SECRET: process.env.JWT_SECRET as string,
@@ -40,6 +41,7 @@ export const HTTP_STATUS = {
   UNAUTHORIZED_401: 401,
   FORBIDDEN_403: 403,
   SERVER_ERROR_500: 500,
+  TOO_MANY_REQUESTS_429: 429,
 };
 
 export enum SORT_DIRECTION {

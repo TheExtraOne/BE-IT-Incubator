@@ -4,11 +4,13 @@ import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
+import TRefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;
 export let userCollection: Collection<TUserAccountRepViewModel>;
 export let commentCollection: Collection<TCommentRepViewModel>;
+export let refreshTokensMetaCollection: Collection<TRefreshTokensMetaRepViewModel>;
 export let client: MongoClient;
 
 export const connectToDb = async (url: string): Promise<boolean> => {
@@ -26,6 +28,9 @@ export const connectToDb = async (url: string): Promise<boolean> => {
   );
   commentCollection = db.collection<TCommentRepViewModel>(
     SETTINGS.COLLECTION_NAMES.COMMENTS
+  );
+  refreshTokensMetaCollection = db.collection<TRefreshTokensMetaRepViewModel>(
+    SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS_META
   );
 
   try {

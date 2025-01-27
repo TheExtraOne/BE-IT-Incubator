@@ -15,7 +15,7 @@ const accessTokenVerificationMiddleware = async (
   }
 
   const accessToken: string = bearerJWT.split(" ")[1];
-  const result: Result<string | null> = await jwtService.getUserIdByToken({
+  const result: Result<string | null> = await jwtService.verifyToken({
     token: accessToken,
     type: TOKEN_TYPE.AC_TOKEN,
   });

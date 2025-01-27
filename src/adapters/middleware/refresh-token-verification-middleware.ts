@@ -15,7 +15,7 @@ const refreshTokenVerificationMiddleware = async (
     return;
   }
 
-  const result: Result<string | null> = await jwtService.getUserIdByToken({
+  const result: Result<string | null> = await jwtService.verifyToken({
     token: refreshToken,
     type: TOKEN_TYPE.R_TOKEN,
   });

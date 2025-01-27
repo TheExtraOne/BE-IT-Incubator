@@ -8,6 +8,7 @@ import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 import { Result, TRequestWithBody } from "../common/types/types";
 import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationControllerInputModel";
 import authService from "./auth-service";
+import securityService from "../security/security-service";
 
 const authController = {
   loginUser: async (
@@ -27,14 +28,18 @@ const authController = {
       return;
     }
 
+    const userId = result.data?.id!;
     const accessToken: string = await jwtService.createJWT({
-      userId: result.data?.id!,
+      userId: userId,
       type: TOKEN_TYPE.AC_TOKEN,
     });
     const refreshToken: string = await jwtService.createJWT({
-      userId: result.data?.id!,
+      userId: userId,
       type: TOKEN_TYPE.R_TOKEN,
     });
+
+    // Creating refreshTokenMeta without waiting
+    securityService.createRefreshTokenMeta(refreshToken);
 
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
     res.status(HTTP_STATUS.OK_200).json({ accessToken });

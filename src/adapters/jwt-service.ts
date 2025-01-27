@@ -40,7 +40,7 @@ const jwtService = {
     return token;
   },
 
-  getUserIdByToken: async ({
+  verifyToken: async ({
     token,
     type,
   }: {
@@ -73,6 +73,35 @@ const jwtService = {
       };
     } catch (error) {
       console.log("error", error);
+      return {
+        status: RESULT_STATUS.UNAUTHORIZED,
+        data: null,
+        errorMessage: "Unauthorized",
+        extensions: [{ field: "token", message: `${error}` }],
+      };
+    }
+  },
+
+  async decodeToken(
+    token: string
+  ): Promise<Result<{ iat?: number; exp?: number; userId?: string } | null>> {
+    try {
+      const result = jwt.decode(token);
+      if (typeof result === "string") {
+        return {
+          status: RESULT_STATUS.UNAUTHORIZED,
+          data: null,
+          errorMessage: "Unauthorized",
+          extensions: [{ field: "token", message: "Incorrect token" }],
+        };
+      }
+      return {
+        status: RESULT_STATUS.SUCCESS,
+        data: { iat: result?.iat, exp: result?.exp, userId: result?.userId },
+        extensions: [],
+      };
+    } catch (error) {
+      console.error("Can't decode token", error);
       return {
         status: RESULT_STATUS.UNAUTHORIZED,
         data: null,

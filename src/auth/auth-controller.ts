@@ -157,12 +157,14 @@ const authController = {
     const resultDecodeNewRefreshToken = await jwtService.decodeToken(
       newRefreshToken
     );
-    const { iat } = resultDecodeNewRefreshToken?.data || {};
+    const { iat, exp } = resultDecodeNewRefreshToken?.data || {};
     // Update time
     securityService.updateRefreshTokenMetaTime({
       deviceId: deviceId!,
       lastActiveDate: securityService.convertTimeToISOFromUnix(iat!),
+      expirationDate: securityService.convertTimeToISOFromUnix(exp!),
     });
+
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,

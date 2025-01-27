@@ -61,13 +61,16 @@ const securityService = {
   updateRefreshTokenMetaTime: async ({
     deviceId,
     lastActiveDate,
+    expirationDate,
   }: {
     deviceId: string;
     lastActiveDate: string;
+    expirationDate: string;
   }): Promise<void> => {
     securityRepository.updateRefreshTokenMetaTime({
       deviceId,
       lastActiveDate,
+      expirationDate,
     });
   },
 

@@ -12,11 +12,9 @@ const securityRepository = {
     return insertedId.toString();
   },
 
-  getRefreshTokenMetaByFilters: async ({
-    filter = {},
-  }: {
-    filter?: Record<string, string> | Record<string, never>;
-  }): Promise<TRefreshTokensMetaRepViewModel | null> => {
+  getRefreshTokenMetaByFilters: async (
+    filter: Record<string, string> | Record<string, never> = {}
+  ): Promise<TRefreshTokensMetaRepViewModel | null> => {
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel | null =
       await refreshTokensMetaCollection.findOne(filter);
 
@@ -26,13 +24,20 @@ const securityRepository = {
   updateRefreshTokenMetaTime: async ({
     deviceId,
     lastActiveDate,
+    expirationDate,
   }: {
     deviceId: string;
     lastActiveDate: string;
+    expirationDate: string;
   }): Promise<void> => {
     await refreshTokensMetaCollection.updateOne(
-      { deviceId },
-      { $set: { lastActiveDate } }
+      { ["deviceId"]: deviceId },
+      {
+        $set: {
+          ["lastActiveDate"]: lastActiveDate,
+          ["expirationDate"]: expirationDate,
+        },
+      }
     );
   },
 

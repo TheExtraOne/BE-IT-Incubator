@@ -27,12 +27,13 @@ const refreshTokenVerificationMiddleware = async (
   }
 
   const resultDecode = await jwtService.decodeToken(refreshToken);
-  const { userId, deviceId } = resultDecode?.data || {};
+  const { userId, deviceId, iat } = resultDecode?.data || {};
 
   const isTokenInTheCollection: TRefreshTokensMetaRepViewModel | null =
     await securityService.getRefreshTokenMetaByFilters({
       ["userId"]: userId!,
       ["deviceId"]: deviceId!,
+      ["lastActiveDate"]: securityService.convertTimeToISOFromUnix(iat!)!,
     });
 
   if (!isTokenInTheCollection) {

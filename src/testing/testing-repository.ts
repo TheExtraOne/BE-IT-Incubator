@@ -3,6 +3,7 @@ import {
   postCollection,
   userCollection,
   commentCollection,
+  refreshTokensMetaCollection,
 } from "../db/db";
 
 const testingRepository = {
@@ -11,6 +12,7 @@ const testingRepository = {
     await postCollection.deleteMany({});
     await userCollection.deleteMany({});
     await commentCollection.deleteMany({});
+    await refreshTokensMetaCollection.deleteMany({});
   },
 };
 

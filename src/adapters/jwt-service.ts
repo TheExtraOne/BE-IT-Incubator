@@ -82,9 +82,11 @@ const jwtService = {
     }
   },
 
-  async decodeToken(
+  decodeToken: async (
     token: string
-  ): Promise<Result<{ iat?: number; exp?: number; userId?: string } | null>> {
+  ): Promise<
+    Result<{ iat?: number; exp?: number; userId?: string } | null>
+  > => {
     try {
       const result = jwt.decode(token);
       if (typeof result === "string") {

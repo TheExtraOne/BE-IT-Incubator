@@ -10,9 +10,13 @@ type TRefreshTokensMetaRepViewModel = WithId<{
    */
   title: string;
   /**
-   * Date of the last generating of refresh/access tokens
+   * Date of the last generating of refresh token
    */
   lastActiveDate: string;
+  /**
+   * Date of the expiration of refresh token
+   */
+  expirationDate: string;
   /**
    * Id of connected device session
    */

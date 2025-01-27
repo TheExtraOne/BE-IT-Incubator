@@ -6,7 +6,15 @@ import jwtService from "../adapters/jwt-service";
 import { Result } from "../common/types/types";
 
 const securityService = {
-  createRefreshTokenMeta: async (refreshToken: string): Promise<void> => {
+  createRefreshTokenMeta: async ({
+    refreshToken,
+    title,
+    ip,
+  }: {
+    refreshToken: string;
+    title: string;
+    ip: string;
+  }): Promise<void> => {
     const resultDecode: Result<{
       iat?: number;
       exp?: number;
@@ -15,15 +23,23 @@ const securityService = {
 
     const newRefreshTokenMeta: TRefreshTokensMetaRepViewModel = {
       _id: new ObjectId(),
-      ip: "some ip",
-      title: "some title",
-      lastActiveDate: new Date(resultDecode.data?.iat! * 1000).toISOString(),
+      ip,
+      title,
+      lastActiveDate: securityService._convertTimeToISOFromUnix(
+        resultDecode.data?.iat!
+      ),
+      expirationDate: securityService._convertTimeToISOFromUnix(
+        resultDecode.data?.exp!
+      ),
       deviceId: uuidv4(),
       userId: resultDecode.data?.userId!,
     };
 
     securityRepository.createRefreshTokenMeta(newRefreshTokenMeta);
   },
+
+  _convertTimeToISOFromUnix: (unixTime: number): string =>
+    new Date(unixTime * 1000).toISOString(),
 };
 
 export default securityService;

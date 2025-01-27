@@ -26,6 +26,7 @@ const refreshTokenVerificationMiddleware = async (
   }
 
   const userId = result.data;
+  // TODO: remove check after implementing sessions
   // Check if token is in a blacklist
   const isTokenInTheBlackList = await usersService.checkIfTokenIsInTheBlackList(
     {

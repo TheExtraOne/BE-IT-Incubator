@@ -1,4 +1,4 @@
-type TDeviceControllerViewModel = {
+type TRefreshTokenMetaControllerViewModel = {
   /**
    * IP address of device during signing in
    */
@@ -17,4 +17,4 @@ type TDeviceControllerViewModel = {
   deviceId: string;
 };
 
-export default TDeviceControllerViewModel;
+export default TRefreshTokenMetaControllerViewModel;

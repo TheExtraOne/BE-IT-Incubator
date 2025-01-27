@@ -31,7 +31,7 @@ const rateLimitingService = {
     await rateLimitingCollection.countDocuments({
       ["ip"]: ip,
       URL: url,
-      date: { $gt: subSeconds(new Date(), 10) },
+      date: { $gt: subSeconds(new Date(), 11) },
     }),
 };
 

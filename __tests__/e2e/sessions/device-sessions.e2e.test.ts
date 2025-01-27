@@ -107,6 +107,64 @@ describe("device sessions", () => {
           devicesResponse.body[i].lastActiveDate
         );
       }
+
+      // Delete second device using first device's refresh token
+      const secondDeviceId = updatedDevicesResponse.body[1].deviceId;
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices/${secondDeviceId}`)
+        .set("Cookie", refreshResponse.headers["set-cookie"][0])
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Get updated list of devices
+      const finalDevicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", refreshResponse.headers["set-cookie"][0])
+        .expect(HTTP_STATUS.OK_200);
+
+      // Verify second device is removed
+      expect(finalDevicesResponse.body).toHaveLength(3);
+      const remainingDeviceIds = finalDevicesResponse.body.map(
+        (d: TRefreshTokenMetaControllerViewModel) => d.deviceId
+      );
+      expect(remainingDeviceIds).not.toContain(secondDeviceId);
+
+      // Logout with third device
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/logout`)
+        .set("Cookie", sessions[2].refreshToken)
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Get list of devices after logout
+      const afterLogoutDevicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", refreshResponse.headers["set-cookie"][0])
+        .expect(HTTP_STATUS.OK_200);
+
+      // Verify third device is removed after logout
+      expect(afterLogoutDevicesResponse.body).toHaveLength(2);
+      const afterLogoutDeviceIds = afterLogoutDevicesResponse.body.map(
+        (d: TRefreshTokenMetaControllerViewModel) => d.deviceId
+      );
+      const thirdDeviceId = updatedDevicesResponse.body[2].deviceId;
+      expect(afterLogoutDeviceIds).not.toContain(thirdDeviceId);
+
+      // Delete all other devices with first device
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", refreshResponse.headers["set-cookie"][0])
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Get final list of devices
+      const afterDeleteAllDevicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", refreshResponse.headers["set-cookie"][0])
+        .expect(HTTP_STATUS.OK_200);
+
+      // Verify only first device remains
+      expect(afterDeleteAllDevicesResponse.body).toHaveLength(1);
+      expect(afterDeleteAllDevicesResponse.body[0].deviceId).toBe(
+        updatedDevicesResponse.body[0].deviceId
+      );
     });
   });
 

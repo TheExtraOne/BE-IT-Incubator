@@ -9,12 +9,12 @@ const rateLimitingMiddleware = async (
 ) => {
   await rateLimitingService.createNewRequest({
     ip: req.ip || "::1",
-    url: req.baseUrl,
+    url: req.originalUrl,
   });
 
   const requestNumber = await rateLimitingService.getRequests({
     ip: req.ip || "::1",
-    url: req.baseUrl,
+    url: req.originalUrl,
   });
 
   if (requestNumber > 5) {

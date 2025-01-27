@@ -4,6 +4,7 @@ import {
   userCollection,
   commentCollection,
   refreshTokensMetaCollection,
+  rateLimitingCollection,
 } from "../db/db";
 
 const testingRepository = {
@@ -13,6 +14,7 @@ const testingRepository = {
     await userCollection.deleteMany({});
     await commentCollection.deleteMany({});
     await refreshTokensMetaCollection.deleteMany({});
+    await rateLimitingCollection.deleteMany({});
   },
 };
 

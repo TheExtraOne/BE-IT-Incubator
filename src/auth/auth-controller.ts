@@ -58,6 +58,7 @@ const authController = {
       .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
       .catch((err) => console.log(err));
 
+    res.clearCookie("refreshToken", { path: "/" });
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 

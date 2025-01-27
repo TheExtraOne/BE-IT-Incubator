@@ -10,19 +10,22 @@ import { correctUserBodyParams, req, testDb } from "../helpers";
 describe("POST /auth/registration", () => {
   beforeAll(async () => await testDb.setup());
 
+  beforeEach(() => {
+    emailAdapter.sendEmail = jest
+      .fn()
+      .mockImplementation(
+        (userEmail: string, subject: string, message: string) =>
+          Promise.resolve({
+            status: RESULT_STATUS.SUCCESS,
+            data: "mailId",
+            extensions: [],
+          })
+      );
+  });
+
   afterEach(async () => await testDb.clear());
 
   afterAll(async () => await testDb.teardown());
-
-  emailAdapter.sendEmail = jest
-    .fn()
-    .mockImplementation((userEmail: string, subject: string, message: string) =>
-      Promise.resolve({
-        status: RESULT_STATUS.SUCCESS,
-        data: "mailId",
-        extensions: [],
-      })
-    );
 
   describe("Registration success/failure", () => {
     it("should return 204 and create user if input is valid", async () => {

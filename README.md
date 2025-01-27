@@ -43,15 +43,37 @@ Create a `.env` file in the root directory with:
 src/
 ├── app.ts                 # Express configuration
 ├── index.ts              # Entry point
+├── adapters/             # External service adapters
+│   └── email-adapter.ts  # Email service implementation
 ├── auth/                 # Authentication
-├── blogs/                # Blog management
-├── comments/            # Comments system
-├── common/             # Shared utilities
-├── db/                # Database config
-├── jwt/              # JWT services
-├── posts/            # Posts management
-├── users/            # User management
-└── testing/          # Test utilities
+│   ├── auth-controller.ts
+│   ├── auth-router.ts
+│   ├── auth-service.ts
+│   ├── middleware/      # Auth-specific middlewares
+│   └── models/         # Auth DTOs and types
+├── blogs/               # Blog management
+├── comments/           # Comments system
+├── common/            # Shared utilities
+│   ├── middlewares/  # Common middlewares
+│   ├── settings.ts  # Global settings
+│   └── types/      # Shared types
+├── db/              # Database config
+├── jwt/            # JWT services
+│   ├── jwt-service.ts
+│   └── middleware/ # Token verification
+├── managers/      # Business logic managers
+├── posts/        # Posts management
+├── users/        # User management
+└── testing/      # Test utilities
+
+__tests__/
+├── e2e/                # End-to-end tests
+│   ├── auth/          # Authentication tests
+│   ├── blogs/        # Blog-related tests
+│   ├── comments/     # Comment-related tests
+│   ├── posts/        # Post-related tests
+│   ├── users/        # User-related tests
+│   └── helpers.ts    # Test utilities
 ```
 
 ## Features
@@ -59,7 +81,7 @@ src/
 ### Core Functionality
 
 - ✅ Complete CRUD operations for blogs, posts, comments, and users
-- ✅ JWT authentication with access tokens
+- ✅ JWT authentication with access and refresh tokens
 - ✅ Email-based registration confirmation
 - ✅ Blog-specific post management
 - ✅ Comments system with authentication
@@ -69,26 +91,44 @@ src/
 ### Authentication & Security
 
 - ✅ Secure password hashing
-- ✅ JWT-based authentication
+- ✅ JWT-based authentication with:
+  - Access tokens for API requests
+  - Refresh tokens for token renewal
+  - Secure HTTP-only cookies
+  - Token blacklisting for logout
 - ✅ Protected endpoints
 - ✅ Basic authorization
 - ✅ Email confirmation system
+- ✅ Session management with logout capability
 
 ### Testing & Quality
 
-- ✅ Comprehensive E2E tests
+- ✅ Comprehensive E2E tests covering:
+  - User authentication flows
+  - Token refresh and logout
+  - Registration and confirmation
+  - CRUD operations
+  - Error cases and validation
 - ✅ Isolated test environment with MongoDB Memory Server
 - ✅ Coverage reporting
 - ✅ TypeScript type safety
 
 ## API Features
 
-### Users
+### Authentication
 
 - User registration with email confirmation
-- Secure authentication
+- Secure login with JWT tokens
+- Token refresh mechanism
+- Secure logout with token invalidation
+- Session management
+
+### Users
+
+- User registration and authentication
 - Profile management
 - User search and filtering
+- Password security
 
 ### Blogs & Posts
 

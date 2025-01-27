@@ -19,21 +19,22 @@ describe("POST /auth/registration-email-resending", () => {
       .post(`${SETTINGS.PATH.AUTH}/registration`)
       .send(correctUserBodyParams)
       .expect(HTTP_STATUS.NO_CONTENT_204);
+
+    emailAdapter.sendEmail = jest
+      .fn()
+      .mockImplementation(
+        (userEmail: string, subject: string, message: string) =>
+          Promise.resolve({
+            status: RESULT_STATUS.SUCCESS,
+            data: "mailId",
+            extensions: [],
+          })
+      );
   });
 
   afterEach(async () => await testDb.clear());
 
   afterAll(async () => await testDb.teardown());
-
-  emailAdapter.sendEmail = jest
-    .fn()
-    .mockImplementation((userEmail: string, subject: string, message: string) =>
-      Promise.resolve({
-        status: RESULT_STATUS.SUCCESS,
-        data: "mailId",
-        extensions: [],
-      })
-    );
 
   describe("Email resending success/failure", () => {
     it("should return 204 if email exists and not confirmed", async () => {

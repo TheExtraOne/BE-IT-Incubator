@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { add } from "date-fns";
+import bcryptService from "../adapters/bcypt-service";
 
 const mapUser = (user: TUserAccountRepViewModel): TUserControllerViewModel => ({
   id: user._id.toString(),
@@ -79,12 +80,7 @@ const usersService = {
     email,
     isConfirmed = false,
   }: TUserServiceInputModel): Promise<Result<string | null>> => {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await usersService._generateHash({
-      value: password,
-      salt: passwordSalt,
-    });
-
+    const passwordHash = await bcryptService.generateHash(password);
     const errors = await usersService.checkIfFieldIsUnique({
       login,
       email,
@@ -156,7 +152,7 @@ const usersService = {
       };
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
+    const isPasswordCorrect = await bcryptService.checkPassword(
       password,
       user.accountData.passwordHash
     );
@@ -184,9 +180,6 @@ const usersService = {
       extensions: [],
     };
   },
-
-  _generateHash: async ({ value, salt }: { value: string; salt: string }) =>
-    await bcrypt.hash(value, salt),
 };
 
 export default usersService;

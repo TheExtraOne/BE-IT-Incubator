@@ -1,4 +1,4 @@
-import emailAdapter from "../adapters/email-adapter";
+import emailService from "../adapters/email-service";
 import { Result } from "../common/types/types";
 
 const mailManager = {
@@ -9,7 +9,7 @@ const mailManager = {
     confirmationCode: string;
     email: string;
   }): Promise<Result<string | null>> =>
-    emailAdapter.sendEmail({
+    emailService.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
       message: `<h1>Thank for your registration</h1>

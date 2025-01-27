@@ -1,4 +1,4 @@
-import emailAdapter from "../../../src/adapters/email-adapter";
+import emailService from "../../../src/adapters/email-service";
 import {
   HTTP_STATUS,
   RESULT_STATUS,
@@ -20,7 +20,7 @@ describe("POST /auth/registration-email-resending", () => {
       .send(correctUserBodyParams)
       .expect(HTTP_STATUS.NO_CONTENT_204);
 
-    emailAdapter.sendEmail = jest
+    emailService.sendEmail = jest
       .fn()
       .mockImplementation(
         (userEmail: string, subject: string, message: string) =>

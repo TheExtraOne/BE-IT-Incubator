@@ -4,15 +4,13 @@ A robust REST API platform for blogging with TypeScript and Express.js. Features
 
 ## Technical Stack
 
-- **Backend Framework**: Node.js/Express.js (v4.21.2)
-- **Language**: TypeScript (v5.7.2)
-- **Database**: MongoDB (v6.12.0)
-- **Validation**: Express-validator (v7.2.1)
-- **Authentication**: JWT, bcryptjs
-- **Email Service**: Nodemailer (v6.9.16)
-- **Utils**: UUID (v11.0.5), date-fns (v4.1.0)
-- **Security**: CORS enabled, Password hashing
-- **Testing**: Jest (v29.7.0), Supertest (v7.0.0)
+- **Backend Framework**: Node.js/Express.js
+- **Language**: TypeScript
+- **Database**: MongoDB
+- **Validation**: Express-validator
+- **Authentication**: JWT, bcrypt
+- **Email Service**: Nodemailer
+- **Testing**: Jest, Supertest
 
 ## Development Setup
 
@@ -41,39 +39,34 @@ Create a `.env` file in the root directory with:
 
 ```
 src/
-├── app.ts                 # Express configuration
-├── index.ts              # Entry point
-├── adapters/             # External service adapters
-│   └── email-adapter.ts  # Email service implementation
-├── auth/                 # Authentication
-│   ├── auth-controller.ts
-│   ├── auth-router.ts
-│   ├── auth-service.ts
-│   ├── middleware/      # Auth-specific middlewares
-│   └── models/         # Auth DTOs and types
-├── blogs/               # Blog management
-├── comments/           # Comments system
-├── common/            # Shared utilities
-│   ├── middlewares/  # Common middlewares
+├── app.ts                # Express configuration
+├── index.ts             # Entry point
+├── adapters/            # External service adapters
+│   ├── bcypt-service.ts # Password encryption
+│   ├── email-service.ts # Email service
+│   ├── jwt-service.ts   # JWT operations
+│   └── middleware/      # Token verification middleware
+├── auth/                # Authentication
+├── blogs/             # Blog management
+├── comments/         # Comments system
+├── common/          # Shared utilities
+│   ├── middlewares/ # Common middlewares
 │   ├── settings.ts  # Global settings
 │   └── types/      # Shared types
-├── db/              # Database config
-├── jwt/            # JWT services
-│   ├── jwt-service.ts
-│   └── middleware/ # Token verification
-├── managers/      # Business logic managers
-├── posts/        # Posts management
-├── users/        # User management
-└── testing/      # Test utilities
+├── db/             # Database configuration
+├── managers/       # Business logic managers
+├── posts/         # Posts management
+├── testing/       # Testing utilities
+└── users/         # User management
 
 __tests__/
 ├── e2e/                # End-to-end tests
 │   ├── auth/          # Authentication tests
 │   ├── blogs/        # Blog-related tests
 │   ├── comments/     # Comment-related tests
-│   ├── posts/        # Post-related tests
-│   ├── users/        # User-related tests
-│   └── helpers.ts    # Test utilities
+│   ├── posts/       # Post-related tests
+│   ├── users/       # User-related tests
+│   └── helpers.ts   # Test utilities
 ```
 
 ## Features
@@ -90,71 +83,69 @@ __tests__/
 
 ### Authentication & Security
 
-- ✅ Secure password hashing
+- ✅ Secure password hashing with bcrypt
 - ✅ JWT-based authentication with:
   - Access tokens for API requests
   - Refresh tokens for token renewal
   - Secure HTTP-only cookies
   - Token blacklisting for logout
-- ✅ Protected endpoints
-- ✅ Basic authorization
+- ✅ Protected endpoints with basic authorization
 - ✅ Email confirmation system
 - ✅ Session management with logout capability
 
 ### Testing & Quality
 
 - ✅ Comprehensive E2E tests covering:
-  - User authentication flows
-  - Token refresh and logout
-  - Registration and confirmation
+  - Authentication flows (login, registration, confirmation)
   - CRUD operations
   - Error cases and validation
-- ✅ Isolated test environment with MongoDB Memory Server
-- ✅ Coverage reporting
+- ✅ Isolated test environment
 - ✅ TypeScript type safety
+- ✅ Input validation middleware
+- ✅ Error handling middleware
 
 ## API Features
 
 ### Authentication
 
 - User registration with email confirmation
-- Secure login with JWT tokens
+- Login with JWT token generation
 - Token refresh mechanism
-- Secure logout with token invalidation
-- Session management
+- Secure logout
+- Registration email resend capability
 
 ### Users
 
-- User registration and authentication
-- Profile management
+- User creation and management
+- Profile retrieval and updates
 - User search and filtering
-- Password security
+- Secure password handling
 
 ### Blogs & Posts
 
 - Blog creation and management
 - Post creation within blogs
-- Advanced search functionality
+- Advanced search and filtering
 - Sorting and pagination
 - Query parameter validation
 
 ### Comments
 
 - Comment creation on posts
-- Comment management
+- Comment management (update, delete)
 - Pagination and sorting
 - Authentication-based actions
 
 ## Development Scripts
 
-- `yarn watch`: TypeScript compilation (watch mode)
-- `yarn dev`: Development server with debugging
-- `yarn jest`: Run tests
+- `yarn watch`: TypeScript compilation in watch mode
+- `yarn dev`: Run development server
+- `yarn test`: Run tests
 - `yarn jest:coverage`: Generate test coverage
 
 ## Upcoming Features
 
-- [ ] Rate limiting
 - [ ] API documentation (Swagger/OpenAPI)
+- [ ] Rate limiting
 - [ ] Enhanced security features
 - [ ] Performance optimizations

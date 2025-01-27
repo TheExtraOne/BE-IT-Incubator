@@ -2,7 +2,7 @@ import { RESULT_STATUS, SETTINGS } from "../common/settings";
 import nodemailer from "nodemailer";
 import { Result } from "../common/types/types";
 
-const emailAdapter = {
+const emailService = {
   sendEmail: async ({
     userEmail,
     subject,
@@ -47,4 +47,4 @@ const emailAdapter = {
   },
 };
 
-export default emailAdapter;
+export default emailService;

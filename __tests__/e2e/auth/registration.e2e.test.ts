@@ -1,4 +1,4 @@
-import emailAdapter from "../../../src/adapters/email-adapter";
+import emailService from "../../../src/adapters/email-service";
 import {
   HTTP_STATUS,
   RESULT_STATUS,
@@ -11,7 +11,7 @@ describe("POST /auth/registration", () => {
   beforeAll(async () => await testDb.setup());
 
   beforeEach(() => {
-    emailAdapter.sendEmail = jest
+    emailService.sendEmail = jest
       .fn()
       .mockImplementation(
         (userEmail: string, subject: string, message: string) =>
@@ -43,7 +43,7 @@ describe("POST /auth/registration", () => {
       expect(user!.accountData.email).toBe(correctUserBodyParams.email);
       expect(user!.emailConfirmation.isConfirmed).toBe(false);
       expect(user!.emailConfirmation.confirmationCode).toBeTruthy();
-      expect(emailAdapter.sendEmail).toBeCalled();
+      expect(emailService.sendEmail).toBeCalled();
     });
 
     it("should return 400 if login or/and email already exists", async () => {

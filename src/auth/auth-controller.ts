@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import usersService from "../users/users-service";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../common/settings";
 import TAuthLoginControllerInputModel from "./models/AuthLoginControllerInputModel";
-import jwtService from "../jwt/jwt-service";
+import jwtService from "../adapters/jwt-service";
 import usersQueryRepository from "../users/users-query-repository";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 import { Result, TRequestWithBody } from "../common/types/types";

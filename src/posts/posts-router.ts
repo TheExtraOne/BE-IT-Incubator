@@ -6,8 +6,8 @@ import {
 } from "../common/middlewares";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
 import postsController from "./posts-controller";
-import accessTokenVerificationMiddleware from "../jwt/middleware/access-token-verification-middleware";
 import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
+import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 
 const postsRouter = Router({});
 

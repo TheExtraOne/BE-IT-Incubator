@@ -1,4 +1,3 @@
-// import { ObjectId } from "mongodb";
 import { refreshTokensMetaCollection } from "../db/db";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 
@@ -13,14 +12,26 @@ const securityRepository = {
     return insertedId.toString();
   },
 
-  //   deletePostById: async (id: string): Promise<boolean> => {
-  //     if (!ObjectId.isValid(id)) return false;
-  //     const { deletedCount } = await postCollection.deleteOne({
-  //       _id: new ObjectId(id),
-  //     });
+  getRefreshTokenMetaByFilters: async ({
+    filter = {},
+  }: {
+    filter?: Record<string, string> | Record<string, never>;
+  }): Promise<TRefreshTokensMetaRepViewModel | null> => {
+    const refreshTokensMeta: TRefreshTokensMetaRepViewModel | null =
+      await refreshTokensMetaCollection.findOne(filter);
 
-  //     return !!deletedCount;
-  //   },
+    return refreshTokensMeta;
+  },
+
+  deleteRefreshTokenMetaByDeviceId: async (
+    deviceId: string
+  ): Promise<boolean> => {
+    const { deletedCount } = await refreshTokensMetaCollection.deleteOne({
+      deviceId,
+    });
+
+    return !!deletedCount;
+  },
 };
 
 export default securityRepository;

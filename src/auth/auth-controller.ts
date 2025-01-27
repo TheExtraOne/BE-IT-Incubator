@@ -9,6 +9,7 @@ import { Result, TRequestWithBody } from "../common/types/types";
 import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationControllerInputModel";
 import authService from "./auth-service";
 import securityService from "../security/security-service";
+import { v4 as uuidv4 } from "uuid";
 
 const authController = {
   loginUser: async (
@@ -29,12 +30,13 @@ const authController = {
     }
 
     const userId = result.data?.id!;
+    const deviceId = uuidv4();
     const accessToken: string = await jwtService.createJWT({
-      userId: userId,
+      payload: { userId },
       type: TOKEN_TYPE.AC_TOKEN,
     });
     const refreshToken: string = await jwtService.createJWT({
-      userId: userId,
+      payload: { userId, deviceId },
       type: TOKEN_TYPE.R_TOKEN,
     });
 
@@ -45,6 +47,7 @@ const authController = {
         req.headers["user-agent"] ||
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
       ip: req.ip || "::1",
+      deviceId,
     });
 
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
@@ -53,12 +56,10 @@ const authController = {
 
   logoutUser: async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    // Extracting userId from req <- put it there in the middlewares from access token
-    const userId = req.userId;
-    // Add old refreshToken to the black list
-    usersService
-      .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
-      .catch((err) => console.log(err));
+    const result = await jwtService.decodeToken(refreshToken);
+    const { deviceId } = result.data || {};
+
+    securityService.deleteRefreshTokenMetaByDeviceId(deviceId!);
 
     res.clearCookie("refreshToken", { path: "/" });
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
@@ -142,18 +143,20 @@ const authController = {
     // Extracting userId from req <- put it there in the middlewares from access token
     const userId = req.userId;
 
-    // Add old refreshToken to the black list of user
-    usersService
-      .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
-      .catch((err) => console.log(err));
+    //TODO: extract deviceId and user id from decodeToken
+
+    // // Add old refreshToken to the black list of user
+    // usersService
+    //   .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
+    //   .catch((err) => console.log(err));
 
     // Generate new tokens
     const newAccessToken: string = await jwtService.createJWT({
-      userId: userId!,
+      payload: { userId: userId! },
       type: TOKEN_TYPE.AC_TOKEN,
     });
     const newRefreshToken: string = await jwtService.createJWT({
-      userId: userId!,
+      payload: { userId: userId! },
       type: TOKEN_TYPE.R_TOKEN,
     });
     res.cookie("refreshToken", newRefreshToken, {

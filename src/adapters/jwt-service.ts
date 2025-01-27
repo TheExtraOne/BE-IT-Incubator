@@ -11,27 +11,27 @@ export type TCreateJWTResponse = {
 
 const jwtService = {
   createJWT: async ({
-    userId,
+    payload,
     type,
   }: {
-    userId: string;
+    payload: Record<string, string | number>;
     type?: TOKEN_TYPE.AC_TOKEN | TOKEN_TYPE.R_TOKEN;
   }): Promise<string> => {
     let token: string;
 
     switch (type) {
       case TOKEN_TYPE.AC_TOKEN:
-        token = jwt.sign({ userId }, SETTINGS.AC_SECRET, {
+        token = jwt.sign(payload, SETTINGS.AC_SECRET, {
           expiresIn: SETTINGS.AC_EXPIRY,
         });
         break;
       case TOKEN_TYPE.R_TOKEN:
-        token = jwt.sign({ userId }, SETTINGS.RT_SECRET, {
+        token = jwt.sign(payload, SETTINGS.RT_SECRET, {
           expiresIn: SETTINGS.RT_EXPIRY,
         });
         break;
       default:
-        token = jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
+        token = jwt.sign(payload, SETTINGS.JWT_SECRET, {
           expiresIn: SETTINGS.JWT_EXPIRY,
         });
         break;
@@ -85,7 +85,12 @@ const jwtService = {
   decodeToken: async (
     token: string
   ): Promise<
-    Result<{ iat?: number; exp?: number; userId?: string } | null>
+    Result<{
+      iat?: number;
+      exp?: number;
+      userId?: string;
+      deviceId?: string;
+    } | null>
   > => {
     try {
       const result = jwt.decode(token);
@@ -99,7 +104,12 @@ const jwtService = {
       }
       return {
         status: RESULT_STATUS.SUCCESS,
-        data: { iat: result?.iat, exp: result?.exp, userId: result?.userId },
+        data: {
+          iat: result?.iat,
+          exp: result?.exp,
+          userId: result?.userId,
+          deviceId: result?.deviceId,
+        },
         extensions: [],
       };
     } catch (error) {

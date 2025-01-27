@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import jwtService from "../../adapters/jwt-service";
 import { Result } from "../../common/types/types";
-import usersService from "../../users/users-service";
+import TRefreshTokensMetaRepViewModel from "../../security/models/RefreshTokensMetaRepViewModel";
+import securityService from "../../security/security-service";
 
 const refreshTokenVerificationMiddleware = async (
   req: Request,
@@ -25,21 +26,19 @@ const refreshTokenVerificationMiddleware = async (
     return;
   }
 
-  const userId = result.data;
-  // TODO: remove check after implementing sessions
-  // Check if token is in a blacklist
-  const isTokenInTheBlackList = await usersService.checkIfTokenIsInTheBlackList(
-    {
-      id: userId!,
-      token: refreshToken,
-    }
-  );
-  if (isTokenInTheBlackList) {
+  const resultDecode = await jwtService.decodeToken(refreshToken);
+  const { userId, deviceId } = resultDecode?.data || {};
+
+  const isTokenInTheCollection: TRefreshTokensMetaRepViewModel | null =
+    await securityService.getRefreshTokenMetaByFilters({
+      filter: { userId: userId!, deviceId: deviceId! },
+    });
+
+  if (!isTokenInTheCollection) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
-
-  req.userId = userId;
+  req.userId = userId!;
 
   next();
 };

@@ -7,7 +7,13 @@ const securityRouter = Router({});
 securityRouter.get(
   "/devices",
   refreshTokenVerificationMiddleware,
-  securityController.getDevices
+  securityController.getRefreshTokensMeta
+);
+
+securityRouter.delete(
+  "/devices/:deviceId",
+  refreshTokenVerificationMiddleware,
+  securityController.deleteRefreshTokenMetaByDeviceId
 );
 
 export default securityRouter;

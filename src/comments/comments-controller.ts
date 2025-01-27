@@ -95,7 +95,7 @@ const commentsController = {
       return;
     }
 
-    await commentsService.updateCommentById({
+    commentsService.updateCommentById({
       id: req.params.id,
       content: req.body.content,
     });
@@ -120,7 +120,7 @@ const commentsController = {
       return;
     }
 
-    await commentsService.deleteCommentById(req.params.id);
+    commentsService.deleteCommentById(req.params.id);
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 };

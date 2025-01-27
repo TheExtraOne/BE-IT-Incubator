@@ -79,22 +79,6 @@ const usersRepository = {
     return !!matchedCount;
   },
 
-  updateRefreshTokensInvalidListById: async ({
-    id,
-    token,
-  }: {
-    id: string;
-    token: string;
-  }): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await userCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $push: { refreshTokensInvalidList: token } }
-    );
-
-    return !!matchedCount;
-  },
-
   updateUserEmailConfirmationByEmail: async ({
     emailConfirmation,
     email,

@@ -17,11 +17,11 @@ const mapRefreshTokensMeta = (
   refreshTokensMeta.map(mapRefreshTokenMeta);
 
 const securityQueryRepository = {
-  getAllRefreshTokensMeta: async (): Promise<
-    TRefreshTokenMetaControllerViewModel[] | []
-  > => {
+  getAllRefreshTokensMeta: async (
+    filter: Record<string, string> | undefined = {}
+  ): Promise<TRefreshTokenMetaControllerViewModel[] | []> => {
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel[] | [] =
-      await refreshTokensMetaCollection.find({}).toArray();
+      await refreshTokensMetaCollection.find(filter).toArray();
 
     return mapRefreshTokensMeta(refreshTokensMeta);
   },

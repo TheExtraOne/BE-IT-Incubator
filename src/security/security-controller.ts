@@ -9,9 +9,12 @@ import securityService from "./security-service";
 import jwtService from "../adapters/jwt-service";
 
 const securityController = {
-  getRefreshTokensMeta: async (_req: Request, res: Response) => {
+  getRefreshTokensMeta: async (req: Request, res: Response) => {
+    const userId = req.userId;
     const devices: TRefreshTokenMetaControllerViewModel[] =
-      await securityQueryRepository.getAllRefreshTokensMeta();
+      await securityQueryRepository.getAllRefreshTokensMeta({
+        ["userId"]: userId!,
+      });
 
     res.status(HTTP_STATUS.OK_200).json(devices);
   },

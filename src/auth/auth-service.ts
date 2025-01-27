@@ -83,18 +83,22 @@ const authService = {
       expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
       isConfirmed: false,
     };
-    await usersRepository.updateUserEmailConfirmationByEmail({
+    usersRepository.updateUserEmailConfirmationByEmail({
       emailConfirmation,
       email,
     });
 
     // Send email with new confirmation code
-    const result = await mailManager.sendRegistrationMail({
+    mailManager.sendRegistrationMail({
       email,
       confirmationCode: emailConfirmation.confirmationCode,
     });
 
-    return result;
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
   },
 
   confirmRegistration: async (confirmationCode: string): Promise<Result> => {

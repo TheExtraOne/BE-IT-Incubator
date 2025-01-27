@@ -6,6 +6,7 @@ import { TRequestWithParams } from "../common/types/types";
 import TPathParamsRefreshTokenMetaModel from "./models/PathParamsRefreshTokenMetaModel";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 import securityService from "./security-service";
+import jwtService from "../adapters/jwt-service";
 
 const securityController = {
   getRefreshTokensMeta: async (_req: Request, res: Response) => {
@@ -24,7 +25,7 @@ const securityController = {
 
     const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
       await securityService.getRefreshTokenMetaByFilters({
-        filter: { deviceId },
+        ["deviceId"]: deviceId,
       });
 
     if (!refreshTokenMeta) {
@@ -38,6 +39,19 @@ const securityController = {
     }
 
     securityService.deleteRefreshTokenMetaByDeviceId(deviceId);
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  },
+
+  deleteAllRefreshTokensMeta: async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    const result = await jwtService.decodeToken(refreshToken!);
+    const { userId, deviceId } = result.data || {};
+
+    securityService.deleteAllRefreshTokensMeta({
+      userId: userId!,
+      deviceId: deviceId!,
+    });
+
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 };

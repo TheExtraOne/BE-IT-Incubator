@@ -41,7 +41,7 @@ const authController = {
     });
 
     // Creating refreshTokenMeta without waiting
-    securityService.createRefreshTokenMeta({
+    await securityService.createRefreshTokenMeta({
       refreshToken,
       title:
         req.headers["user-agent"] ||

@@ -37,18 +37,26 @@ const securityService = {
       userId: resultDecode.data?.userId!,
     };
 
-    securityRepository.createRefreshTokenMeta(newRefreshTokenMeta);
+    await securityRepository.createRefreshTokenMeta(newRefreshTokenMeta);
   },
 
-  getRefreshTokenMetaByFilters: async ({
-    filter = {},
-  }: {
-    filter?: Record<string, string> | Record<string, never>;
-  }): Promise<TRefreshTokensMetaRepViewModel | null> =>
-    securityRepository.getRefreshTokenMetaByFilters({ filter }),
+  getRefreshTokenMetaByFilters: async (
+    filter: Record<string, string> | Record<string, never> = {}
+  ): Promise<TRefreshTokensMetaRepViewModel | null> =>
+    securityRepository.getRefreshTokenMetaByFilters(filter),
 
   deleteRefreshTokenMetaByDeviceId: (deviceId: string): Promise<boolean> =>
     securityRepository.deleteRefreshTokenMetaByDeviceId(deviceId),
+
+  deleteAllRefreshTokensMeta: async ({
+    userId,
+    deviceId,
+  }: {
+    userId: string;
+    deviceId: string;
+  }): Promise<void> => {
+    await securityRepository.deleteAllRefreshTokensMeta({ userId, deviceId });
+  },
 
   updateRefreshTokenMetaTime: async ({
     deviceId,

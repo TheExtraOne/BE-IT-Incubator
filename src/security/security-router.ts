@@ -15,5 +15,10 @@ securityRouter.delete(
   refreshTokenVerificationMiddleware,
   securityController.deleteRefreshTokenMetaByDeviceId
 );
+securityRouter.delete(
+  "/devices/",
+  refreshTokenVerificationMiddleware,
+  securityController.deleteAllRefreshTokensMeta
+);
 
 export default securityRouter;

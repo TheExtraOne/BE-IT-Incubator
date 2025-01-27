@@ -31,7 +31,8 @@ const refreshTokenVerificationMiddleware = async (
 
   const isTokenInTheCollection: TRefreshTokensMetaRepViewModel | null =
     await securityService.getRefreshTokenMetaByFilters({
-      filter: { userId: userId!, deviceId: deviceId! },
+      ["userId"]: userId!,
+      ["deviceId"]: deviceId!,
     });
 
   if (!isTokenInTheCollection) {

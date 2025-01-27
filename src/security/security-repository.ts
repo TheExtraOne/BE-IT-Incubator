@@ -45,6 +45,19 @@ const securityRepository = {
 
     return !!deletedCount;
   },
+
+  deleteAllRefreshTokensMeta: async ({
+    userId,
+    deviceId,
+  }: {
+    userId: string;
+    deviceId: string;
+  }): Promise<void> => {
+    await refreshTokensMetaCollection.deleteMany({
+      ["userId"]: userId,
+      ["deviceId"]: { $ne: deviceId },
+    });
+  },
 };
 
 export default securityRepository;

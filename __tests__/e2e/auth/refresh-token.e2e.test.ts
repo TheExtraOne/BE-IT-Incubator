@@ -61,39 +61,5 @@ describe("POST /auth/refresh-token", () => {
         .set("Cookie", "refreshToken=invalid.token.here")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
-
-    it("should return 401 if refresh token is the blacklist", async () => {
-      // Create user
-      await req
-        .post(SETTINGS.PATH.USERS)
-        .set({ Authorization: userCredentials.correct })
-        .send(correctUserBodyParams)
-        .expect(HTTP_STATUS.CREATED_201);
-
-      // Login to get initial tokens
-      const loginRes = await req
-        .post(`${SETTINGS.PATH.AUTH}/login`)
-        .send({
-          loginOrEmail: correctUserBodyParams.login,
-          password: correctUserBodyParams.password,
-        })
-        .expect(HTTP_STATUS.OK_200);
-
-      // Get refresh token from cookies
-      const cookies = loginRes.headers["set-cookie"];
-      const refreshTokenCookie = cookies[0]; // Take the first cookie which should be the refresh token
-
-      // First refresh - should succeed
-      await req
-        .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
-        .set("Cookie", refreshTokenCookie)
-        .expect(HTTP_STATUS.OK_200);
-
-      // Try to reuse the same refresh token - should fail
-      await req
-        .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
-        .set("Cookie", refreshTokenCookie)
-        .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
   });
 });

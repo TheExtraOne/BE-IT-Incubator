@@ -60,7 +60,7 @@ const usersService = {
     return errors;
   },
 
-  checkIfTokenIsInInvalidList: async ({
+  checkIfTokenIsInTheBlackList: async ({
     id,
     token,
   }: {

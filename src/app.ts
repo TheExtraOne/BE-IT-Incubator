@@ -8,6 +8,7 @@ import testingRouter from "./testing/testing-router";
 import authRouter from "./auth/auth-router";
 import commentsRouter from "./comments/comments-router";
 import cookieParser from "cookie-parser";
+import securityRouter from "./security/security-router";
 
 const app = express();
 app.use(express.json());
@@ -24,5 +25,6 @@ app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.TESTING, testingRouter);
 app.use(SETTINGS.PATH.AUTH, authRouter);
 app.use(SETTINGS.PATH.COMMENTS, commentsRouter);
+app.use(SETTINGS.PATH.SECURITY, securityRouter);
 
 export default app;

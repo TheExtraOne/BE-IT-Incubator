@@ -44,15 +44,6 @@ const authController = {
     const refreshToken = req.cookies.refreshToken;
     // Extracting userId from req <- put it there in the middlewares from access token
     const userId = req.userId;
-    // Check if token is in a blacklist
-    const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({
-      id: userId!,
-      token: refreshToken,
-    });
-    if (isTokenInvalid) {
-      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
-      return;
-    }
     // Add old refreshToken to the black list
     usersService
       .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
@@ -139,16 +130,6 @@ const authController = {
     const refreshToken = req.cookies.refreshToken;
     // Extracting userId from req <- put it there in the middlewares from access token
     const userId = req.userId;
-
-    // Check if token is in a blacklist
-    const isTokenInvalid = await usersService.checkIfTokenIsInInvalidList({
-      id: userId!,
-      token: refreshToken,
-    });
-    if (isTokenInvalid) {
-      res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
-      return;
-    }
 
     // Add old refreshToken to the black list of user
     usersService

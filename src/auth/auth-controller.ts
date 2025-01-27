@@ -138,17 +138,11 @@ const authController = {
   },
 
   refreshToken: async (req: Request, res: Response) => {
-    // Checking expiration of refreshToken in the middlewares
+    // Checking expiration and validity of the refreshToken in the middlewares
     const refreshToken = req.cookies.refreshToken;
-    // Extracting userId from req <- put it there in the middlewares from access token
-    const userId = req.userId;
 
-    //TODO: extract deviceId and user id from decodeToken
-
-    // // Add old refreshToken to the black list of user
-    // usersService
-    //   .updateRefreshTokensInvalidListById({ id: userId!, token: refreshToken })
-    //   .catch((err) => console.log(err));
+    const resultDecode = await jwtService.decodeToken(refreshToken);
+    const { userId, deviceId } = resultDecode?.data || {};
 
     // Generate new tokens
     const newAccessToken: string = await jwtService.createJWT({
@@ -156,8 +150,18 @@ const authController = {
       type: TOKEN_TYPE.AC_TOKEN,
     });
     const newRefreshToken: string = await jwtService.createJWT({
-      payload: { userId: userId! },
+      payload: { userId: userId!, deviceId: deviceId! },
       type: TOKEN_TYPE.R_TOKEN,
+    });
+
+    const resultDecodeNewRefreshToken = await jwtService.decodeToken(
+      newRefreshToken
+    );
+    const { iat } = resultDecodeNewRefreshToken?.data || {};
+    // Update time
+    securityService.updateRefreshTokenMetaTime({
+      deviceId: deviceId!,
+      lastActiveDate: securityService.convertTimeToISOFromUnix(iat!),
     });
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,

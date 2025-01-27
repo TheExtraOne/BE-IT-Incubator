@@ -27,10 +27,10 @@ const securityService = {
       _id: new ObjectId(),
       ip,
       title,
-      lastActiveDate: securityService._convertTimeToISOFromUnix(
+      lastActiveDate: securityService.convertTimeToISOFromUnix(
         resultDecode.data?.iat!
       ),
-      expirationDate: securityService._convertTimeToISOFromUnix(
+      expirationDate: securityService.convertTimeToISOFromUnix(
         resultDecode.data?.exp!
       ),
       deviceId,
@@ -50,7 +50,20 @@ const securityService = {
   deleteRefreshTokenMetaByDeviceId: (deviceId: string): Promise<boolean> =>
     securityRepository.deleteRefreshTokenMetaByDeviceId(deviceId),
 
-  _convertTimeToISOFromUnix: (unixTime: number): string =>
+  updateRefreshTokenMetaTime: async ({
+    deviceId,
+    lastActiveDate,
+  }: {
+    deviceId: string;
+    lastActiveDate: string;
+  }): Promise<void> => {
+    securityRepository.updateRefreshTokenMetaTime({
+      deviceId,
+      lastActiveDate,
+    });
+  },
+
+  convertTimeToISOFromUnix: (unixTime: number): string =>
     new Date(unixTime * 1000).toISOString(),
 };
 

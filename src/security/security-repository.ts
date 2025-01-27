@@ -23,6 +23,19 @@ const securityRepository = {
     return refreshTokensMeta;
   },
 
+  updateRefreshTokenMetaTime: async ({
+    deviceId,
+    lastActiveDate,
+  }: {
+    deviceId: string;
+    lastActiveDate: string;
+  }): Promise<void> => {
+    await refreshTokensMetaCollection.updateOne(
+      { deviceId },
+      { $set: { lastActiveDate } }
+    );
+  },
+
   deleteRefreshTokenMetaByDeviceId: async (
     deviceId: string
   ): Promise<boolean> => {

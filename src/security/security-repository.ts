@@ -45,7 +45,7 @@ const securityRepository = {
     deviceId: string
   ): Promise<boolean> => {
     const { deletedCount } = await refreshTokensMetaCollection.deleteOne({
-      deviceId,
+      ["deviceId"]: deviceId,
     });
 
     return !!deletedCount;

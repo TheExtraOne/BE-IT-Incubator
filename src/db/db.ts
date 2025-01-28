@@ -5,7 +5,7 @@ import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import TRefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
-import TRateLimitingRepViewModel from "../adapters/models/RateLimitingRepViewModel";
+import TRateLimitingRepViewModel from "../rate-limiting/models/RateLimitingRepViewModel";
 
 export let blogCollection: Collection<TBlogRepViewModel>;
 export let postCollection: Collection<TPostRepViewModel>;

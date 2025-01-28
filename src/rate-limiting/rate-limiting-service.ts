@@ -1,9 +1,7 @@
 import { ObjectId } from "mongodb";
 import TRateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
-import { rateLimitingCollection } from "../db/db";
-import { subSeconds } from "date-fns";
+import rateLimitingRepository from "./rate-limiting-repository";
 
-// TODO: move to repository
 const rateLimitingService = {
   createNewRequest: async ({
     ip,
@@ -18,7 +16,8 @@ const rateLimitingService = {
       URL: url,
       date: new Date(),
     };
-    await rateLimitingCollection.insertOne(newRequest);
+
+    await rateLimitingRepository.insertNewRequest(newRequest);
   },
 
   getRequests: async ({
@@ -28,11 +27,7 @@ const rateLimitingService = {
     ip: string;
     url: string;
   }): Promise<number> =>
-    await rateLimitingCollection.countDocuments({
-      ["ip"]: ip,
-      URL: url,
-      date: { $gt: subSeconds(new Date(), 11) },
-    }),
+    await rateLimitingRepository.getRequestsAmount({ ip, url }),
 };
 
 export default rateLimitingService;

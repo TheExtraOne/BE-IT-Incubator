@@ -30,6 +30,8 @@ export const SETTINGS = {
   RT_SECRET: process.env.RT_SECRET as string,
   RT_EXPIRY: process.env.RT_EXPIRY as string,
   MAIL_PASSWORD: process.env.MAIL_RU_PASS as string,
+  RATE_LIMIT_WINDOW: process.env.RATE_LIMIT_WINDOW || 10,
+  RATE_LIMIT_MAX_REQUESTS: process.env.RATE_LIMIT_MAX_REQUESTS || 5,
 };
 
 export const HTTP_STATUS = {

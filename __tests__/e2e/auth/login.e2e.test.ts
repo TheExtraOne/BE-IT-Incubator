@@ -76,6 +76,36 @@ describe("POST /auth/login", () => {
     });
   });
 
+  describe("Rate limiting", () => {
+    it("should return 429 after exceeding 5 requests within 10 seconds", async () => {
+      // Create user first
+      await req
+        .post(SETTINGS.PATH.USERS)
+        .set({ Authorization: userCredentials.correct })
+        .send(correctUserBodyParams)
+        .expect(HTTP_STATUS.CREATED_201);
+
+      const loginData = {
+        loginOrEmail: correctUserBodyParams.login,
+        password: correctUserBodyParams.password,
+      };
+
+      // Make 5 successful requests
+      for (let i = 0; i < 5; i++) {
+        await req
+          .post(`${SETTINGS.PATH.AUTH}/login`)
+          .send(loginData)
+          .expect(HTTP_STATUS.OK_200);
+      }
+
+      // 6th request should be rate limited
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/login`)
+        .send(loginData)
+        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    });
+  });
+
   describe("Input validation", () => {
     describe("loginOrEmail validation", () => {
       it("should return 400 if loginOrEmail is not string", async () => {

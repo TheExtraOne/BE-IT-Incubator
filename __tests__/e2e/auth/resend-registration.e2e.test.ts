@@ -36,6 +36,23 @@ describe("POST /auth/registration-email-resending", () => {
 
   afterAll(async () => await testDb.teardown());
 
+  describe("Rate limiting", () => {
+    it("should return 429 after exceeding 5 requests within 10 seconds", async () => {
+      // Make 5 requests
+      for (let i = 0; i < 5; i++) {
+        await req
+          .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+          .send({ email: correctUserBodyParams.email });
+      }
+
+      // 6th request should be rate limited
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+        .send({ email: correctUserBodyParams.email })
+        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    });
+  });
+
   describe("Email resending success/failure", () => {
     it("should return 204 if email exists and not confirmed", async () => {
       await req

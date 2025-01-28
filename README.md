@@ -33,7 +33,12 @@ Create a `.env` file in the root directory with:
 - `PORT`: API gateway port (default: 3000)
 - `MONGO_URL`: MongoDB connection string
 - `LOGIN_PASSWORD`: Authorization credentials
-- Additional email configuration for Nodemailer
+- `JWT_SECRET` and `JWT_EXPIRY`: Ordinary JWT settings
+- `AC_SECRET` and `AC_EXPIRY`: Ordinary access token settings
+- `RT_SECRET` and `RT_EXPIRY`: Ordinary refresh token settings
+- `MAIL_RU_PASS`: Password for using nodemailer
+- `RATE_LIMIT_WINDOW`: Time window for rate limiting in seconds (default: 10)
+- `RATE_LIMIT_MAX_REQUESTS`: Maximum requests per time window (default: 5)
 
 ## Project Structure
 
@@ -47,28 +52,29 @@ src/
 │   ├── jwt-service.ts   # JWT operations
 │   └── middleware/      # Token verification middleware
 ├── auth/                # Authentication
-├── blogs/             # Blog management
-├── comments/         # Comments system
-├── common/          # Shared utilities
-│   ├── middlewares/ # Common middlewares
-│   ├── settings.ts  # Global settings
-│   └── types/      # Shared types
-├── db/             # Database configuration
-├── managers/       # Business logic managers
-├── posts/         # Posts management
-├── security/      # Security & session management
-├── testing/       # Testing utilities
-└── users/         # User management
+├── blogs/              # Blog management
+├── comments/           # Comments system
+├── common/             # Shared utilities
+│   ├── middlewares/    # Common middlewares
+│   ├── settings.ts     # Global settings
+│   └── types/          # Shared types
+├── db/                 # Database configuration
+├── managers/           # Business logic managers
+├── posts/              # Posts management
+├── rate-limiting/      # Rate limiting functionality
+├── security/           # Security & session management
+├── testing/            # Testing utilities
+└── users/              # User management
 
 __tests__/
 ├── e2e/                # End-to-end tests
 │   ├── auth/          # Authentication tests
-│   ├── blogs/        # Blog-related tests
-│   ├── comments/     # Comment-related tests
-│   ├── posts/       # Post-related tests
-│   ├── sessions/    # Device session tests
-│   ├── users/       # User-related tests
-│   └── helpers.ts   # Test utilities
+│   ├── blogs/         # Blog-related tests
+│   ├── comments/      # Comment-related tests
+│   ├── posts/         # Post-related tests
+│   ├── sessions/      # Device session tests
+│   ├── users/         # User-related tests
+│   └── helpers.ts     # Test utilities
 ```
 
 ## Features
@@ -82,6 +88,7 @@ __tests__/
 - ✅ Comments system with authentication
 - ✅ Advanced search and filtering
 - ✅ Pagination and sorting capabilities
+- ✅ Sophisticated rate limiting system
 
 ### Authentication & Security
 
@@ -118,6 +125,11 @@ __tests__/
   - GET /security/devices - List all active sessions
   - DELETE /security/devices/:deviceId - Terminate specific session
   - DELETE /security/devices - Terminate all other sessions
+- ✅ Rate limiting protection:
+  - Configurable time windows
+  - IP-based tracking
+  - MongoDB persistence
+  - Per-endpoint limits
 
 ### Testing & Quality
 
@@ -169,6 +181,15 @@ __tests__/
 - Pagination and sorting
 - Authentication-based actions
 
+### Rate Limiting
+
+- ✅ Advanced request rate limiting system
+- ✅ Configurable time windows and request limits
+- ✅ IP-based rate limiting with MongoDB persistence
+- ✅ Per-endpoint rate limit configuration
+- ✅ Automatic request tracking and limiting
+- ✅ Protection against DDoS and brute-force attacks
+
 ## Development Scripts
 
 - `yarn watch`: TypeScript compilation in watch mode
@@ -179,5 +200,4 @@ __tests__/
 ## Upcoming Features
 
 - [ ] API documentation (Swagger/OpenAPI)
-- [ ] Rate limiting
 - [ ] Performance optimizations

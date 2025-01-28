@@ -115,6 +115,29 @@ describe("POST /auth/registration-confirmation", () => {
     });
   });
 
+  describe("Rate limiting", () => {
+    it("should return 429 after exceeding 5 requests within 10 seconds", async () => {
+      // Get the confirmation code from the created user
+      const user = await usersRepository.getByLoginOrEmail(
+        correctUserBodyParams.login
+      );
+      const confirmationCode = user!.emailConfirmation.confirmationCode;
+
+      // Make 5 requests (they will fail with 400 since code will be already confirmed after first success)
+      for (let i = 0; i < 5; i++) {
+        await req
+          .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+          .send({ code: confirmationCode });
+      }
+
+      // 6th request should be rate limited
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+        .send({ code: confirmationCode })
+        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    });
+  });
+
   describe("Input validation", () => {
     it("should return 400 if code is not provided", async () => {
       const response = await req

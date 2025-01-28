@@ -13,21 +13,21 @@ type TSession = {
   accessToken: string;
 };
 
-describe("device sessions", () => {
+const userAgents = {
+  chrome: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",
+  firefox: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15) Firefox/89.0",
+  safari:
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) Safari/605.1.15",
+  edge: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/91.0.864.59",
+};
+
+describe("security/devices endpoints", () => {
   beforeAll(async () => await testDb.setup());
   afterEach(async () => await testDb.clear());
   afterAll(async () => await testDb.teardown());
 
-  const userAgents = {
-    chrome: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",
-    firefox: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15) Firefox/89.0",
-    safari:
-      "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) Safari/605.1.15",
-    edge: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/91.0.864.59",
-  };
-
-  describe("login with multiple devices", () => {
-    it("should successfully login from 4 different devices and verify sessions", async () => {
+  describe("GET /security/devices", () => {
+    it("should return list of active sessions", async () => {
       // Create user
       await req
         .post(SETTINGS.PATH.USERS)
@@ -35,10 +35,8 @@ describe("device sessions", () => {
         .send(correctUserBodyParams)
         .expect(HTTP_STATUS.CREATED_201);
 
-      // Store refresh tokens and device info
+      // Login with multiple devices
       const sessions: TSession[] = [];
-
-      // Login with 4 different user agents
       for (const [browser, userAgent] of Object.entries(userAgents)) {
         const loginResponse = await req
           .post(`${SETTINGS.PATH.AUTH}/login`)
@@ -62,7 +60,7 @@ describe("device sessions", () => {
         .set("Cookie", sessions[0].refreshToken)
         .expect(HTTP_STATUS.OK_200);
 
-      // Verify 4 devices are present
+      // Verify all devices are present
       expect(devicesResponse.body).toHaveLength(4);
 
       // Store initial lastActiveDate of first device
@@ -166,9 +164,7 @@ describe("device sessions", () => {
         updatedDevicesResponse.body[0].deviceId
       );
     });
-  });
 
-  describe("error cases", () => {
     it("should return 401 for invalid refresh token", async () => {
       await req
         .get(`${SETTINGS.PATH.SECURITY}/devices`)
@@ -180,6 +176,118 @@ describe("device sessions", () => {
       await req
         .get(`${SETTINGS.PATH.SECURITY}/devices`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
+    });
+  });
+
+  describe("DELETE /security/devices", () => {
+    it("should terminate all other sessions except current", async () => {
+      // Create user and login with multiple devices
+      await req
+        .post(SETTINGS.PATH.USERS)
+        .set({ Authorization: userCredentials.correct })
+        .send(correctUserBodyParams)
+        .expect(HTTP_STATUS.CREATED_201);
+
+      const sessions: TSession[] = [];
+      for (const [browser, userAgent] of Object.entries(userAgents)) {
+        const loginResponse = await req
+          .post(`${SETTINGS.PATH.AUTH}/login`)
+          .set("User-Agent", userAgent)
+          .send({
+            loginOrEmail: correctUserBodyParams.login,
+            password: correctUserBodyParams.password,
+          })
+          .expect(HTTP_STATUS.OK_200);
+
+        sessions.push({
+          browser,
+          refreshToken: loginResponse.headers["set-cookie"][0],
+          accessToken: loginResponse.body.accessToken,
+        });
+      }
+
+      // Delete all other sessions
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", sessions[0].refreshToken)
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Verify only current session remains
+      const devicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", sessions[0].refreshToken)
+        .expect(HTTP_STATUS.OK_200);
+
+      expect(devicesResponse.body).toHaveLength(1);
+    });
+
+    it("should return 401 for invalid refresh token", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", "refreshToken=invalid")
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
+    });
+
+    it("should return 401 for missing refresh token", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices`)
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
+    });
+  });
+
+  describe("DELETE /security/devices/:deviceId", () => {
+    it("should terminate specific session by deviceId", async () => {
+      // Create user and login with multiple devices
+      await req
+        .post(SETTINGS.PATH.USERS)
+        .set({ Authorization: userCredentials.correct })
+        .send(correctUserBodyParams)
+        .expect(HTTP_STATUS.CREATED_201);
+
+      const sessions: TSession[] = [];
+      for (const [browser, userAgent] of Object.entries(userAgents)) {
+        const loginResponse = await req
+          .post(`${SETTINGS.PATH.AUTH}/login`)
+          .set("User-Agent", userAgent)
+          .send({
+            loginOrEmail: correctUserBodyParams.login,
+            password: correctUserBodyParams.password,
+          })
+          .expect(HTTP_STATUS.OK_200);
+
+        sessions.push({
+          browser,
+          refreshToken: loginResponse.headers["set-cookie"][0],
+          accessToken: loginResponse.body.accessToken,
+        });
+      }
+
+      // Get devices to find deviceId to delete
+      const devicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", sessions[0].refreshToken)
+        .expect(HTTP_STATUS.OK_200);
+
+      const deviceIdToDelete = devicesResponse.body[1].deviceId;
+
+      // Delete specific device
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices/${deviceIdToDelete}`)
+        .set("Cookie", sessions[0].refreshToken)
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Verify device was deleted
+      const updatedDevicesResponse = await req
+        .get(`${SETTINGS.PATH.SECURITY}/devices`)
+        .set("Cookie", sessions[0].refreshToken)
+        .expect(HTTP_STATUS.OK_200);
+
+      expect(updatedDevicesResponse.body).toHaveLength(3);
+      expect(
+        updatedDevicesResponse.body.map(
+          (d: TRefreshTokenMetaControllerViewModel) => d.deviceId
+        )
+      ).not.toContain(deviceIdToDelete);
     });
 
     it("should return 403 when trying to delete another user's session", async () => {
@@ -199,7 +307,7 @@ describe("device sessions", () => {
         })
         .expect(HTTP_STATUS.OK_200);
 
-      // Get devices to get a deviceId
+      // Get first user's deviceId
       const devicesResponse = await req
         .get(`${SETTINGS.PATH.SECURITY}/devices`)
         .set("Cookie", loginResponse.headers["set-cookie"][0])
@@ -207,7 +315,7 @@ describe("device sessions", () => {
 
       const deviceId = devicesResponse.body[0].deviceId;
 
-      // Create second user and try to delete first user's session
+      // Create second user
       const secondUser = {
         ...correctUserBodyParams,
         login: "secondUser",
@@ -220,6 +328,7 @@ describe("device sessions", () => {
         .send(secondUser)
         .expect(HTTP_STATUS.CREATED_201);
 
+      // Login as second user
       const secondLoginResponse = await req
         .post(`${SETTINGS.PATH.AUTH}/login`)
         .set("User-Agent", userAgents.firefox)
@@ -258,6 +367,19 @@ describe("device sessions", () => {
         .delete(`${SETTINGS.PATH.SECURITY}/devices/nonexistentdeviceid`)
         .set("Cookie", loginResponse.headers["set-cookie"][0])
         .expect(HTTP_STATUS.NOT_FOUND_404);
+    });
+
+    it("should return 401 for invalid refresh token", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices/anydeviceid`)
+        .set("Cookie", "refreshToken=invalid")
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
+    });
+
+    it("should return 401 for missing refresh token", async () => {
+      await req
+        .delete(`${SETTINGS.PATH.SECURITY}/devices/anydeviceid`)
+        .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
   });
 });

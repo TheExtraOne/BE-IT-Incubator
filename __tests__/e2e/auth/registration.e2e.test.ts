@@ -27,6 +27,23 @@ describe("POST /auth/registration", () => {
 
   afterAll(async () => await testDb.teardown());
 
+  describe("Rate limiting", () => {
+    it("should return 429 after exceeding 5 requests within 10 seconds", async () => {
+      // Make 5 requests (they will fail with 400 after first success due to duplicate login/email)
+      for (let i = 0; i < 5; i++) {
+        await req
+          .post(`${SETTINGS.PATH.AUTH}/registration`)
+          .send(correctUserBodyParams);
+      }
+
+      // 6th request should be rate limited
+      await req
+        .post(`${SETTINGS.PATH.AUTH}/registration`)
+        .send(correctUserBodyParams)
+        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    });
+  });
+
   describe("Registration success/failure", () => {
     it("should return 204 and create user if input is valid", async () => {
       await req

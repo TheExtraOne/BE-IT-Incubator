@@ -6,7 +6,7 @@ import accessTokenVerificationMiddleware from "../adapters/middleware/access-tok
 import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registration-input-validation-middleware";
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
 import refreshTokenVerificationMiddleware from "../adapters/middleware/refresh-token-verification-middleware";
-import rateLimitingMiddleware from "../adapters/middleware/rate-limiting-middleware";
+import rateLimitingMiddleware from "../rate-limiting/middleware/rate-limiting-middleware";
 
 const authRouter = Router({});
 

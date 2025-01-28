@@ -34,10 +34,6 @@ type TUserAccountRepViewModel = WithId<{
     createdAt: string;
   };
   emailConfirmation: TEmailConfirmation;
-  /**
-   * array with invalid refreshTokens
-   */
-  refreshTokensInvalidList: string[];
 }>;
 
 export default TUserAccountRepViewModel;

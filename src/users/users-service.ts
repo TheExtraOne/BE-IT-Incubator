@@ -66,7 +66,6 @@ const usersService = {
     email,
     isConfirmed = false,
   }: TUserServiceInputModel): Promise<Result<string | null>> => {
-    const passwordHash = await bcryptService.generateHash(password);
     const errors = await usersService.checkIfFieldIsUnique({
       login,
       email,
@@ -80,6 +79,7 @@ const usersService = {
       };
     }
 
+    const passwordHash = await bcryptService.generateHash(password);
     const newUserAccount: TUserAccountRepViewModel = {
       _id: new ObjectId(),
       accountData: {
@@ -93,7 +93,6 @@ const usersService = {
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed,
       },
-      refreshTokensInvalidList: [],
     };
 
     const createdUserId: string = await usersRepository.createUserAccount(

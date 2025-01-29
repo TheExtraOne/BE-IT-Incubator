@@ -59,7 +59,7 @@ const commentsQueryRepository = {
     // Pagination
     const commentsCount: number =
       await commentsQueryRepository._getCommentsCount({ postId });
-    const pagesCount =
+    const pagesCount: number =
       commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
     const commentsToSkip = (pageNumber - 1) * pageSize;
 

@@ -39,7 +39,9 @@ const usersService = {
   }): Promise<TExtension[] | []> => {
     const errors: TExtension[] = [];
     if (login) {
-      const isLoginUnique = await usersService.checkIsLoginUnique(login);
+      const isLoginUnique: boolean = await usersService.checkIsLoginUnique(
+        login
+      );
       !isLoginUnique &&
         errors.push({
           message: "Login already exists",
@@ -47,7 +49,9 @@ const usersService = {
         });
     }
     if (email) {
-      const isEmailUnique = await usersService.checkIsEmailUnique(email);
+      const isEmailUnique: boolean = await usersService.checkIsEmailUnique(
+        email
+      );
       !isEmailUnique &&
         errors.push({
           message: "Email already exists",
@@ -64,7 +68,7 @@ const usersService = {
     email,
     isConfirmed = false,
   }: TUserServiceInputModel): Promise<Result<string | null>> => {
-    const errors = await usersService.checkIfFieldIsUnique({
+    const errors: [] | TExtension[] = await usersService.checkIfFieldIsUnique({
       login,
       email,
     });
@@ -77,7 +81,7 @@ const usersService = {
       };
     }
 
-    const passwordHash = await bcryptService.generateHash(password);
+    const passwordHash: string = await bcryptService.generateHash(password);
     const newUserAccount: TUserAccountRepViewModel = {
       _id: new ObjectId(),
       accountData: {
@@ -126,7 +130,7 @@ const usersService = {
       };
     }
 
-    const isPasswordCorrect = await bcryptService.checkPassword(
+    const isPasswordCorrect: boolean = await bcryptService.checkPassword(
       password,
       user.accountData.passwordHash
     );

@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
-import { validationResult } from "express-validator";
+import { Result, ValidationError, validationResult } from "express-validator";
 import { HTTP_STATUS } from "../settings";
-import { TAPIErrorResult } from "../types/types";
+import { TAPIErrorResult, TExtension } from "../types/types";
 
 type TExpressValidator = {
   type: string;
@@ -16,14 +16,14 @@ const inputCheckErrorsMiddleware = (
   res: Response<TAPIErrorResult>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req);
+  const errors: Result<ValidationError> = validationResult(req);
 
   if (!errors.isEmpty()) {
     const errorsArray = errors.array({
       onlyFirstError: true,
     }) as TExpressValidator[];
 
-    const response = errorsArray.map((error) => ({
+    const response: TExtension[] = errorsArray.map((error) => ({
       field: error.path,
       message: error.msg,
     }));

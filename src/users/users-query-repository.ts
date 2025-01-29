@@ -66,7 +66,7 @@ const usersQueryRepository = {
       searchEmailTerm,
       searchLoginTerm,
     });
-    const pagesCount =
+    const pagesCount: number =
       usersCount && pageSize ? Math.ceil(usersCount / pageSize) : 0;
     const usersToSkip = (pageNumber - 1) * pageSize;
 

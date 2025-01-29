@@ -21,6 +21,7 @@ import TQueryCommentsModel from "../comments/models/QueryCommentsModel";
 
 const postsController = {
   getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
+    // Validating in the middleware
     const {
       pageNumber = 1,
       pageSize = 10,
@@ -59,7 +60,6 @@ const postsController = {
     res: Response
   ) => {
     // userId is checked in the middlewares
-    // Check if postId exist
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
     if (!post) {
@@ -101,7 +101,6 @@ const postsController = {
     res: Response
   ) => {
     // userId is checked in the middlewares
-    // Check if postId exist
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
     if (!post) {
@@ -120,7 +119,7 @@ const postsController = {
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const success = await postsService.updatePostById({
+    const success: boolean = await postsService.updatePostById({
       id: req.params.id,
       title,
       shortDescription,
@@ -137,7 +136,7 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const success = await postsService.deletePostById(req.params.id);
+    const success: boolean = await postsService.deletePostById(req.params.id);
 
     res.sendStatus(
       success ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404

@@ -35,13 +35,15 @@ const commentsController = {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-    res.status(HTTP_STATUS.CREATED_201).json(result.data);
+    const createdComment = result.data!;
+    res.status(HTTP_STATUS.CREATED_201).json(createdComment);
   },
 
   getAllCommentsForPostId: async (
     req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
     res: Response
   ) => {
+    // Validating query in the middleware
     const {
       pageNumber = 1,
       pageSize = 10,
@@ -114,7 +116,7 @@ const commentsController = {
       return;
     }
 
-    // Check that userId is the same in the comment's author
+    // Check that user can delete the comment
     if (comment.commentatorInfo.userId !== req.userId) {
       res.sendStatus(HTTP_STATUS.FORBIDDEN_403);
       return;

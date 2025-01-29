@@ -22,6 +22,7 @@ import TBlogControllerInputModel from "./models/BlogControllerInputModel";
 
 const blogsController = {
   getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
+    // Query validation is in the middleware
     const {
       searchNameTerm = null,
       pageNumber = 1,
@@ -60,14 +61,14 @@ const blogsController = {
     req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
     res: Response
   ) => {
-    // We are reaching out to blogsQueryRepository directly because of CQRS
+    // Check if blog exists
     const blog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(req.params.id);
     if (!blog) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-
+    // Query validation is in the middleware
     const {
       pageNumber = 1,
       pageSize = 10,
@@ -111,8 +112,9 @@ const blogsController = {
     res: Response
   ) => {
     // Checking that blogId exists
-    const blogId = req.params.id;
-    const blog = await blogsQueryRepository.getBlogById(blogId);
+    const blogId: string = req.params.id;
+    const blog: TBlogControllerViewModel | null =
+      await blogsQueryRepository.getBlogById(blogId);
     if (!blog) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
@@ -144,7 +146,7 @@ const blogsController = {
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const is_successful = await blogsService.updateBlogById({
+    const is_successful: boolean = await blogsService.updateBlogById({
       id: req.params.id,
       name,
       description,
@@ -160,7 +162,9 @@ const blogsController = {
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
-    const is_successful = await blogsService.deleteBlogById(req.params.id);
+    const is_successful: boolean = await blogsService.deleteBlogById(
+      req.params.id
+    );
 
     res.sendStatus(
       is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404

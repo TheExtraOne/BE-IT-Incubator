@@ -40,8 +40,10 @@ const postsQueryRepository = {
     let filter: Record<string, string> | Record<string, never> = {};
     if (blogId) filter = { blogId };
 
-    const postsCount = await postsQueryRepository._getPostsCount(filter);
-    const pagesCount =
+    const postsCount: number = await postsQueryRepository._getPostsCount(
+      filter
+    );
+    const pagesCount: number =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 

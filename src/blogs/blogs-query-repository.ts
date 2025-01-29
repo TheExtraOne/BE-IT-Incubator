@@ -44,10 +44,10 @@ const blogsQueryRepository = {
     if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
     // Pagination
-    const blogsCount = await blogsQueryRepository._getBlogsCount(
+    const blogsCount: number = await blogsQueryRepository._getBlogsCount(
       searchNameTerm
     );
-    const pagesCount =
+    const pagesCount: number =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
 

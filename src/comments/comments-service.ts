@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
 import commentsRepository from "./comments-repository";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
-import TCommentRepViewModel from "./models/CommentRepViewModel";
+import TCommentRepViewModel, {
+  TCommentatorInfo,
+} from "./models/CommentRepViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
 import usersRepository from "../users/users-repository";
@@ -38,7 +40,7 @@ const commentsService = {
       };
     }
 
-    const commentatorInfo = {
+    const commentatorInfo: TCommentatorInfo = {
       userId: userId,
       userLogin: user.accountData.userName,
     };

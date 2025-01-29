@@ -13,9 +13,11 @@ import TUserServiceViewModel from "./models/UserServiceViewModel";
 import usersQueryRepository from "./users-query-repository";
 import TUserControllerInputModel from "./models/UserControllerInputModel";
 import TPathParamsUserModel from "./models/PathParamsUserModel";
+import TUserControllerViewModel from "./models/UserControllerViewModel";
 
 const usersController = {
   getUsers: async (req: TRequestWithQuery<TQueryUserModel>, res: Response) => {
+    // Validating in the middleware
     const {
       searchEmailTerm = null,
       searchLoginTerm = null,
@@ -58,7 +60,8 @@ const usersController = {
       return;
     }
 
-    const createdUser = await usersQueryRepository.getUserById(result.data!);
+    const createdUser: TUserControllerViewModel | null =
+      await usersQueryRepository.getUserById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdUser);
   },

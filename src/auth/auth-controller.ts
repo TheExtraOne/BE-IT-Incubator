@@ -40,7 +40,6 @@ const authController = {
       type: TOKEN_TYPE.R_TOKEN,
     });
 
-    // Creating refreshTokenMeta without waiting
     await securityService.createRefreshTokenMeta({
       refreshToken,
       title: req.headers["user-agent"] || "Unknown device",
@@ -53,8 +52,14 @@ const authController = {
   },
 
   logoutUser: async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    const result = await jwtService.decodeToken(refreshToken);
+    // Validate refreshToken and its presence in the middleware
+    const refreshToken: string = req.cookies.refreshToken;
+    const result: Result<{
+      iat?: number;
+      exp?: number;
+      userId?: string;
+      deviceId?: string;
+    } | null> = await jwtService.decodeToken(refreshToken);
     const { deviceId } = result.data || {};
 
     securityService.deleteRefreshTokenMetaByDeviceId(deviceId!);
@@ -64,7 +69,8 @@ const authController = {
   },
 
   getUserInformation: async (req: Request, res: Response) => {
-    const userId = req.userId;
+    // Validating userId and it's presence in the middleware
+    const userId: string | null = req.userId;
     const user: TUserControllerViewModel | null =
       await usersQueryRepository.getUserById(userId!);
 
@@ -137,9 +143,14 @@ const authController = {
 
   refreshToken: async (req: Request, res: Response) => {
     // Checking expiration and validity of the refreshToken in the middlewares
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken: string = req.cookies.refreshToken;
 
-    const resultDecode = await jwtService.decodeToken(refreshToken);
+    const resultDecode: Result<{
+      iat?: number;
+      exp?: number;
+      userId?: string;
+      deviceId?: string;
+    } | null> = await jwtService.decodeToken(refreshToken);
     const { userId, deviceId } = resultDecode?.data || {};
 
     // Generate new tokens
@@ -152,9 +163,12 @@ const authController = {
       type: TOKEN_TYPE.R_TOKEN,
     });
 
-    const resultDecodeNewRefreshToken = await jwtService.decodeToken(
-      newRefreshToken
-    );
+    const resultDecodeNewRefreshToken: Result<{
+      iat?: number;
+      exp?: number;
+      userId?: string;
+      deviceId?: string;
+    } | null> = await jwtService.decodeToken(newRefreshToken);
     const { iat, exp } = resultDecodeNewRefreshToken?.data || {};
     // Update time
     securityService.updateRefreshTokenMetaTime({

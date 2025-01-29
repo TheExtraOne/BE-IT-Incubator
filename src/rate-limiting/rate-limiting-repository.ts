@@ -4,8 +4,13 @@ import { subSeconds } from "date-fns";
 import { SETTINGS } from "../common/settings";
 
 const rateLimitingRepository = {
-  insertNewRequest: async (newRequest: TRateLimitingRepViewModel) =>
-    await rateLimitingCollection.insertOne(newRequest),
+  insertNewRequest: async (
+    newRequest: TRateLimitingRepViewModel
+  ): Promise<string> => {
+    const { insertedId } = await rateLimitingCollection.insertOne(newRequest);
+
+    return insertedId.toString();
+  },
 
   getRequestsAmount: async ({
     ip,

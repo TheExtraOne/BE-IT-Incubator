@@ -1,5 +1,9 @@
 import { WithId, OptionalUnlessRequiredId } from "mongodb";
 
+export type TCommentatorInfo = {
+  userId: string;
+  userLogin: string;
+};
 type TCommentRepViewModel = WithId<{
   /**
    * content of the comment
@@ -8,7 +12,7 @@ type TCommentRepViewModel = WithId<{
   /**
    * commentatorInfo includes user id and login
    */
-  commentatorInfo: { userId: string; userLogin: string };
+  commentatorInfo: TCommentatorInfo;
   /**
    * Date of creating in ISO format
    */

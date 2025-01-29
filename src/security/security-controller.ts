@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import { HTTP_STATUS } from "../common/settings";
 import TRefreshTokenMetaControllerViewModel from "./models/RefreshTokenMetaControllerViewModel";
 import securityQueryRepository from "./security-query-repository";
-import { TRequestWithParams } from "../common/types/types";
+import { Result, TRequestWithParams } from "../common/types/types";
 import TPathParamsRefreshTokenMetaModel from "./models/PathParamsRefreshTokenMetaModel";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 import securityService from "./security-service";
@@ -10,7 +10,8 @@ import jwtService from "../adapters/jwt-service";
 
 const securityController = {
   getRefreshTokensMeta: async (req: Request, res: Response) => {
-    const userId = req.userId;
+    // Validating userId in the middleware
+    const userId: string | null = req.userId;
     const devices: TRefreshTokenMetaControllerViewModel[] =
       await securityQueryRepository.getAllRefreshTokensMeta({
         ["userId"]: userId!,
@@ -24,7 +25,7 @@ const securityController = {
     res: Response
   ) => {
     const { deviceId } = req.params;
-    const userId = req.userId;
+    const userId: string | null = req.userId;
 
     const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
       await securityService.getRefreshTokenMetaByFilters({ deviceId });
@@ -44,8 +45,13 @@ const securityController = {
   },
 
   deleteAllRefreshTokensMeta: async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    const result = await jwtService.decodeToken(refreshToken!);
+    const refreshToken: string = req.cookies.refreshToken;
+    const result: Result<{
+      iat?: number;
+      exp?: number;
+      userId?: string;
+      deviceId?: string;
+    } | null> = await jwtService.decodeToken(refreshToken!);
     const { userId, deviceId } = result.data || {};
 
     securityService.deleteAllRefreshTokensMeta({

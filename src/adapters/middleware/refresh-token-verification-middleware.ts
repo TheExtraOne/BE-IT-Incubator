@@ -10,7 +10,7 @@ const refreshTokenVerificationMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken: string | undefined = req.cookies.refreshToken;
   if (!refreshToken) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
@@ -26,7 +26,12 @@ const refreshTokenVerificationMiddleware = async (
     return;
   }
 
-  const resultDecode = await jwtService.decodeToken(refreshToken);
+  const resultDecode: Result<{
+    iat?: number;
+    exp?: number;
+    userId?: string;
+    deviceId?: string;
+  } | null> = await jwtService.decodeToken(refreshToken);
   const { userId, deviceId, iat } = resultDecode?.data || {};
 
   const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =

@@ -2,7 +2,7 @@ import { WithId, OptionalUnlessRequiredId } from "mongodb";
 
 export type TEmailConfirmation = {
   /**
-   * confirmationCode of the user, generated with uuid
+   * confirmationCode of the user, generated with mongo db ObjectId and converted to string
    */
   confirmationCode: string;
   /**

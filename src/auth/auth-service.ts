@@ -4,9 +4,10 @@ import { Result } from "../common/types/types";
 import mailManager from "../managers/mail-manager";
 import usersRepository from "../users/users-repository";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
-import { v4 as uuidv4 } from "uuid";
 import { add } from "date-fns";
+import { ObjectId } from "mongodb";
 
+// TODO: add types
 const authService = {
   registerUser: async ({
     login,
@@ -79,7 +80,7 @@ const authService = {
     }
     // Generate new confirmation code
     const emailConfirmation = {
-      confirmationCode: uuidv4(),
+      confirmationCode: new ObjectId().toString(),
       expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
       isConfirmed: false,
     };

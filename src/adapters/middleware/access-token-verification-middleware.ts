@@ -8,7 +8,7 @@ const accessTokenVerificationMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const bearerJWT = req.headers.authorization;
+  const bearerJWT: string | undefined = req.headers.authorization;
   if (!bearerJWT) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
@@ -24,7 +24,8 @@ const accessTokenVerificationMiddleware = async (
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }
-  req.userId = result.data;
+  const userId = result.data!;
+  req.userId = userId;
 
   next();
 };

@@ -1,10 +1,8 @@
 import { ObjectId } from "mongodb";
 import { Result, TExtension } from "../common/types/types";
-import bcrypt from "bcryptjs";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
 import usersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
-import { v4 as uuidv4 } from "uuid";
 import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { add } from "date-fns";
@@ -89,7 +87,7 @@ const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: uuidv4(),
+        confirmationCode: new ObjectId().toString(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed,
       },

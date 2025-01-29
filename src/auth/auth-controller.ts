@@ -9,7 +9,7 @@ import { Result, TRequestWithBody } from "../common/types/types";
 import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationControllerInputModel";
 import authService from "./auth-service";
 import securityService from "../security/security-service";
-import { v4 as uuidv4 } from "uuid";
+import { ObjectId } from "mongodb";
 
 const authController = {
   loginUser: async (
@@ -30,13 +30,13 @@ const authController = {
     }
 
     const userId = result.data?.id!;
-    const deviceId = uuidv4();
+    const deviceId = new ObjectId();
     const accessToken: string = await jwtService.createJWT({
       payload: { userId },
       type: TOKEN_TYPE.AC_TOKEN,
     });
     const refreshToken: string = await jwtService.createJWT({
-      payload: { userId, deviceId },
+      payload: { userId, deviceId: deviceId.toString() },
       type: TOKEN_TYPE.R_TOKEN,
     });
 

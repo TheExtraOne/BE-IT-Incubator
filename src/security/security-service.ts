@@ -14,7 +14,7 @@ const securityService = {
     refreshToken: string;
     title: string;
     ip: string;
-    deviceId: string;
+    deviceId?: ObjectId;
   }): Promise<void> => {
     const resultDecode: Result<{
       iat?: number;
@@ -24,7 +24,7 @@ const securityService = {
     } | null> = await jwtService.decodeToken(refreshToken);
 
     const newRefreshTokenMeta: TRefreshTokensMetaRepViewModel = {
-      _id: new ObjectId(),
+      _id: deviceId ?? new ObjectId(),
       ip,
       title,
       lastActiveDate: securityService.convertTimeToISOFromUnix(
@@ -33,17 +33,28 @@ const securityService = {
       expirationDate: securityService.convertTimeToISOFromUnix(
         resultDecode.data?.exp!
       ),
-      deviceId,
       userId: resultDecode.data?.userId!,
     };
 
     await securityRepository.createRefreshTokenMeta(newRefreshTokenMeta);
   },
 
-  getRefreshTokenMetaByFilters: async (
-    filter: Record<string, string> | Record<string, never> = {}
-  ): Promise<TRefreshTokensMetaRepViewModel | null> =>
-    securityRepository.getRefreshTokenMetaByFilters(filter),
+  getRefreshTokenMetaByFilters: async ({
+    deviceId,
+    userId,
+    lastActiveDate,
+  }: {
+    deviceId: string;
+    userId?: string;
+    lastActiveDate?: string;
+  }): Promise<TRefreshTokensMetaRepViewModel | null> => {
+    // No mapping
+    return await securityRepository.getRefreshTokenMetaByFilters({
+      deviceId,
+      userId,
+      lastActiveDate,
+    });
+  },
 
   deleteRefreshTokenMetaByDeviceId: (deviceId: string): Promise<boolean> =>
     securityRepository.deleteRefreshTokenMetaByDeviceId(deviceId),

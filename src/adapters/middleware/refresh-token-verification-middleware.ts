@@ -29,14 +29,14 @@ const refreshTokenVerificationMiddleware = async (
   const resultDecode = await jwtService.decodeToken(refreshToken);
   const { userId, deviceId, iat } = resultDecode?.data || {};
 
-  const isTokenInTheCollection: TRefreshTokensMetaRepViewModel | null =
+  const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
     await securityService.getRefreshTokenMetaByFilters({
-      ["userId"]: userId!,
-      ["deviceId"]: deviceId!,
-      ["lastActiveDate"]: securityService.convertTimeToISOFromUnix(iat!)!,
+      userId: userId!,
+      deviceId: deviceId!,
+      lastActiveDate: securityService.convertTimeToISOFromUnix(iat!)!,
     });
 
-  if (!isTokenInTheCollection) {
+  if (!refreshTokenMeta) {
     res.sendStatus(HTTP_STATUS.UNAUTHORIZED_401);
     return;
   }

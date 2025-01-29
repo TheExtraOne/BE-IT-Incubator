@@ -18,10 +18,6 @@ type TRefreshTokensMetaRepViewModel = WithId<{
    */
   expirationDate: string;
   /**
-   * Id of connected device session
-   */
-  deviceId: string;
-  /**
    * Id of user
    */
   userId: string;

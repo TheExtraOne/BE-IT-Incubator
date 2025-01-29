@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { refreshTokensMetaCollection } from "../db/db";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 
@@ -12,9 +13,23 @@ const securityRepository = {
     return insertedId.toString();
   },
 
-  getRefreshTokenMetaByFilters: async (
-    filter: Record<string, string> | Record<string, never> = {}
-  ): Promise<TRefreshTokensMetaRepViewModel | null> => {
+  getRefreshTokenMetaByFilters: async ({
+    deviceId,
+    userId,
+    lastActiveDate,
+  }: {
+    deviceId: string;
+    userId?: string;
+    lastActiveDate?: string;
+  }): Promise<TRefreshTokensMetaRepViewModel | null> => {
+    if (!ObjectId.isValid(deviceId)) return null;
+
+    const filter: Record<string, string | ObjectId> = {
+      _id: new ObjectId(deviceId),
+    };
+    if (userId) filter["userId"] = userId;
+    if (lastActiveDate) filter["lastActiveDate"] = lastActiveDate;
+
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel | null =
       await refreshTokensMetaCollection.findOne(filter);
 
@@ -29,9 +44,10 @@ const securityRepository = {
     deviceId: string;
     lastActiveDate: string;
     expirationDate: string;
-  }): Promise<void> => {
-    await refreshTokensMetaCollection.updateOne(
-      { ["deviceId"]: deviceId },
+  }): Promise<boolean> => {
+    if (!ObjectId.isValid(deviceId)) return false;
+    const { matchedCount } = await refreshTokensMetaCollection.updateOne(
+      { _id: new ObjectId(deviceId) },
       {
         $set: {
           ["lastActiveDate"]: lastActiveDate,
@@ -39,13 +55,16 @@ const securityRepository = {
         },
       }
     );
+
+    return !!matchedCount;
   },
 
   deleteRefreshTokenMetaByDeviceId: async (
     deviceId: string
   ): Promise<boolean> => {
+    if (!ObjectId.isValid(deviceId)) return false;
     const { deletedCount } = await refreshTokensMetaCollection.deleteOne({
-      ["deviceId"]: deviceId,
+      _id: new ObjectId(deviceId),
     });
 
     return !!deletedCount;
@@ -57,11 +76,15 @@ const securityRepository = {
   }: {
     userId: string;
     deviceId: string;
-  }): Promise<void> => {
-    await refreshTokensMetaCollection.deleteMany({
+  }): Promise<boolean> => {
+    if (!ObjectId.isValid(deviceId)) return false;
+
+    const { deletedCount } = await refreshTokensMetaCollection.deleteMany({
       ["userId"]: userId,
-      ["deviceId"]: { $ne: deviceId },
+      _id: { $ne: new ObjectId(deviceId) },
     });
+
+    return !!deletedCount;
   },
 };
 

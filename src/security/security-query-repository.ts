@@ -8,7 +8,7 @@ const mapRefreshTokenMeta = (
   ip: refreshTokenMeta.ip,
   title: refreshTokenMeta.title,
   lastActiveDate: refreshTokenMeta.lastActiveDate,
-  deviceId: refreshTokenMeta.deviceId,
+  deviceId: refreshTokenMeta._id.toString(),
 });
 
 const mapRefreshTokensMeta = (

@@ -27,9 +27,7 @@ const securityController = {
     const userId = req.userId;
 
     const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
-      await securityService.getRefreshTokenMetaByFilters({
-        ["deviceId"]: deviceId,
-      });
+      await securityService.getRefreshTokenMetaByFilters({ deviceId });
 
     if (!refreshTokenMeta) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);

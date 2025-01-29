@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
-import { BlogModel } from "../db/db";
+import { BlogModelClass } from "../db/db";
 
 const blogsRepository = {
-  getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {
+  getBlogById: async (id: string) => {
     if (!ObjectId.isValid(id)) return null;
-    const blog: TBlogRepViewModel | null = await BlogModel.findOne({
+    const blog = await BlogModelClass.findOne({
       _id: new ObjectId(id),
     });
 
@@ -13,9 +13,10 @@ const blogsRepository = {
   },
 
   createBlog: async (newBlog: TBlogRepViewModel): Promise<string> => {
-    const { _id: insertedId } = await BlogModel.create(newBlog);
+    const blogInstance = new BlogModelClass(newBlog);
+    await blogInstance.save();
 
-    return insertedId.toString();
+    return blogInstance._id.toString();
   },
 
   updateBlogById: async ({
@@ -29,22 +30,29 @@ const blogsRepository = {
     description: string;
     websiteUrl: string;
   }): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await BlogModel.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { name, description, websiteUrl } }
-    );
+    // if (!ObjectId.isValid(id)) return false;
+    // const { matchedCount } = await BlogModel.updateOne(
+    //   { _id: new ObjectId(id) },
+    //   { $set: { name, description, websiteUrl } }
+    // );
 
-    return !!matchedCount;
+    // return !!matchedCount;
+    const blogInstance = await blogsRepository.getBlogById(id);
+    if (!blogInstance) return false;
+    blogInstance.name = name;
+    blogInstance.description = description;
+    blogInstance.websiteUrl = websiteUrl;
+    await blogInstance.save();
+
+    return true;
   },
 
   deleteBlogById: async (id: string): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await BlogModel.deleteOne({
-      _id: new ObjectId(id),
-    });
+    const blogInstance = await blogsRepository.getBlogById(id);
+    if (!blogInstance) return false;
+    await blogInstance.deleteOne();
 
-    return !!deletedCount;
+    return true;
   },
 };
 

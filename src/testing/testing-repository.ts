@@ -1,20 +1,20 @@
 import {
-  BlogModel,
-  PostModel,
-  UserModel,
-  CommentModel,
-  RefreshTokenModel,
-  RateLimitModel,
+  BlogModelClass,
+  PostModelClass,
+  UserModelClass,
+  CommentModelClass,
+  RefreshTokenModelClass,
+  RateLimitModelClass,
 } from "../db/db";
 
 const testingRepository = {
   deleteAllData: async (): Promise<void> => {
-    await BlogModel.deleteMany({});
-    await PostModel.deleteMany({});
-    await UserModel.deleteMany({});
-    await CommentModel.deleteMany({});
-    await RefreshTokenModel.deleteMany({});
-    await RateLimitModel.deleteMany({});
+    await BlogModelClass.deleteMany({});
+    await PostModelClass.deleteMany({});
+    await UserModelClass.deleteMany({});
+    await CommentModelClass.deleteMany({});
+    await RefreshTokenModelClass.deleteMany({});
+    await RateLimitModelClass.deleteMany({});
   },
 };
 

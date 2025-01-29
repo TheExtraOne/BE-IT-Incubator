@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
 import TPostRepViewModel from "./models/PostRepViewModel";
-import { PostModel } from "../db/db";
+import { PostModelClass } from "../db/db";
 
 const postsRepository = {
   createPost: async (newPost: TPostRepViewModel): Promise<string> => {
-    const { _id: insertedId } = await PostModel.create(newPost);
+    const { _id: insertedId } = await PostModelClass.create(newPost);
 
     return insertedId.toString();
   },
@@ -23,7 +23,7 @@ const postsRepository = {
     blogId: string;
   }): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await PostModel.updateOne(
+    const { matchedCount } = await PostModelClass.updateOne(
       { _id: new ObjectId(id) },
       { $set: { title, shortDescription, content, blogId } }
     );
@@ -33,7 +33,7 @@ const postsRepository = {
 
   deletePostById: async (id: string): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await PostModel.deleteOne({
+    const { deletedCount } = await PostModelClass.deleteOne({
       _id: new ObjectId(id),
     });
 

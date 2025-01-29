@@ -1,7 +1,7 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, testDb } from "../helpers";
 import usersRepository from "../../../src/users/users-repository";
-import { UserModel } from "../../../src/db/db";
+import { UserModelClass } from "../../../src/db/db";
 
 describe("POST /auth/registration-confirmation", () => {
   beforeAll(async () => await testDb.setup());
@@ -88,7 +88,7 @@ describe("POST /auth/registration-confirmation", () => {
       const confirmationCode = user!.emailConfirmation.confirmationCode;
 
       // Manually expire the confirmation code by setting expiration date to past
-      await UserModel.updateOne(
+      await UserModelClass.updateOne(
         { _id: user!._id },
         {
           $set: {

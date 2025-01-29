@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
-import { BlogModel } from "../db/db";
+import { BlogModelClass } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 
@@ -20,10 +20,14 @@ const mapBlogs = (
 
 const blogsQueryRepository = {
   _getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
-    const filter: Record<string, RegExp> | Record<string, never> = {};
-    if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
+    // const filter: Record<string, RegExp> | Record<string, never> = {};
+    // if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
 
-    return await BlogModel.countDocuments(filter);
+    // return await BlogModel.countDocuments(filter);
+    const query = BlogModelClass.countDocuments();
+    if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
+
+    return query.exec();
   },
 
   getAllBlogs: async ({
@@ -51,7 +55,7 @@ const blogsQueryRepository = {
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
 
-    const blogs: TBlogRepViewModel[] | [] = await BlogModel.find(filter)
+    const blogs: TBlogRepViewModel[] | [] = await BlogModelClass.find(filter)
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(blogsToSkip)
       .limit(pageSize)
@@ -69,9 +73,9 @@ const blogsQueryRepository = {
   getBlogById: async (id: string): Promise<TBlogControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
 
-    const blog: TBlogRepViewModel | null = await BlogModel.findOne({
+    const blog: TBlogRepViewModel | null = await BlogModelClass.findOne({
       _id: new ObjectId(id),
-    });
+    }).lean();
 
     return blog ? mapBlog(blog) : null;
   },

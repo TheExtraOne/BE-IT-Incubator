@@ -57,27 +57,27 @@ const rateLimitSchema = new mongoose.Schema<TRateLimitingRepViewModel>({
   date: { type: Date, required: true },
 });
 
-export const BlogModel = mongoose.model(
+export const BlogModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.BLOGS,
   blogSchema
 );
-export const PostModel = mongoose.model(
+export const PostModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.POSTS,
   postSchema
 );
-export const CommentModel = mongoose.model(
+export const CommentModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.COMMENTS,
   commentSchema
 );
-export const UserModel = mongoose.model(
+export const UserModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.USERS,
   userSchema
 );
-export const RefreshTokenModel = mongoose.model(
+export const RefreshTokenModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS_META,
   refreshTokenSchema
 );
-export const RateLimitModel = mongoose.model(
+export const RateLimitModelClass = mongoose.model(
   SETTINGS.COLLECTION_NAMES.RATE_LIMITING,
   rateLimitSchema
 );

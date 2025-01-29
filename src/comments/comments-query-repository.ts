@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { CommentModel } from "../db/db";
+import { CommentModelClass } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 import TCommentControllerViewModel from "./models/CommentServiceViewModel";
@@ -27,7 +27,7 @@ const commentsQueryRepository = {
     const filters: Record<string, string> | Record<string, never> = {};
     if (postId) filters.postId = postId;
 
-    return await CommentModel.countDocuments(filters);
+    return await CommentModelClass.countDocuments(filters);
   },
 
   getCommentById: async (
@@ -35,9 +35,10 @@ const commentsQueryRepository = {
   ): Promise<TCommentControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
 
-    const comment: TCommentRepViewModel | null = await CommentModel.findOne({
-      _id: new ObjectId(id),
-    });
+    const comment: TCommentRepViewModel | null =
+      await CommentModelClass.findOne({
+        _id: new ObjectId(id),
+      }).lean();
 
     return comment ? mapComment(comment) : null;
   },
@@ -62,7 +63,7 @@ const commentsQueryRepository = {
       commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
     const commentsToSkip = (pageNumber - 1) * pageSize;
 
-    const comments: TCommentRepViewModel[] | [] = await CommentModel.find({
+    const comments: TCommentRepViewModel[] | [] = await CommentModelClass.find({
       postId,
     })
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })

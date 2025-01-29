@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { UserModel } from "../db/db";
+import { UserModelClass } from "../db/db";
 import TUserAccountRepViewModel, {
   TEmailConfirmation,
 } from "./models/UserAccountRepViewModel";
@@ -7,9 +7,9 @@ import TUserAccountRepViewModel, {
 const usersRepository = {
   getUserById: async (id: string): Promise<TUserAccountRepViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const user: TUserAccountRepViewModel | null = await UserModel.findOne({
+    const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
       _id: new ObjectId(id),
-    });
+    }).lean();
 
     return user;
   },
@@ -17,9 +17,9 @@ const usersRepository = {
   getUserByConfirmationCode: async (
     confirmationCode: string
   ): Promise<TUserAccountRepViewModel | null> => {
-    const user: TUserAccountRepViewModel | null = await UserModel.findOne({
+    const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
       "emailConfirmation.confirmationCode": confirmationCode,
-    });
+    }).lean();
 
     return user;
   },
@@ -27,14 +27,14 @@ const usersRepository = {
   createUserAccount: async (
     newUserAccount: TUserAccountRepViewModel
   ): Promise<string> => {
-    const { _id: insertedId } = await UserModel.create(newUserAccount);
+    const { _id: insertedId } = await UserModelClass.create(newUserAccount);
 
     return insertedId.toString();
   },
 
   deleteUserById: async (id: string): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await UserModel.deleteOne({
+    const { deletedCount } = await UserModelClass.deleteOne({
       _id: new ObjectId(id),
     });
 
@@ -48,7 +48,9 @@ const usersRepository = {
     fieldName: string;
     fieldValue: string;
   }): Promise<boolean> => {
-    const user = await UserModel.findOne({ [fieldName]: fieldValue });
+    const user = await UserModelClass.findOne({
+      [fieldName]: fieldValue,
+    }).lean();
 
     return !user;
   },
@@ -56,12 +58,12 @@ const usersRepository = {
   getByLoginOrEmail: async (
     loginOrEmail: string
   ): Promise<TUserAccountRepViewModel | null> =>
-    await UserModel.findOne({
+    await UserModelClass.findOne({
       $or: [
         { "accountData.userName": loginOrEmail },
         { "accountData.email": loginOrEmail },
       ],
-    }),
+    }).lean(),
 
   updateUserRegistrationConfirmationById: async ({
     id,
@@ -71,7 +73,7 @@ const usersRepository = {
     isRegistrationConfirmed?: boolean;
   }): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await UserModel.updateOne(
+    const { matchedCount } = await UserModelClass.updateOne(
       { _id: new ObjectId(id) },
       { $set: { "emailConfirmation.isConfirmed": isRegistrationConfirmed } }
     );
@@ -86,7 +88,7 @@ const usersRepository = {
     emailConfirmation: TEmailConfirmation;
     email: string;
   }): Promise<boolean> => {
-    const { matchedCount } = await UserModel.updateOne(
+    const { matchedCount } = await UserModelClass.updateOne(
       { "accountData.email": email },
       {
         $set: { emailConfirmation },

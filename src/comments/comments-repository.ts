@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
-import { CommentModel } from "../db/db";
+import { CommentModelClass } from "../db/db";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
 
 const commentsRepository = {
   createComment: async (newComment: TCommentRepViewModel): Promise<string> => {
-    const { _id: insertedId } = await CommentModel.create(newComment);
+    const { _id: insertedId } = await CommentModelClass.create(newComment);
 
     return insertedId.toString();
   },
@@ -17,7 +17,7 @@ const commentsRepository = {
     content: string;
   }): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await CommentModel.updateOne(
+    const { matchedCount } = await CommentModelClass.updateOne(
       { _id: new ObjectId(id) },
       { $set: { content } }
     );
@@ -27,7 +27,7 @@ const commentsRepository = {
 
   deleteCommentById: async (id: string): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await CommentModel.deleteOne({
+    const { deletedCount } = await CommentModelClass.deleteOne({
       _id: new ObjectId(id),
     });
 
@@ -37,9 +37,10 @@ const commentsRepository = {
   getCommentById: async (id: string): Promise<TCommentRepViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
 
-    const comment: TCommentRepViewModel | null = await CommentModel.findOne({
-      _id: new ObjectId(id),
-    });
+    const comment: TCommentRepViewModel | null =
+      await CommentModelClass.findOne({
+        _id: new ObjectId(id),
+      }).lean();
 
     return comment;
   },

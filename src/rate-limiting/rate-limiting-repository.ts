@@ -1,5 +1,5 @@
 import TRateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
-import { RateLimitModel } from "../db/db";
+import { RateLimitModelClass } from "../db/db";
 import { subSeconds } from "date-fns";
 import { SETTINGS } from "../common/settings";
 
@@ -7,7 +7,7 @@ const rateLimitingRepository = {
   insertNewRequest: async (
     newRequest: TRateLimitingRepViewModel
   ): Promise<string> => {
-    const { _id: insertedId } = await RateLimitModel.create(newRequest);
+    const { _id: insertedId } = await RateLimitModelClass.create(newRequest);
 
     return insertedId.toString();
   },
@@ -19,7 +19,7 @@ const rateLimitingRepository = {
     ip: string;
     url: string;
   }): Promise<number> =>
-    await RateLimitModel.countDocuments({
+    await RateLimitModelClass.countDocuments({
       ["ip"]: ip,
       URL: url,
       date: { $gt: subSeconds(new Date(), +SETTINGS.RATE_LIMIT_WINDOW) },

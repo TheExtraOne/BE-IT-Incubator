@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
-import { UserModel } from "../db/db";
+import { UserModelClass } from "../db/db";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
 import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
@@ -32,16 +32,16 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    return await UserModel.countDocuments(
+    return await UserModelClass.countDocuments(
       filters.length ? { $or: filters } : {}
     );
   },
 
   getUserById: async (id: string) => {
     if (!ObjectId.isValid(id)) return null;
-    const user: TUserAccountRepViewModel | null = await UserModel.findOne({
+    const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
       _id: new ObjectId(id),
-    });
+    }).lean();
 
     return user ? mapUser(user) : null;
   },
@@ -79,7 +79,7 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    const users: TUserAccountRepViewModel[] | [] = await UserModel.find(
+    const users: TUserAccountRepViewModel[] | [] = await UserModelClass.find(
       filters.length ? { $or: filters } : {}
     )
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })

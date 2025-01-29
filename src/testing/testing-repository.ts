@@ -1,20 +1,20 @@
 import {
-  blogCollection,
-  postCollection,
-  userCollection,
-  commentCollection,
-  refreshTokensMetaCollection,
-  rateLimitingCollection,
+  BlogModel,
+  PostModel,
+  UserModel,
+  CommentModel,
+  RefreshTokenModel,
+  RateLimitModel,
 } from "../db/db";
 
 const testingRepository = {
   deleteAllData: async (): Promise<void> => {
-    await blogCollection.deleteMany({});
-    await postCollection.deleteMany({});
-    await userCollection.deleteMany({});
-    await commentCollection.deleteMany({});
-    await refreshTokensMetaCollection.deleteMany({});
-    await rateLimitingCollection.deleteMany({});
+    await BlogModel.deleteMany({});
+    await PostModel.deleteMany({});
+    await UserModel.deleteMany({});
+    await CommentModel.deleteMany({});
+    await RefreshTokenModel.deleteMany({});
+    await RateLimitModel.deleteMany({});
   },
 };
 

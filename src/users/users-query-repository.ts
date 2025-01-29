@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
-import { userCollection } from "../db/db";
+import { UserModel } from "../db/db";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
 import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
@@ -32,14 +32,14 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    return await userCollection.countDocuments(
+    return await UserModel.countDocuments(
       filters.length ? { $or: filters } : {}
     );
   },
 
   getUserById: async (id: string) => {
     if (!ObjectId.isValid(id)) return null;
-    const user: TUserAccountRepViewModel | null = await userCollection.findOne({
+    const user: TUserAccountRepViewModel | null = await UserModel.findOne({
       _id: new ObjectId(id),
     });
 
@@ -79,12 +79,13 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    const users: TUserAccountRepViewModel[] | [] = await userCollection
-      .find(filters.length ? { $or: filters } : {})
+    const users: TUserAccountRepViewModel[] | [] = await UserModel.find(
+      filters.length ? { $or: filters } : {}
+    )
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(usersToSkip)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
     return {
       pagesCount,

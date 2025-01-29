@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import TPostRepViewModel from "./models/PostRepViewModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
-import { postCollection } from "../db/db";
+import { PostModel } from "../db/db";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
 
@@ -22,7 +22,7 @@ const mapPosts = (
 const postsQueryRepository = {
   _getPostsCount: async (
     filter: Record<string, string> | undefined = {}
-  ): Promise<number> => await postCollection.countDocuments(filter),
+  ): Promise<number> => await PostModel.countDocuments(filter),
 
   getAllPosts: async ({
     blogId,
@@ -47,12 +47,11 @@ const postsQueryRepository = {
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 
-    const posts: TPostRepViewModel[] | [] = await postCollection
-      .find(filter)
+    const posts: TPostRepViewModel[] | [] = await PostModel.find(filter)
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(postsToSkip)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
     return {
       pagesCount,
@@ -65,7 +64,7 @@ const postsQueryRepository = {
 
   getPostById: async (id: string): Promise<TPostControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const post: TPostRepViewModel | null = await postCollection.findOne({
+    const post: TPostRepViewModel | null = await PostModel.findOne({
       _id: new ObjectId(id),
     });
 

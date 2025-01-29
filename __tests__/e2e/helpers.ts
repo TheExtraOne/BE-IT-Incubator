@@ -4,7 +4,7 @@ import app from "../../src/app";
 import TBlogControllerInputModel from "../../src/blogs/models/BlogControllerInputModel";
 import { getEncodedCredentials } from "../../src/common/middlewares/basic-authorization-middleware";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { client, connectToDb } from "../../src/db/db";
+import mongoose from "mongoose";
 
 export const userCredentials = {
   correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN_CREDENTIALS)}`,
@@ -41,7 +41,7 @@ export const testDb = {
   setup: async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-    await connectToDb(uri);
+    await mongoose.connect(uri);
     await testDb.clear();
   },
 
@@ -50,7 +50,7 @@ export const testDb = {
   },
 
   teardown: async () => {
-    await client.close();
+    await mongoose.disconnect();
     if (mongoServer) {
       await mongoServer.stop();
       mongoServer = null;

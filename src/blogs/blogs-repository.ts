@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
-import { blogCollection } from "../db/db";
+import { BlogModel } from "../db/db";
 
 const blogsRepository = {
   getBlogById: async (id: string): Promise<TBlogRepViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const blog: TBlogRepViewModel | null = await blogCollection.findOne({
+    const blog: TBlogRepViewModel | null = await BlogModel.findOne({
       _id: new ObjectId(id),
     });
 
@@ -13,7 +13,7 @@ const blogsRepository = {
   },
 
   createBlog: async (newBlog: TBlogRepViewModel): Promise<string> => {
-    const { insertedId } = await blogCollection.insertOne(newBlog);
+    const { _id: insertedId } = await BlogModel.create(newBlog);
 
     return insertedId.toString();
   },
@@ -30,7 +30,7 @@ const blogsRepository = {
     websiteUrl: string;
   }): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await blogCollection.updateOne(
+    const { matchedCount } = await BlogModel.updateOne(
       { _id: new ObjectId(id) },
       { $set: { name, description, websiteUrl } }
     );
@@ -40,7 +40,7 @@ const blogsRepository = {
 
   deleteBlogById: async (id: string): Promise<boolean> => {
     if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await blogCollection.deleteOne({
+    const { deletedCount } = await BlogModel.deleteOne({
       _id: new ObjectId(id),
     });
 

@@ -1,12 +1,12 @@
 import { ObjectId } from "mongodb";
-import { refreshTokensMetaCollection } from "../db/db";
+import { RefreshTokenModel } from "../db/db";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 
 const securityRepository = {
   createRefreshTokenMeta: async (
     newRefreshTokenMeta: TRefreshTokensMetaRepViewModel
   ): Promise<string> => {
-    const { insertedId } = await refreshTokensMetaCollection.insertOne(
+    const { _id: insertedId } = await RefreshTokenModel.create(
       newRefreshTokenMeta
     );
 
@@ -31,7 +31,7 @@ const securityRepository = {
     if (lastActiveDate) filter["lastActiveDate"] = lastActiveDate;
 
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel | null =
-      await refreshTokensMetaCollection.findOne(filter);
+      await RefreshTokenModel.findOne(filter);
 
     return refreshTokensMeta;
   },
@@ -46,7 +46,7 @@ const securityRepository = {
     expirationDate: string;
   }): Promise<boolean> => {
     if (!ObjectId.isValid(deviceId)) return false;
-    const { matchedCount } = await refreshTokensMetaCollection.updateOne(
+    const { matchedCount } = await RefreshTokenModel.updateOne(
       { _id: new ObjectId(deviceId) },
       {
         $set: {
@@ -63,7 +63,7 @@ const securityRepository = {
     deviceId: string
   ): Promise<boolean> => {
     if (!ObjectId.isValid(deviceId)) return false;
-    const { deletedCount } = await refreshTokensMetaCollection.deleteOne({
+    const { deletedCount } = await RefreshTokenModel.deleteOne({
       _id: new ObjectId(deviceId),
     });
 
@@ -79,7 +79,7 @@ const securityRepository = {
   }): Promise<boolean> => {
     if (!ObjectId.isValid(deviceId)) return false;
 
-    const { deletedCount } = await refreshTokensMetaCollection.deleteMany({
+    const { deletedCount } = await RefreshTokenModel.deleteMany({
       ["userId"]: userId,
       _id: { $ne: new ObjectId(deviceId) },
     });

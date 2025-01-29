@@ -1,4 +1,4 @@
-import { refreshTokensMetaCollection } from "../db/db";
+import { RefreshTokenModel } from "../db/db";
 import TRefreshTokenMetaControllerViewModel from "./models/RefreshTokenMetaControllerViewModel";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 
@@ -21,7 +21,7 @@ const securityQueryRepository = {
     filter: Record<string, string> | undefined = {}
   ): Promise<TRefreshTokenMetaControllerViewModel[] | []> => {
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel[] | [] =
-      await refreshTokensMetaCollection.find(filter).toArray();
+      await RefreshTokenModel.find(filter).lean();
 
     return mapRefreshTokensMeta(refreshTokensMeta);
   },

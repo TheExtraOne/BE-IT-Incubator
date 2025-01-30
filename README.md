@@ -100,6 +100,11 @@ __tests__/
   - Token blacklisting for logout
 - ✅ Protected endpoints with basic authorization
 - ✅ Email confirmation system
+- ✅ Password recovery system:
+  - Password recovery request
+  - Secure recovery code handling
+  - New password validation
+  - Old password invalidation
 - ✅ Advanced session management:
   - Multi-device login support
   - Device-specific session tracking
@@ -134,10 +139,16 @@ __tests__/
 ### Testing & Quality
 
 - ✅ Comprehensive E2E tests covering:
-  - Authentication flows (login, registration, confirmation)
+  - Authentication flows:
+    - Login and logout
+    - Registration with email confirmation
+    - Password recovery and reset
+    - Token refresh
+    - Registration email resend
   - CRUD operations
   - Error cases and validation
-- ✅ Isolated test environment
+  - Rate limiting
+- ✅ Isolated test environment with MongoDB Memory Server
 - ✅ TypeScript type safety
 - ✅ Input validation middleware
 - ✅ Error handling middleware
@@ -158,6 +169,7 @@ __tests__/
 - Token refresh mechanism
 - Secure logout
 - Registration email resend capability
+- Password recovery and reset functionality
 
 ### Users
 
@@ -199,5 +211,5 @@ __tests__/
 
 ## Upcoming Features
 
-- [ ] API documentation (Swagger/OpenAPI)
-- [ ] Performance optimizations
+- 🔄 API documentation (Swagger/OpenAPI)
+- 🔄 Performance optimizations

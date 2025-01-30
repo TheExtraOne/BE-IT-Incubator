@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { UserModelClass } from "../db/db";
 import TUserAccountRepViewModel, {
   TEmailConfirmation,
+  TPasswordResetConfirmation,
 } from "./models/UserAccountRepViewModel";
 
 const usersRepository = {
@@ -19,6 +20,16 @@ const usersRepository = {
   ): Promise<TUserAccountRepViewModel | null> => {
     const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
       "emailConfirmation.confirmationCode": confirmationCode,
+    }).lean();
+
+    return user;
+  },
+
+  getUserByRecoveryCode: async (
+    recoveryCode: string
+  ): Promise<TUserAccountRepViewModel | null> => {
+    const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
+      "passwordResetConfirmation.recoveryCode": recoveryCode,
     }).lean();
 
     return user;
@@ -78,6 +89,43 @@ const usersRepository = {
       { $set: { "emailConfirmation.isConfirmed": isRegistrationConfirmed } }
     );
 
+    return !!matchedCount;
+  },
+
+  updateUserPasswordResetConfirmationById: async ({
+    id,
+    newPassword,
+  }: {
+    id: string;
+    newPassword: string;
+  }): Promise<boolean> => {
+    if (!ObjectId.isValid(id)) return false;
+    const { matchedCount } = await UserModelClass.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "passwordResetConfirmation.isConfirmed": true,
+          newPassword: newPassword,
+        },
+      }
+    );
+
+    return !!matchedCount;
+  },
+
+  updateUserPasswordResetConfirmationByEmail: async ({
+    passwordResetConfirmation,
+    email,
+  }: {
+    passwordResetConfirmation: TPasswordResetConfirmation;
+    email: string;
+  }): Promise<boolean> => {
+    const { matchedCount } = await UserModelClass.updateOne(
+      { "accountData.email": email },
+      {
+        $set: { passwordResetConfirmation: passwordResetConfirmation },
+      }
+    );
     return !!matchedCount;
   },
 

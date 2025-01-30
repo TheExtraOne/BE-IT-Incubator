@@ -95,6 +95,11 @@ const usersService = {
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed,
       },
+      passwordResetConfirmation: {
+        confirmationCode: null,
+        expirationDate: null,
+        isConfirmed: null,
+      },
     };
 
     const createdUserId: string = await usersRepository.createUserAccount(

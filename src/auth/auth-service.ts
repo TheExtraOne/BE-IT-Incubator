@@ -5,9 +5,11 @@ import mailManager from "../managers/mail-manager";
 import usersRepository from "../users/users-repository";
 import TUserAccountRepViewModel, {
   TEmailConfirmation,
+  TPasswordResetConfirmation,
 } from "../users/models/UserAccountRepViewModel";
 import { add } from "date-fns";
 import { ObjectId } from "mongodb";
+import bcryptService from "../adapters/bcypt-service";
 
 const authService = {
   registerUser: async ({
@@ -103,6 +105,47 @@ const authService = {
     };
   },
 
+  recoverPassword: async (email: string): Promise<Result<string | null>> => {
+    // Check if user with such email exist
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getByLoginOrEmail(email);
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [
+          {
+            field: "email",
+            message: "Not Found",
+          },
+        ],
+      };
+    }
+    // Generate new confirmation code
+    const passwordResetConfirmation: TPasswordResetConfirmation = {
+      confirmationCode: new ObjectId().toString(),
+      expirationDate: add(new Date(), { minutes: 30 }),
+      isConfirmed: false,
+    };
+    await usersRepository.updateUserPasswordResetConfirmationByEmail({
+      passwordResetConfirmation,
+      email,
+    });
+
+    // Send email with new confirmation code
+    mailManager.sendPasswordRecoveryMail({
+      email,
+      confirmationCode: passwordResetConfirmation.confirmationCode!,
+    });
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
+
   confirmRegistration: async (confirmationCode: string): Promise<Result> => {
     const user: TUserAccountRepViewModel | null =
       await usersRepository.getUserByConfirmationCode(confirmationCode);
@@ -151,6 +194,72 @@ const authService = {
     // If ok, then updating user flag
     await usersRepository.updateUserRegistrationConfirmationById({
       id: String(user._id),
+    });
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  setNewPassword: async (
+    newPassword: string,
+    recoveryCode: string
+  ): Promise<Result> => {
+    const user: TUserAccountRepViewModel | null =
+      await usersRepository.getUserByRecoveryCode(recoveryCode);
+    // Check if user with such recoveryCode exist
+    if (!user) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [
+          {
+            field: "recoveryCode",
+            message: "User with such recoveryCode does not exist",
+          },
+        ],
+      };
+    }
+    // Check if recoveryCode has already been applied
+    if (user.passwordResetConfirmation.isConfirmed) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Already confirmed",
+        extensions: [
+          {
+            field: "recoveryCode",
+            message: "Already confirmed",
+          },
+        ],
+      };
+    }
+    // Check if recoveryCode expired
+    if (
+      !user?.passwordResetConfirmation?.expirationDate ||
+      user.passwordResetConfirmation.expirationDate < new Date()
+    ) {
+      return {
+        status: RESULT_STATUS.BAD_REQUEST,
+        data: null,
+        errorMessage: "Recovery code expired",
+        extensions: [
+          {
+            field: "recoveryCode",
+            message: "Already expired",
+          },
+        ],
+      };
+    }
+
+    // If ok, then updating user flag
+    const passwordHash: string = await bcryptService.generateHash(newPassword);
+    await usersRepository.updateUserPasswordResetConfirmationById({
+      id: user._id.toString(),
+      newPassword: passwordHash,
     });
 
     return {

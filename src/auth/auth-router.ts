@@ -7,6 +7,7 @@ import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registrat
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
 import refreshTokenVerificationMiddleware from "../adapters/middleware/refresh-token-verification-middleware";
 import rateLimitingMiddleware from "../rate-limiting/middleware/rate-limiting-middleware";
+import bodyAuthNewPasswordInputValidator from "./middleware/body-auth-new-password-input-validation";
 
 const authRouter = Router({});
 
@@ -33,8 +34,29 @@ const postEmailResendingInputMiddleware = [
   bodyAuthRegistrationInputValidator.emailValidation,
   inputCheckErrorsMiddleware,
 ];
+const passwordRecoveryMiddleware = [
+  rateLimitingMiddleware,
+  bodyAuthRegistrationInputValidator.emailValidation,
+  inputCheckErrorsMiddleware,
+];
+const newPasswordMiddleware = [
+  rateLimitingMiddleware,
+  bodyAuthNewPasswordInputValidator.newPasswordValidation,
+  bodyAuthNewPasswordInputValidator.recoveryCodeValidation,
+  inputCheckErrorsMiddleware,
+];
 
 authRouter.post("/login", [...loginMiddleware], authController.loginUser);
+authRouter.post(
+  "/password-recovery",
+  [...passwordRecoveryMiddleware],
+  authController.recoverPassword
+);
+authRouter.post(
+  "/new-password",
+  [...newPasswordMiddleware],
+  authController.setNewPassword
+);
 authRouter.post(
   "/registration",
   [...registrationMiddleware],

@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema<TUserAccountRepViewModel>({
     expirationDate: { type: Date, required: true },
     isConfirmed: { type: Boolean, required: true },
   },
+  passwordResetConfirmation: {
+    confirmationCode: { type: String, default: null },
+    expirationDate: { type: Date, default: null },
+    isConfirmed: { type: Boolean, default: null },
+  },
 });
 const refreshTokenSchema = new mongoose.Schema<TRefreshTokensMetaRepViewModel>({
   ip: { type: String, required: true },

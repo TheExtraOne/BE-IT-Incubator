@@ -10,6 +10,7 @@ import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationCont
 import authService from "./auth-service";
 import securityService from "../security/security-service";
 import { ObjectId } from "mongodb";
+import TAuthNewPasswordControllerInputModel from "./models/AuthNewPasswordControllerInputModel";
 
 const authController = {
   loginUser: async (
@@ -49,6 +50,23 @@ const authController = {
 
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
     res.status(HTTP_STATUS.OK_200).json({ accessToken });
+  },
+
+  recoverPassword: async (
+    req: TRequestWithBody<{ email: string }>,
+    res: Response
+  ) => {
+    const { email } = req.body;
+    await authService.recoverPassword(email);
+    // if (result.status !== RESULT_STATUS.SUCCESS) {
+    //   res
+    //     .status(HTTP_STATUS.BAD_REQUEST_400)
+    //     .json({ errorsMessages: result.extensions });
+    //   return;
+    // }
+
+    // Even if current email is not registered (for prevent user's email detection) we are returning 204
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   },
 
   logoutUser: async (req: Request, res: Response) => {
@@ -131,6 +149,26 @@ const authController = {
     const { code: confirmationCode } = req.body;
     const result: Result = await authService.confirmRegistration(
       confirmationCode
+    );
+    if (result.status !== RESULT_STATUS.SUCCESS) {
+      res
+        .status(HTTP_STATUS.BAD_REQUEST_400)
+        .json({ errorsMessages: result.extensions });
+      return;
+    }
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
+  },
+
+  setNewPassword: async (
+    req: TRequestWithBody<TAuthNewPasswordControllerInputModel>,
+    res: Response
+  ) => {
+    // Validation in the middlewares
+    // Check if recovery code is correct in the BLL
+    const { newPassword, recoveryCode } = req.body;
+    const result: Result = await authService.setNewPassword(
+      newPassword,
+      recoveryCode
     );
     if (result.status !== RESULT_STATUS.SUCCESS) {
       res

@@ -20,9 +20,12 @@ const mapPosts = (
 ): TPostControllerViewModel[] | [] => posts.map(mapPost);
 
 const postsQueryRepository = {
-  _getPostsCount: async (
-    filter: Record<string, string> | undefined = {}
-  ): Promise<number> => await PostModelClass.countDocuments(filter),
+  _getPostsCount: async (blogId: string | null): Promise<number> => {
+    const query = PostModelClass.countDocuments();
+    if (blogId) query.where("blogId", blogId);
+
+    return await query;
+  },
 
   getAllPosts: async ({
     blogId,
@@ -37,17 +40,17 @@ const postsQueryRepository = {
     sortBy: string;
     sortDirection: TSortDirection;
   }): Promise<TResponseWithPagination<TPostControllerViewModel[] | []>> => {
-    let filter: Record<string, string> | Record<string, never> = {};
-    if (blogId) filter = { blogId };
-
     const postsCount: number = await postsQueryRepository._getPostsCount(
-      filter
+      blogId
     );
     const pagesCount: number =
       postsCount && pageSize ? Math.ceil(postsCount / pageSize) : 0;
     const postsToSkip = (pageNumber - 1) * pageSize;
 
-    const posts: TPostRepViewModel[] | [] = await PostModelClass.find(filter)
+    const query = PostModelClass.find();
+    if (blogId) query.where("blogId", blogId);
+
+    const posts: TPostRepViewModel[] | [] = await query
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(postsToSkip)
       .limit(pageSize)
@@ -64,9 +67,9 @@ const postsQueryRepository = {
 
   getPostById: async (id: string): Promise<TPostControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const post: TPostRepViewModel | null = await PostModelClass.findOne({
-      _id: new ObjectId(id),
-    }).lean();
+    const post: TPostRepViewModel | null = await PostModelClass.findById(
+      new ObjectId(id)
+    ).lean();
 
     return post ? mapPost(post) : null;
   },

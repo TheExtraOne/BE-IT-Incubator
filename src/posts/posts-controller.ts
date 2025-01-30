@@ -119,7 +119,7 @@ const postsController = {
     res: Response
   ) => {
     const { title, shortDescription, content, blogId } = req.body;
-    const success: boolean = await postsService.updatePostById({
+    const result: Result = await postsService.updatePostById({
       id: req.params.id,
       title,
       shortDescription,
@@ -127,7 +127,7 @@ const postsController = {
       blogId,
     });
 
-    success
+    result.status === RESULT_STATUS.SUCCESS
       ? res.sendStatus(HTTP_STATUS.NO_CONTENT_204)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
   },
@@ -136,10 +136,12 @@ const postsController = {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) => {
-    const success: boolean = await postsService.deletePostById(req.params.id);
+    const result: Result = await postsService.deletePostById(req.params.id);
 
     res.sendStatus(
-      success ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
+      result.status === RESULT_STATUS.SUCCESS
+        ? HTTP_STATUS.NO_CONTENT_204
+        : HTTP_STATUS.NOT_FOUND_404
     );
   },
 };

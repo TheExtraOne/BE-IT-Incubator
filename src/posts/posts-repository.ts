@@ -1,43 +1,30 @@
 import { ObjectId } from "mongodb";
 import TPostRepViewModel from "./models/PostRepViewModel";
 import { PostModelClass } from "../db/db";
+import { HydratedDocument } from "mongoose";
 
 const postsRepository = {
-  createPost: async (newPost: TPostRepViewModel): Promise<string> => {
-    const { _id: insertedId } = await PostModelClass.create(newPost);
-
-    return insertedId.toString();
+  savePost: async (
+    post: HydratedDocument<TPostRepViewModel>
+  ): Promise<void> => {
+    await post.save();
   },
 
-  updatePostById: async ({
-    id,
-    title,
-    shortDescription,
-    content,
-    blogId,
-  }: {
-    id: string;
-    title: string;
-    shortDescription: string;
-    content: string;
-    blogId: string;
-  }): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await PostModelClass.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { title, shortDescription, content, blogId } }
-    );
+  getPostById: async (
+    id: string
+  ): Promise<HydratedDocument<TPostRepViewModel> | null> => {
+    if (!ObjectId.isValid(id)) return null;
 
-    return !!matchedCount;
+    const post: HydratedDocument<TPostRepViewModel> | null =
+      await PostModelClass.findById(new ObjectId(id));
+
+    return post;
   },
 
-  deletePostById: async (id: string): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await PostModelClass.deleteOne({
-      _id: new ObjectId(id),
-    });
-
-    return !!deletedCount;
+  deletePostById: async (
+    post: HydratedDocument<TPostRepViewModel>
+  ): Promise<void> => {
+    await post.deleteOne();
   },
 };
 

@@ -6,6 +6,8 @@ import { Result } from "../common/types/types";
 import { RESULT_STATUS } from "../common/settings";
 import blogsRepository from "../blogs/blogs-repository";
 import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
+import { PostModelClass } from "../db/db";
+import { HydratedDocument } from "mongoose";
 
 const postsService = {
   createPost: async ({
@@ -36,7 +38,9 @@ const postsService = {
       blogName: blog.name,
       createdAt: new Date().toISOString(),
     };
-    const createdPostId = await postsRepository.createPost(newPost);
+    const postInstance = new PostModelClass(newPost);
+    await postInstance.save();
+    const createdPostId = postInstance._id.toString();
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -57,17 +61,50 @@ const postsService = {
     shortDescription: string;
     content: string;
     blogId: string;
-  }): Promise<boolean> =>
-    await postsRepository.updatePostById({
-      id,
-      title,
-      shortDescription,
-      content,
-      blogId,
-    }),
+  }): Promise<Result> => {
+    const post: HydratedDocument<TPostRepViewModel> | null =
+      await postsRepository.getPostById(id);
+    if (!post) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
 
-  deletePostById: async (id: string): Promise<boolean> =>
-    await postsRepository.deletePostById(id),
+    post.title = title;
+    post.shortDescription = shortDescription;
+    post.content = content;
+    post.blogId = blogId;
+    await post.save();
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  deletePostById: async (id: string): Promise<Result> => {
+    const postInstance: HydratedDocument<TPostRepViewModel> | null =
+      await postsRepository.getPostById(id);
+    if (!postInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
+
+    await postsRepository.deletePostById(postInstance);
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 };
 
 export default postsService;

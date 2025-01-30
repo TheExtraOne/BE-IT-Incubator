@@ -2,9 +2,9 @@ import { WithId, OptionalUnlessRequiredId } from "mongodb";
 
 export type TPasswordResetConfirmation = {
   /**
-   * confirmationCode of the user, generated with mongo db ObjectId and converted to string
+   * recoveryCode of the user, generated with mongo db ObjectId and converted to string
    */
-  confirmationCode: string | null;
+  recoveryCode: string | null;
   /**
    * expirationDate of the confirmationCode
    */

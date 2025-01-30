@@ -124,7 +124,7 @@ const authService = {
     }
     // Generate new confirmation code
     const passwordResetConfirmation: TPasswordResetConfirmation = {
-      confirmationCode: new ObjectId().toString(),
+      recoveryCode: new ObjectId().toString(),
       expirationDate: add(new Date(), { minutes: 30 }),
       isConfirmed: false,
     };
@@ -136,7 +136,7 @@ const authService = {
     // Send email with new confirmation code
     mailManager.sendPasswordRecoveryMail({
       email,
-      confirmationCode: passwordResetConfirmation.confirmationCode!,
+      recoveryCode: passwordResetConfirmation.recoveryCode!,
     });
 
     return {

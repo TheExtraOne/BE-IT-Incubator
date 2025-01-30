@@ -23,9 +23,9 @@ const mailManager = {
 
   sendPasswordRecoveryMail: async ({
     email,
-    confirmationCode,
+    recoveryCode,
   }: {
-    confirmationCode: string;
+    recoveryCode: string;
     email: string;
   }): Promise<Result<string | null>> =>
     emailService.sendEmail({
@@ -33,10 +33,10 @@ const mailManager = {
       subject: "Blogs&Posts platform",
       message: `<h1>Password recovery</h1>
                     <p>To recover your password please follow the link below:
-                       <a href='https://somesite.com/password-recovery?recoveryCode=${confirmationCode}'>recovery password</a>
+                       <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
                     </p>
                     <p>Or use the link below:
-                      <a href='https://somesite.com/password-recovery?recoveryCode=${confirmationCode}'>https://somesite.com/password-recovery?recoveryCode=${confirmationCode}</a>
+                      <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>https://somesite.com/password-recovery?recoveryCode=${recoveryCode}</a>
                     </p>`,
     }),
 };

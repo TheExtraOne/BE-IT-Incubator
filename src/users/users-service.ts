@@ -96,7 +96,7 @@ const usersService = {
         isConfirmed,
       },
       passwordResetConfirmation: {
-        confirmationCode: null,
+        recoveryCode: null,
         expirationDate: null,
         isConfirmed: null,
       },

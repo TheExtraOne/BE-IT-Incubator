@@ -89,7 +89,7 @@ export const RateLimitModelClass = mongoose.model(
 
 export const connectToDb = async (url: string): Promise<boolean> => {
   try {
-    await mongoose.connect(`${url}/${SETTINGS.DB_NAME}`);
+    await mongoose.connect(url, { dbName: SETTINGS.DB_NAME });
     console.log("Successful connected to db");
     return true;
   } catch (e) {

@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema<TUserAccountRepViewModel>({
     isConfirmed: { type: Boolean, required: true },
   },
   passwordResetConfirmation: {
-    confirmationCode: { type: String, default: null },
+    recoveryCode: { type: String, default: null },
     expirationDate: { type: Date, default: null },
     isConfirmed: { type: Boolean, default: null },
   },

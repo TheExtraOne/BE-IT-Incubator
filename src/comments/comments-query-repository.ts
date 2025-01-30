@@ -24,10 +24,10 @@ const commentsQueryRepository = {
   }: {
     postId?: string;
   }): Promise<number> => {
-    const filters: Record<string, string> | Record<string, never> = {};
-    if (postId) filters.postId = postId;
+    const query = CommentModelClass.countDocuments();
+    if (postId) query.where("postId", postId);
 
-    return await CommentModelClass.countDocuments(filters);
+    return await query;
   },
 
   getCommentById: async (
@@ -36,9 +36,7 @@ const commentsQueryRepository = {
     if (!ObjectId.isValid(id)) return null;
 
     const comment: TCommentRepViewModel | null =
-      await CommentModelClass.findOne({
-        _id: new ObjectId(id),
-      }).lean();
+      await CommentModelClass.findById(new ObjectId(id)).lean();
 
     return comment ? mapComment(comment) : null;
   },
@@ -63,9 +61,8 @@ const commentsQueryRepository = {
       commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
     const commentsToSkip = (pageNumber - 1) * pageSize;
 
-    const comments: TCommentRepViewModel[] | [] = await CommentModelClass.find({
-      postId,
-    })
+    const comments: TCommentRepViewModel[] | [] = await CommentModelClass.find()
+      .where("postId", postId)
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(commentsToSkip)
       .limit(pageSize)

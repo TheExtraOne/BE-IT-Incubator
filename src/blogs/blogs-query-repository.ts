@@ -23,7 +23,7 @@ const blogsQueryRepository = {
     const query = BlogModelClass.countDocuments();
     if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
 
-    return query;
+    return await query;
   },
 
   getAllBlogs: async ({

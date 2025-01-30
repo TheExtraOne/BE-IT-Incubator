@@ -1,33 +1,22 @@
 import { ObjectId } from "mongodb";
 import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
 import commentsRepository from "./comments-repository";
-import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 import TCommentRepViewModel, {
   TCommentatorInfo,
 } from "./models/CommentRepViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
 import usersRepository from "../users/users-repository";
-import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
-
-const mapComment = (
-  comment: TCommentRepViewModel
-): TCommentControllerViewModel => ({
-  id: comment._id.toString(),
-  content: comment.content,
-  commentatorInfo: comment.commentatorInfo,
-  createdAt: comment.createdAt,
-});
+import { HydratedDocument } from "mongoose";
+import { CommentModelClass } from "../db/db";
 
 const commentsService = {
   createComment: async ({
     content,
     userId,
     postId,
-  }: TCommentsServiceInputModel): Promise<
-    Result<TCommentServiceViewModel | null>
-  > => {
+  }: TCommentsServiceInputModel): Promise<Result<string | null>> => {
     const user: TUserAccountRepViewModel | null =
       await usersRepository.getUserById(userId!);
 
@@ -53,16 +42,14 @@ const commentsService = {
       postId,
     };
 
-    const commentId: string = await commentsRepository.createComment(
-      newComment
-    );
+    const commentInstance: HydratedDocument<TCommentRepViewModel> =
+      new CommentModelClass(newComment);
 
-    const createdComment: TCommentRepViewModel | null =
-      await commentsRepository.getCommentById(commentId);
+    await commentInstance.save();
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: mapComment(createdComment!),
+      data: commentInstance._id.toString(),
       extensions: [],
     };
   },
@@ -73,11 +60,47 @@ const commentsService = {
   }: {
     id: string;
     content: string;
-  }): Promise<boolean> =>
-    await commentsRepository.updateCommentById({ id, content }),
+  }): Promise<Result> => {
+    const commentInstance: HydratedDocument<TCommentRepViewModel> | null =
+      await commentsRepository.getCommentById(id);
+    if (!commentInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
+    commentInstance.content = content;
+    await commentInstance.save();
 
-  deleteCommentById: async (id: string): Promise<boolean> =>
-    await commentsRepository.deleteCommentById(id),
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  deleteCommentById: async (id: string): Promise<Result> => {
+    const commentInstance: HydratedDocument<TCommentRepViewModel> | null =
+      await commentsRepository.getCommentById(id);
+    if (!commentInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
+
+    await commentsRepository.deleteCommentById(commentInstance);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 };
 
 export default commentsService;

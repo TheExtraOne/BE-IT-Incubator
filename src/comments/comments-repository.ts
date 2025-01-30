@@ -1,46 +1,27 @@
 import { ObjectId } from "mongodb";
 import { CommentModelClass } from "../db/db";
 import TCommentRepViewModel from "./models/CommentRepViewModel";
+import { HydratedDocument } from "mongoose";
 
 const commentsRepository = {
-  createComment: async (newComment: TCommentRepViewModel): Promise<string> => {
-    const { _id: insertedId } = await CommentModelClass.create(newComment);
-
-    return insertedId.toString();
+  saveComment: async (
+    comment: HydratedDocument<TCommentRepViewModel>
+  ): Promise<void> => {
+    await comment.save();
   },
 
-  updateCommentById: async ({
-    id,
-    content,
-  }: {
-    id: string;
-    content: string;
-  }): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { matchedCount } = await CommentModelClass.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { content } }
-    );
-
-    return !!matchedCount;
+  deleteCommentById: async (
+    comment: HydratedDocument<TCommentRepViewModel>
+  ): Promise<void> => {
+    await comment.deleteOne();
   },
 
-  deleteCommentById: async (id: string): Promise<boolean> => {
-    if (!ObjectId.isValid(id)) return false;
-    const { deletedCount } = await CommentModelClass.deleteOne({
-      _id: new ObjectId(id),
-    });
-
-    return !!deletedCount;
-  },
-
-  getCommentById: async (id: string): Promise<TCommentRepViewModel | null> => {
+  getCommentById: async (
+    id: string
+  ): Promise<HydratedDocument<TCommentRepViewModel> | null> => {
     if (!ObjectId.isValid(id)) return null;
-
-    const comment: TCommentRepViewModel | null =
-      await CommentModelClass.findOne({
-        _id: new ObjectId(id),
-      }).lean();
+    const comment: HydratedDocument<TCommentRepViewModel> | null =
+      await CommentModelClass.findById(new ObjectId(id));
 
     return comment;
   },

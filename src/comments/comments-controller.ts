@@ -24,18 +24,21 @@ const commentsController = {
     >,
     res: Response
   ) => {
-    const result: Result<TCommentServiceViewModel | null> =
-      await commentsService.createComment({
-        content: req.body.content,
-        userId: req.userId!,
-        postId: req.params.id,
-      });
+    const result: Result<string | null> = await commentsService.createComment({
+      content: req.body.content,
+      userId: req.userId!,
+      postId: req.params.id,
+    });
 
     if (result.status !== RESULT_STATUS.SUCCESS) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-    const createdComment = result.data!;
+
+    const commentId = result.data!;
+    const createdComment: TCommentControllerViewModel | null =
+      await commentsQueryRepository.getCommentById(commentId);
+
     res.status(HTTP_STATUS.CREATED_201).json(createdComment);
   },
 

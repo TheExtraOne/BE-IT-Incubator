@@ -2,6 +2,10 @@ import { ObjectId } from "mongodb";
 import TBlogServiceInputModel from "./models/BlogServiceInputModel";
 import blogsRepository from "./blogs-repository";
 import TBlogRepViewModel from "./models/BlogRepViewModel";
+import { BlogModelClass } from "../db/db";
+import { HydratedDocument } from "mongoose";
+import { RESULT_STATUS } from "../common/settings";
+import { Result } from "../common/types/types";
 
 const blogsService = {
   createBlog: async ({
@@ -17,7 +21,11 @@ const blogsService = {
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    return await blogsRepository.createBlog(newBlog);
+    const blogInstance: HydratedDocument<TBlogRepViewModel> =
+      new BlogModelClass(newBlog);
+    await blogInstance.save();
+
+    return newBlog._id.toString();
   },
 
   updateBlogById: async ({
@@ -30,11 +38,50 @@ const blogsService = {
     name: string;
     description: string;
     websiteUrl: string;
-  }): Promise<boolean> =>
-    await blogsRepository.updateBlogById({ id, name, description, websiteUrl }),
+  }): Promise<Result> => {
+    const blogInstance: HydratedDocument<TBlogRepViewModel> | null =
+      await blogsRepository.getBlogById(id);
+    if (!blogInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
 
-  deleteBlogById: async (id: string): Promise<boolean> =>
-    await blogsRepository.deleteBlogById(id),
+    blogInstance.name = name;
+    blogInstance.description = description;
+    blogInstance.websiteUrl = websiteUrl;
+    await blogInstance.save();
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  deleteBlogById: async (id: string): Promise<Result> => {
+    const blogInstance: HydratedDocument<TBlogRepViewModel> | null =
+      await blogsRepository.getBlogById(id);
+    if (!blogInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
+
+    await blogsRepository.deleteBlogById(blogInstance);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 };
 
 export default blogsService;

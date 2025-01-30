@@ -20,14 +20,10 @@ const mapBlogs = (
 
 const blogsQueryRepository = {
   _getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
-    // const filter: Record<string, RegExp> | Record<string, never> = {};
-    // if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
-
-    // return await BlogModel.countDocuments(filter);
     const query = BlogModelClass.countDocuments();
     if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
 
-    return query.exec();
+    return query;
   },
 
   getAllBlogs: async ({
@@ -43,10 +39,6 @@ const blogsQueryRepository = {
     sortBy: string;
     sortDirection: TSortDirection;
   }): Promise<TResponseWithPagination<TBlogControllerViewModel[] | []>> => {
-    // Filtration
-    const filter: Record<string, RegExp> | Record<string, never> = {};
-    if (searchNameTerm) filter.name = new RegExp(searchNameTerm, "i");
-
     // Pagination
     const blogsCount: number = await blogsQueryRepository._getBlogsCount(
       searchNameTerm
@@ -55,7 +47,10 @@ const blogsQueryRepository = {
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
 
-    const blogs: TBlogRepViewModel[] | [] = await BlogModelClass.find(filter)
+    const query = BlogModelClass.find();
+    if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
+
+    const blogs: TBlogRepViewModel[] | [] = await query
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(blogsToSkip)
       .limit(pageSize)
@@ -73,9 +68,9 @@ const blogsQueryRepository = {
   getBlogById: async (id: string): Promise<TBlogControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
 
-    const blog: TBlogRepViewModel | null = await BlogModelClass.findOne({
-      _id: new ObjectId(id),
-    }).lean();
+    const blog: TBlogRepViewModel | null = await BlogModelClass.findById(
+      new ObjectId(id)
+    ).lean();
 
     return blog ? mapBlog(blog) : null;
   },

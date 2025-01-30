@@ -146,7 +146,7 @@ const blogsController = {
     res: Response
   ) => {
     const { name, description, websiteUrl } = req.body;
-    const is_successful: boolean = await blogsService.updateBlogById({
+    const result: Result = await blogsService.updateBlogById({
       id: req.params.id,
       name,
       description,
@@ -154,7 +154,9 @@ const blogsController = {
     });
 
     res.sendStatus(
-      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
+      result.status === RESULT_STATUS.SUCCESS
+        ? HTTP_STATUS.NO_CONTENT_204
+        : HTTP_STATUS.NOT_FOUND_404
     );
   },
 
@@ -162,12 +164,12 @@ const blogsController = {
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) => {
-    const is_successful: boolean = await blogsService.deleteBlogById(
-      req.params.id
-    );
+    const result: Result = await blogsService.deleteBlogById(req.params.id);
 
     res.sendStatus(
-      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
+      result.status === RESULT_STATUS.SUCCESS
+        ? HTTP_STATUS.NO_CONTENT_204
+        : HTTP_STATUS.NOT_FOUND_404
     );
   },
 };

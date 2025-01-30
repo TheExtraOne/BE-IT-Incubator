@@ -105,7 +105,7 @@ const usersRepository = {
       {
         $set: {
           "passwordResetConfirmation.isConfirmed": true,
-          newPassword: newPassword,
+          "accountData.passwordHash": newPassword,
         },
       }
     );

@@ -10,6 +10,7 @@ import TUserAccountRepViewModel, {
 import { add } from "date-fns";
 import { ObjectId } from "mongodb";
 import bcryptService from "../adapters/bcypt-service";
+import { HydratedDocument } from "mongoose";
 
 const authService = {
   registerUser: async ({
@@ -31,7 +32,7 @@ const authService = {
     if (result.status !== RESULT_STATUS.SUCCESS) return result;
 
     const createdUserId: string | null = result.data;
-    const createdUser: TUserAccountRepViewModel | null =
+    const createdUser: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserById(createdUserId!);
 
     mailManager
@@ -48,10 +49,8 @@ const authService = {
     };
   },
 
-  resendRegistrationEmail: async (
-    email: string
-  ): Promise<Result<string | null>> => {
-    const user: TUserAccountRepViewModel | null =
+  resendRegistrationEmail: async (email: string): Promise<Result> => {
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
     // Check if user with such email exist
     if (!user) {
@@ -87,10 +86,9 @@ const authService = {
       expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
       isConfirmed: false,
     };
-    usersRepository.updateUserEmailConfirmationByEmail({
-      emailConfirmation,
-      email,
-    });
+
+    user.emailConfirmation = emailConfirmation;
+    await usersRepository.saveUserAccount(user);
 
     // Send email with new confirmation code
     mailManager.sendRegistrationMail({
@@ -105,9 +103,9 @@ const authService = {
     };
   },
 
-  recoverPassword: async (email: string): Promise<Result<string | null>> => {
+  recoverPassword: async (email: string): Promise<Result> => {
     // Check if user with such email exist
-    const user: TUserAccountRepViewModel | null =
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
     if (!user) {
       return {
@@ -128,10 +126,9 @@ const authService = {
       expirationDate: add(new Date(), { minutes: 30 }),
       isConfirmed: false,
     };
-    await usersRepository.updateUserPasswordResetConfirmationByEmail({
-      passwordResetConfirmation,
-      email,
-    });
+
+    user.passwordResetConfirmation = passwordResetConfirmation;
+    await usersRepository.saveUserAccount(user);
 
     // Send email with new confirmation code
     mailManager.sendPasswordRecoveryMail({
@@ -147,7 +144,7 @@ const authService = {
   },
 
   confirmRegistration: async (confirmationCode: string): Promise<Result> => {
-    const user: TUserAccountRepViewModel | null =
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserByConfirmationCode(confirmationCode);
     // Check if user with such confirmationCode exist
     if (!user) {
@@ -192,9 +189,9 @@ const authService = {
       };
     }
     // If ok, then updating user flag
-    await usersRepository.updateUserRegistrationConfirmationById({
-      id: String(user._id),
-    });
+    user.emailConfirmation.isConfirmed = true;
+
+    await usersRepository.saveUserAccount(user);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -207,7 +204,7 @@ const authService = {
     newPassword: string,
     recoveryCode: string
   ): Promise<Result> => {
-    const user: TUserAccountRepViewModel | null =
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserByRecoveryCode(recoveryCode);
     // Check if user with such recoveryCode exist
     if (!user) {
@@ -257,10 +254,9 @@ const authService = {
 
     // If ok, then updating user flag
     const passwordHash: string = await bcryptService.generateHash(newPassword);
-    await usersRepository.updateUserPasswordResetConfirmationById({
-      id: user._id.toString(),
-      newPassword: passwordHash,
-    });
+    user.passwordResetConfirmation.isConfirmed = true;
+    user.accountData.passwordHash = passwordHash;
+    await usersRepository.saveUserAccount(user);
 
     return {
       status: RESULT_STATUS.SUCCESS,

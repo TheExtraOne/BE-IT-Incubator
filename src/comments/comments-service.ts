@@ -17,7 +17,7 @@ const commentsService = {
     userId,
     postId,
   }: TCommentsServiceInputModel): Promise<Result<string | null>> => {
-    const user: TUserAccountRepViewModel | null =
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserById(userId!);
 
     if (!user) {

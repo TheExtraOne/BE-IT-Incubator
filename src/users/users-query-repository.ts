@@ -37,11 +37,12 @@ const usersQueryRepository = {
     );
   },
 
-  getUserById: async (id: string) => {
+  getUserById: async (id: string): Promise<TUserControllerViewModel | null> => {
     if (!ObjectId.isValid(id)) return null;
-    const user: TUserAccountRepViewModel | null = await UserModelClass.findOne({
-      _id: new ObjectId(id),
-    }).lean();
+
+    const user: TUserAccountRepViewModel | null = await UserModelClass.findById(
+      new ObjectId(id)
+    ).lean();
 
     return user ? mapUser(user) : null;
   },

@@ -70,12 +70,12 @@ const usersController = {
     req: TRequestWithParams<TPathParamsUserModel>,
     res: Response
   ) => {
-    const is_successful: boolean = await usersService.deleteUserById(
-      req.params.id
-    );
+    const result: Result = await usersService.deleteUserById(req.params.id);
 
     res.sendStatus(
-      is_successful ? HTTP_STATUS.NO_CONTENT_204 : HTTP_STATUS.NOT_FOUND_404
+      result.status === RESULT_STATUS.SUCCESS
+        ? HTTP_STATUS.NO_CONTENT_204
+        : HTTP_STATUS.NOT_FOUND_404
     );
   },
 };

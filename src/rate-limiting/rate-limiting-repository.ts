@@ -18,15 +18,12 @@ const rateLimitingRepository = {
     ip: string;
     url: string;
   }): Promise<number> => {
-    const query = RateLimitModelClass.countDocuments();
-    query
+    return await RateLimitModelClass.countDocuments()
       .where("ip", ip)
       .where("URL", url)
       .where("date", {
         $gt: subSeconds(new Date(), +SETTINGS.RATE_LIMIT_WINDOW),
       });
-
-    return await query;
   },
 };
 

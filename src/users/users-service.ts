@@ -7,6 +7,8 @@ import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { add } from "date-fns";
 import bcryptService from "../adapters/bcypt-service";
+import { UserModelClass } from "../db/db";
+import { HydratedDocument } from "mongoose";
 
 const mapUser = (user: TUserAccountRepViewModel): TUserControllerViewModel => ({
   id: user._id.toString(),
@@ -101,20 +103,37 @@ const usersService = {
         isConfirmed: null,
       },
     };
-
-    const createdUserId: string = await usersRepository.createUserAccount(
-      newUserAccount
-    );
+    const userAccountInstance: HydratedDocument<TUserAccountRepViewModel> =
+      new UserModelClass(newUserAccount);
+    await usersRepository.saveUserAccount(userAccountInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: createdUserId,
+      data: newUserAccount._id.toString(),
       extensions: [],
     };
   },
 
-  deleteUserById: async (id: string): Promise<boolean> =>
-    await usersRepository.deleteUserById(id),
+  deleteUserById: async (id: string): Promise<Result> => {
+    const userAccountInstance: HydratedDocument<TUserAccountRepViewModel> | null =
+      await usersRepository.getUserById(id);
+    if (!userAccountInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "id", message: "Not found" }],
+      };
+    }
+
+    await usersRepository.deleteUserAccount(userAccountInstance);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 
   checkUserCredentials: async ({
     loginOrEmail,
@@ -123,7 +142,7 @@ const usersService = {
     loginOrEmail: string;
     password: string;
   }): Promise<Result<TUserControllerViewModel | null>> => {
-    const user: TUserAccountRepViewModel | null =
+    const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {

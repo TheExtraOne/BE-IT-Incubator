@@ -12,7 +12,7 @@ const rateLimitingMiddleware = async (
     url: req.originalUrl,
   });
 
-  const requestNumber: number = await rateLimitingService.getRequests({
+  const requestNumber: number = await rateLimitingService.getRequestsCount({
     ip: req.ip || "::1",
     url: req.originalUrl,
   });

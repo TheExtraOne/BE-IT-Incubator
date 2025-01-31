@@ -79,11 +79,11 @@ export const UserModelClass = mongoose.model(
   userSchema
 );
 export const RefreshTokenModelClass = mongoose.model(
-  SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS_META,
+  SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS,
   refreshTokenSchema
 );
 export const RateLimitModelClass = mongoose.model(
-  SETTINGS.COLLECTION_NAMES.RATE_LIMITING,
+  SETTINGS.COLLECTION_NAMES.RATE_LIMITS,
   rateLimitSchema
 );
 

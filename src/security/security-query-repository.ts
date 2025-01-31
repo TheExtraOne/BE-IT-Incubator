@@ -17,11 +17,12 @@ const mapRefreshTokensMeta = (
   refreshTokensMeta.map(mapRefreshTokenMeta);
 
 const securityQueryRepository = {
-  getAllRefreshTokensMeta: async (
-    filter: Record<string, string> | undefined = {}
+  getAllRefreshTokensMetaByUserId: async (
+    userId: string
   ): Promise<TRefreshTokenMetaControllerViewModel[] | []> => {
-    const refreshTokensMeta: TRefreshTokensMetaRepViewModel[] | [] =
-      await RefreshTokenModelClass.find(filter).lean();
+    const refreshTokensMeta = await RefreshTokenModelClass.find()
+      .where("userId", userId)
+      .lean();
 
     return mapRefreshTokensMeta(refreshTokensMeta);
   },

@@ -1,16 +1,24 @@
 import { ObjectId } from "mongodb";
 import { RefreshTokenModelClass } from "../db/db";
 import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
+import { HydratedDocument } from "mongoose";
 
 const securityRepository = {
-  createRefreshTokenMeta: async (
-    newRefreshTokenMeta: TRefreshTokensMetaRepViewModel
-  ): Promise<string> => {
-    const { _id: insertedId } = await RefreshTokenModelClass.create(
-      newRefreshTokenMeta
-    );
+  saveRefreshTokenMeta: async (
+    refreshTokenMeta: HydratedDocument<TRefreshTokensMetaRepViewModel>
+  ): Promise<void> => {
+    await refreshTokenMeta.save();
+  },
 
-    return insertedId.toString();
+  getRefreshTokensMetaByDeviceId: async (
+    deviceId: string
+  ): Promise<HydratedDocument<TRefreshTokensMetaRepViewModel> | null> => {
+    if (!ObjectId.isValid(deviceId)) return null;
+
+    const refreshTokenMetaInstance: HydratedDocument<TRefreshTokensMetaRepViewModel> | null =
+      await RefreshTokenModelClass.findById(new ObjectId(deviceId));
+
+    return refreshTokenMetaInstance;
   },
 
   getRefreshTokenMetaByFilters: async ({
@@ -24,50 +32,19 @@ const securityRepository = {
   }): Promise<TRefreshTokensMetaRepViewModel | null> => {
     if (!ObjectId.isValid(deviceId)) return null;
 
-    const filter: Record<string, string | ObjectId> = {
-      _id: new ObjectId(deviceId),
-    };
-    if (userId) filter["userId"] = userId;
-    if (lastActiveDate) filter["lastActiveDate"] = lastActiveDate;
-
+    const query = RefreshTokenModelClass.findById(new ObjectId(deviceId));
+    if (userId) query.where("userId", userId);
+    if (lastActiveDate) query.where("lastActiveDate", lastActiveDate);
     const refreshTokensMeta: TRefreshTokensMetaRepViewModel | null =
-      await RefreshTokenModelClass.findOne(filter).lean();
+      await query.lean();
 
     return refreshTokensMeta;
   },
 
-  updateRefreshTokenMetaTime: async ({
-    deviceId,
-    lastActiveDate,
-    expirationDate,
-  }: {
-    deviceId: string;
-    lastActiveDate: string;
-    expirationDate: string;
-  }): Promise<boolean> => {
-    if (!ObjectId.isValid(deviceId)) return false;
-    const { matchedCount } = await RefreshTokenModelClass.updateOne(
-      { _id: new ObjectId(deviceId) },
-      {
-        $set: {
-          ["lastActiveDate"]: lastActiveDate,
-          ["expirationDate"]: expirationDate,
-        },
-      }
-    );
-
-    return !!matchedCount;
-  },
-
-  deleteRefreshTokenMetaByDeviceId: async (
-    deviceId: string
-  ): Promise<boolean> => {
-    if (!ObjectId.isValid(deviceId)) return false;
-    const { deletedCount } = await RefreshTokenModelClass.deleteOne({
-      _id: new ObjectId(deviceId),
-    });
-
-    return !!deletedCount;
+  deleteRefreshTokenMeta: async (
+    refreshTokenMeta: HydratedDocument<TRefreshTokensMetaRepViewModel>
+  ): Promise<void> => {
+    await refreshTokenMeta.deleteOne();
   },
 
   deleteAllRefreshTokensMeta: async ({

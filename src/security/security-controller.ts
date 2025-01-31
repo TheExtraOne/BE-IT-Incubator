@@ -13,9 +13,7 @@ const securityController = {
     // Validating userId in the middleware
     const userId: string | null = req.userId;
     const devices: TRefreshTokenMetaControllerViewModel[] =
-      await securityQueryRepository.getAllRefreshTokensMeta({
-        ["userId"]: userId!,
-      });
+      await securityQueryRepository.getAllRefreshTokensMetaByUserId(userId!);
 
     res.status(HTTP_STATUS.OK_200).json(devices);
   },

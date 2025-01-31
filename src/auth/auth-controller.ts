@@ -58,12 +58,6 @@ const authController = {
   ) => {
     const { email } = req.body;
     await authService.recoverPassword(email);
-    // if (result.status !== RESULT_STATUS.SUCCESS) {
-    //   res
-    //     .status(HTTP_STATUS.BAD_REQUEST_400)
-    //     .json({ errorsMessages: result.extensions });
-    //   return;
-    // }
 
     // Even if current email is not registered (for prevent user's email detection) we are returning 204
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);

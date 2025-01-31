@@ -23,7 +23,7 @@ const blogsService = {
     };
     const blogInstance: HydratedDocument<TBlogRepViewModel> =
       new BlogModelClass(newBlog);
-    await blogInstance.save();
+    await blogsRepository.saveBlog(blogInstance);
 
     return newBlog._id.toString();
   },
@@ -53,7 +53,7 @@ const blogsService = {
     blogInstance.name = name;
     blogInstance.description = description;
     blogInstance.websiteUrl = websiteUrl;
-    await blogInstance.save();
+    await blogsRepository.saveBlog(blogInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,

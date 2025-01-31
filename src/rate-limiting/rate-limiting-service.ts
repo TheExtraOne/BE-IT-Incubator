@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import TRateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
 import rateLimitingRepository from "./rate-limiting-repository";
+import { HydratedDocument } from "mongoose";
+import { RateLimitModelClass } from "../db/db";
 
 const rateLimitingService = {
   createNewRequest: async ({
@@ -17,17 +19,20 @@ const rateLimitingService = {
       date: new Date(),
     };
 
-    await rateLimitingRepository.insertNewRequest(newRequest);
+    const requestInstance: HydratedDocument<TRateLimitingRepViewModel> =
+      new RateLimitModelClass(newRequest);
+
+    await rateLimitingRepository.saveNewRequest(requestInstance);
   },
 
-  getRequests: async ({
+  getRequestsCount: async ({
     ip,
     url,
   }: {
     ip: string;
     url: string;
   }): Promise<number> =>
-    await rateLimitingRepository.getRequestsAmount({ ip, url }),
+    await rateLimitingRepository.getRequestsCount({ ip, url }),
 };
 
 export default rateLimitingService;

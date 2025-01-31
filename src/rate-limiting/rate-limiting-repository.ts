@@ -2,28 +2,32 @@ import TRateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
 import { RateLimitModelClass } from "../db/db";
 import { subSeconds } from "date-fns";
 import { SETTINGS } from "../common/settings";
+import { HydratedDocument } from "mongoose";
 
 const rateLimitingRepository = {
-  insertNewRequest: async (
-    newRequest: TRateLimitingRepViewModel
-  ): Promise<string> => {
-    const { _id: insertedId } = await RateLimitModelClass.create(newRequest);
-
-    return insertedId.toString();
+  saveNewRequest: async (
+    newRequest: HydratedDocument<TRateLimitingRepViewModel>
+  ): Promise<void> => {
+    await newRequest.save();
   },
 
-  getRequestsAmount: async ({
+  getRequestsCount: async ({
     ip,
     url,
   }: {
     ip: string;
     url: string;
-  }): Promise<number> =>
-    await RateLimitModelClass.countDocuments({
-      ["ip"]: ip,
-      URL: url,
-      date: { $gt: subSeconds(new Date(), +SETTINGS.RATE_LIMIT_WINDOW) },
-    }),
+  }): Promise<number> => {
+    const query = RateLimitModelClass.countDocuments();
+    query
+      .where("ip", ip)
+      .where("URL", url)
+      .where("date", {
+        $gt: subSeconds(new Date(), +SETTINGS.RATE_LIMIT_WINDOW),
+      });
+
+    return await query;
+  },
 };
 
 export default rateLimitingRepository;

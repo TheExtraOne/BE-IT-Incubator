@@ -45,7 +45,7 @@ const commentsService = {
     const commentInstance: HydratedDocument<TCommentRepViewModel> =
       new CommentModelClass(newComment);
 
-    await commentInstance.save();
+    await commentsRepository.saveComment(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -72,7 +72,7 @@ const commentsService = {
       };
     }
     commentInstance.content = content;
-    await commentInstance.save();
+    await commentsRepository.saveComment(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,

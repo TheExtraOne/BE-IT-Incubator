@@ -3,6 +3,9 @@ import { ObjectId } from "mongodb";
 import securityRepository from "./security-repository";
 import jwtService from "../adapters/jwt-service";
 import { Result } from "../common/types/types";
+import { RefreshTokenModelClass } from "../db/db";
+import { RESULT_STATUS } from "../common/settings";
+import { HydratedDocument } from "mongoose";
 
 const securityService = {
   createRefreshTokenMeta: async ({
@@ -35,8 +38,10 @@ const securityService = {
       ),
       userId: resultDecode.data?.userId!,
     };
-
-    await securityRepository.createRefreshTokenMeta(newRefreshTokenMeta);
+    const refreshTokenMetaInstance = new RefreshTokenModelClass(
+      newRefreshTokenMeta
+    );
+    await securityRepository.saveRefreshTokenMeta(refreshTokenMetaInstance);
   },
 
   getRefreshTokenMetaByFilters: async ({
@@ -56,8 +61,28 @@ const securityService = {
     });
   },
 
-  deleteRefreshTokenMetaByDeviceId: (deviceId: string): Promise<boolean> =>
-    securityRepository.deleteRefreshTokenMetaByDeviceId(deviceId),
+  deleteRefreshTokenMetaByDeviceId: async (
+    deviceId: string
+  ): Promise<Result> => {
+    const refreshTokenMetaInstance: HydratedDocument<TRefreshTokensMetaRepViewModel> | null =
+      await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
+    if (!refreshTokenMetaInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "deviceId", message: "Not found" }],
+      };
+    }
+
+    await securityRepository.deleteRefreshTokenMeta(refreshTokenMetaInstance);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  },
 
   deleteAllRefreshTokensMeta: async ({
     userId,
@@ -77,12 +102,29 @@ const securityService = {
     deviceId: string;
     lastActiveDate: string;
     expirationDate: string;
-  }): Promise<void> => {
-    securityRepository.updateRefreshTokenMetaTime({
-      deviceId,
-      lastActiveDate,
-      expirationDate,
-    });
+  }): Promise<Result> => {
+    const refreshTokenMetaInstance: HydratedDocument<TRefreshTokensMetaRepViewModel> | null =
+      await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
+
+    if (!refreshTokenMetaInstance) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        errorMessage: "Not Found",
+        extensions: [{ field: "deviceId", message: "Not found" }],
+      };
+    }
+
+    refreshTokenMetaInstance.lastActiveDate = lastActiveDate;
+    refreshTokenMetaInstance.expirationDate = expirationDate;
+
+    await securityRepository.saveRefreshTokenMeta(refreshTokenMetaInstance);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
   },
 
   convertTimeToISOFromUnix: (unixTime: number): string =>

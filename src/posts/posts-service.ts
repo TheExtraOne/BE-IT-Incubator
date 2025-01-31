@@ -39,7 +39,7 @@ const postsService = {
       createdAt: new Date().toISOString(),
     };
     const postInstance = new PostModelClass(newPost);
-    await postInstance.save();
+    await postsRepository.savePost(postInstance);
     const createdPostId = postInstance._id.toString();
 
     return {
@@ -62,9 +62,9 @@ const postsService = {
     content: string;
     blogId: string;
   }): Promise<Result> => {
-    const post: HydratedDocument<TPostRepViewModel> | null =
+    const postInstance: HydratedDocument<TPostRepViewModel> | null =
       await postsRepository.getPostById(id);
-    if (!post) {
+    if (!postInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
         data: null,
@@ -73,11 +73,11 @@ const postsService = {
       };
     }
 
-    post.title = title;
-    post.shortDescription = shortDescription;
-    post.content = content;
-    post.blogId = blogId;
-    await post.save();
+    postInstance.title = title;
+    postInstance.shortDescription = shortDescription;
+    postInstance.content = content;
+    postInstance.blogId = blogId;
+    await postsRepository.savePost(postInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,

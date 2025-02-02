@@ -1,5 +1,5 @@
 import {
-  BlogModelClass,
+  BlogModelMongoose,
   PostModelClass,
   UserModelClass,
   CommentModelClass,
@@ -9,7 +9,7 @@ import {
 
 const testingRepository = {
   deleteAllData: async (): Promise<void> => {
-    await BlogModelClass.deleteMany({});
+    await BlogModelMongoose.deleteMany({});
     await PostModelClass.deleteMany({});
     await UserModelClass.deleteMany({});
     await CommentModelClass.deleteMany({});

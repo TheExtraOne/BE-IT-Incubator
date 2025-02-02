@@ -5,7 +5,7 @@ import postsRepository from "./posts-repository";
 import { Result } from "../common/types/types";
 import { RESULT_STATUS } from "../common/settings";
 import blogsRepository from "../blogs/blogs-repository";
-import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
+import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import { PostModelClass } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
@@ -16,7 +16,7 @@ const postsService = {
     content,
     blogId,
   }: TPostServiceInputModel): Promise<Result<string | null>> => {
-    const blog: TBlogRepViewModel | null = await blogsRepository.getBlogById(
+    const blog: BlogRepViewModel | null = await blogsRepository.getBlogById(
       blogId
     );
 

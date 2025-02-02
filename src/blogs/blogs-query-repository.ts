@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
-import TBlogRepViewModel from "./models/BlogRepViewModel";
+import BlogRepViewModel from "./models/BlogRepViewModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
-import { BlogModelClass } from "../db/db";
+import { BlogModelMongoose } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 
-const mapBlog = (blog: TBlogRepViewModel): TBlogControllerViewModel => ({
+const mapBlog = (blog: BlogRepViewModel): TBlogControllerViewModel => ({
   id: blog._id.toString(),
   name: blog.name,
   description: blog.description,
@@ -14,19 +14,18 @@ const mapBlog = (blog: TBlogRepViewModel): TBlogControllerViewModel => ({
   isMembership: blog.isMembership,
 });
 
-const mapBlogs = (
-  blogs: TBlogRepViewModel[] | []
-): TBlogControllerViewModel[] => blogs.map(mapBlog);
+const mapBlogs = (blogs: BlogRepViewModel[] | []): TBlogControllerViewModel[] =>
+  blogs.map(mapBlog);
 
-const blogsQueryRepository = {
-  _getBlogsCount: async (searchNameTerm: string | null): Promise<number> => {
-    const query = BlogModelClass.countDocuments();
+class BlogsQueryRepository {
+  private async getBlogsCount(searchNameTerm: string | null): Promise<number> {
+    const query = BlogModelMongoose.countDocuments();
     if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
 
     return await query;
-  },
+  }
 
-  getAllBlogs: async ({
+  async getAllBlogs({
     searchNameTerm,
     pageNumber,
     pageSize,
@@ -38,19 +37,17 @@ const blogsQueryRepository = {
     pageSize: number;
     sortBy: string;
     sortDirection: TSortDirection;
-  }): Promise<TResponseWithPagination<TBlogControllerViewModel[] | []>> => {
+  }): Promise<TResponseWithPagination<TBlogControllerViewModel[] | []>> {
     // Pagination
-    const blogsCount: number = await blogsQueryRepository._getBlogsCount(
-      searchNameTerm
-    );
+    const blogsCount: number = await this.getBlogsCount(searchNameTerm);
     const pagesCount: number =
       blogsCount && pageSize ? Math.ceil(blogsCount / pageSize) : 0;
     const blogsToSkip = (pageNumber - 1) * pageSize;
 
-    const query = BlogModelClass.find();
+    const query = BlogModelMongoose.find();
     if (searchNameTerm) query.where("name", new RegExp(searchNameTerm, "i"));
 
-    const blogs: TBlogRepViewModel[] | [] = await query
+    const blogs: BlogRepViewModel[] | [] = await query
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(blogsToSkip)
       .limit(pageSize)
@@ -63,17 +60,17 @@ const blogsQueryRepository = {
       totalCount: blogsCount,
       items: mapBlogs(blogs),
     };
-  },
+  }
 
-  getBlogById: async (id: string): Promise<TBlogControllerViewModel | null> => {
+  async getBlogById(id: string): Promise<TBlogControllerViewModel | null> {
     if (!ObjectId.isValid(id)) return null;
 
-    const blog: TBlogRepViewModel | null = await BlogModelClass.findById(
+    const blog: BlogRepViewModel | null = await BlogModelMongoose.findById(
       new ObjectId(id)
     ).lean();
 
     return blog ? mapBlog(blog) : null;
-  },
-};
+  }
+}
 
-export default blogsQueryRepository;
+export default new BlogsQueryRepository();

@@ -40,7 +40,7 @@ const updateBlogByIdMiddleware = [
 ];
 
 blogsRouter.get("/", [...getAllBlogsMiddleWares], blogsController.getBlogs);
-blogsRouter.get("/:id", blogsController.getBlog);
+blogsRouter.get("/:id", blogsController.getBlogById);
 blogsRouter.get(
   "/:id/posts",
   [...getAllPostsForBlogIdMiddleware],
@@ -49,18 +49,18 @@ blogsRouter.get(
 blogsRouter.post(
   "/:id/posts",
   [...createPostForBlogIdMiddleware],
-  blogsController.createPostForBlogId
+  blogsController.createPostForBlogById
 );
 blogsRouter.post("/", [...createBlogMiddleware], blogsController.createBlog);
 blogsRouter.put(
   "/:id",
   [...updateBlogByIdMiddleware],
-  blogsController.updateBlog
+  blogsController.updateBlogById
 );
 blogsRouter.delete(
   "/:id",
   basicAuthorizationMiddleware,
-  blogsController.deleteBlog
+  blogsController.deleteBlogById
 );
 
 export default blogsRouter;

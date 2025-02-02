@@ -12,11 +12,11 @@ import securityService from "../security/security-service";
 import { ObjectId } from "mongodb";
 import TAuthNewPasswordControllerInputModel from "./models/AuthNewPasswordControllerInputModel";
 
-const authController = {
-  loginUser: async (
+class AuthController {
+  async loginUser(
     req: TRequestWithBody<TAuthLoginControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     // Login/mail and password validation is in the middleware
     const { loginOrEmail, password } = req.body;
     const result: Result<TUserControllerViewModel | null> =
@@ -32,11 +32,11 @@ const authController = {
 
     const userId = result.data?.id!;
     const deviceId = new ObjectId();
-    const accessToken: string = await jwtService.createJWT({
+    const accessToken: string = await jwtService.createToken({
       payload: { userId },
       type: TOKEN_TYPE.AC_TOKEN,
     });
-    const refreshToken: string = await jwtService.createJWT({
+    const refreshToken: string = await jwtService.createToken({
       payload: { userId, deviceId: deviceId.toString() },
       type: TOKEN_TYPE.R_TOKEN,
     });
@@ -50,20 +50,20 @@ const authController = {
 
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
     res.status(HTTP_STATUS.OK_200).json({ accessToken });
-  },
+  }
 
-  recoverPassword: async (
+  async recoverPassword(
     req: TRequestWithBody<{ email: string }>,
     res: Response
-  ) => {
+  ) {
     const { email } = req.body;
     await authService.recoverPassword(email);
 
     // Even if current email is not registered (for prevent user's email detection) we are returning 204
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  logoutUser: async (req: Request, res: Response) => {
+  async logoutUser(req: Request, res: Response) {
     // Validate refreshToken and its presence in the middleware
     const refreshToken: string = req.cookies.refreshToken;
     const result: Result<{
@@ -78,9 +78,9 @@ const authController = {
 
     res.clearCookie("refreshToken", { path: "/" });
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  getUserInformation: async (req: Request, res: Response) => {
+  async getUserInformation(req: Request, res: Response) {
     // Validating userId and it's presence in the middleware
     const userId: string | null = req.userId;
     const user: TUserControllerViewModel | null =
@@ -96,12 +96,12 @@ const authController = {
       login: user.login,
       userId: user.id,
     });
-  },
+  }
 
-  registerUser: async (
+  async registerUser(
     req: TRequestWithBody<TAuthRegistrationControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     const { login, email, password } = req.body;
 
     const result: Result<string | null> = await authService.registerUser({
@@ -117,12 +117,12 @@ const authController = {
     }
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  resendRegistrationEmail: async (
+  async resendRegistrationEmail(
     req: TRequestWithBody<{ email: string }>,
     res: Response
-  ) => {
+  ) {
     const { email } = req.body;
     const result: Result<string | null> =
       await authService.resendRegistrationEmail(email);
@@ -134,12 +134,12 @@ const authController = {
     }
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  confirmRegistration: async (
+  async confirmRegistration(
     req: TRequestWithBody<{ code: string }>,
     res: Response
-  ) => {
+  ) {
     const { code: confirmationCode } = req.body;
     const result: Result = await authService.confirmRegistration(
       confirmationCode
@@ -151,12 +151,12 @@ const authController = {
       return;
     }
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  setNewPassword: async (
+  async setNewPassword(
     req: TRequestWithBody<TAuthNewPasswordControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     // Validation in the middlewares
     // Check if recovery code is correct in the BLL
     const { newPassword, recoveryCode } = req.body;
@@ -171,9 +171,9 @@ const authController = {
       return;
     }
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  refreshToken: async (req: Request, res: Response) => {
+  async refreshToken(req: Request, res: Response) {
     // Checking expiration and validity of the refreshToken in the middlewares
     const refreshToken: string = req.cookies.refreshToken;
 
@@ -186,11 +186,11 @@ const authController = {
     const { userId, deviceId } = resultDecode?.data || {};
 
     // Generate new tokens
-    const newAccessToken: string = await jwtService.createJWT({
+    const newAccessToken: string = await jwtService.createToken({
       payload: { userId: userId! },
       type: TOKEN_TYPE.AC_TOKEN,
     });
-    const newRefreshToken: string = await jwtService.createJWT({
+    const newRefreshToken: string = await jwtService.createToken({
       payload: { userId: userId!, deviceId: deviceId! },
       type: TOKEN_TYPE.R_TOKEN,
     });
@@ -214,7 +214,7 @@ const authController = {
       secure: true,
     });
     res.status(HTTP_STATUS.OK_200).json({ accessToken: newAccessToken });
-  },
-};
+  }
+}
 
-export default authController;
+export default new AuthController();

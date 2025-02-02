@@ -20,8 +20,8 @@ import TPostControllerViewModel from "../posts/models/PostControllerViewModel";
 import postsQueryRepository from "../posts/posts-query-repository";
 import TBlogControllerInputModel from "./models/BlogControllerInputModel";
 
-const blogsController = {
-  getBlogs: async (req: TRequestWithQuery<TQueryBlogModel>, res: Response) => {
+class BlogsController {
+  async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
     // Query validation is in the middleware
     const {
       searchNameTerm = null,
@@ -42,12 +42,12 @@ const blogsController = {
       });
 
     res.status(HTTP_STATUS.OK_200).json(blogs);
-  },
+  }
 
-  getBlog: async (
+  async getBlogById(
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
-  ) => {
+  ) {
     // We are reaching out to blogsQueryRepository directly because of CQRS
     const blog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(req.params.id);
@@ -55,12 +55,12 @@ const blogsController = {
     blog
       ? res.status(HTTP_STATUS.OK_200).json(blog)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-  },
+  }
 
-  getAllPostsForBlogById: async (
+  async getAllPostsForBlogById(
     req: TRequestWithQueryAndParams<TQueryPostModel, TPathParamsBlogModel>,
     res: Response
-  ) => {
+  ) {
     // Check if blog exists
     const blog: TBlogControllerViewModel | null =
       await blogsQueryRepository.getBlogById(req.params.id);
@@ -86,12 +86,12 @@ const blogsController = {
       });
 
     res.status(HTTP_STATUS.OK_200).json(posts);
-  },
+  }
 
-  createBlog: async (
+  async createBlog(
     req: TRequestWithBody<TBlogControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     const { name, description, websiteUrl } = req.body;
     const newBlogId: string = await blogsService.createBlog({
       name,
@@ -102,15 +102,15 @@ const blogsController = {
       await blogsQueryRepository.getBlogById(newBlogId);
 
     res.status(HTTP_STATUS.CREATED_201).json(newBlog);
-  },
+  }
 
-  createPostForBlogId: async (
+  async createPostForBlogById(
     req: TRequestWithParamsAndBody<
       TPathParamsBlogModel,
       { title: string; shortDescription: string; content: string }
     >,
     res: Response
-  ) => {
+  ) {
     // Checking that blogId exists
     const blogId: string = req.params.id;
     const blog: TBlogControllerViewModel | null =
@@ -136,15 +136,15 @@ const blogsController = {
       await postsQueryRepository.getPostById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(newPost);
-  },
+  }
 
-  updateBlog: async (
+  async updateBlogById(
     req: TRequestWithParamsAndBody<
       TPathParamsBlogModel,
       TBlogControllerInputModel
     >,
     res: Response
-  ) => {
+  ) {
     const { name, description, websiteUrl } = req.body;
     const result: Result = await blogsService.updateBlogById({
       id: req.params.id,
@@ -158,12 +158,12 @@ const blogsController = {
         ? HTTP_STATUS.NO_CONTENT_204
         : HTTP_STATUS.NOT_FOUND_404
     );
-  },
+  }
 
-  deleteBlog: async (
+  async deleteBlogById(
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
-  ) => {
+  ) {
     const result: Result = await blogsService.deleteBlogById(req.params.id);
 
     res.sendStatus(
@@ -171,7 +171,7 @@ const blogsController = {
         ? HTTP_STATUS.NO_CONTENT_204
         : HTTP_STATUS.NOT_FOUND_404
     );
-  },
-};
+  }
+}
 
-export default blogsController;
+export default new BlogsController();

@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import { SETTINGS } from "../common/settings";
-import TBlogRepViewModel from "../blogs/models/BlogRepViewModel";
+import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import TPostRepViewModel from "../posts/models/PostRepViewModel";
 import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
 import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import TRefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
 import TRateLimitingRepViewModel from "../rate-limiting/models/RateLimitingRepViewModel";
 
-const blogSchema = new mongoose.Schema<TBlogRepViewModel>({
+const blogSchema = new mongoose.Schema<BlogRepViewModel>({
   name: { type: String, required: true },
   description: { type: String, required: true },
   websiteUrl: { type: String, required: true },
@@ -62,7 +62,7 @@ const rateLimitSchema = new mongoose.Schema<TRateLimitingRepViewModel>({
   date: { type: Date, required: true },
 });
 
-export const BlogModelClass = mongoose.model(
+export const BlogModelMongoose = mongoose.model(
   SETTINGS.COLLECTION_NAMES.BLOGS,
   blogSchema
 );

@@ -2,8 +2,8 @@ import { RESULT_STATUS, SETTINGS } from "../common/settings";
 import nodemailer from "nodemailer";
 import { Result } from "../common/types/types";
 
-const emailService = {
-  sendEmail: async ({
+class EmailService {
+  async sendEmail({
     userEmail,
     subject,
     message,
@@ -11,7 +11,7 @@ const emailService = {
     userEmail: string;
     subject: string;
     message: string;
-  }): Promise<Result<string | null>> => {
+  }): Promise<Result<string | null>> {
     try {
       const transporter = nodemailer.createTransport({
         service: "Mail.ru",
@@ -44,7 +44,7 @@ const emailService = {
         extensions: [{ field: "email", message: `Something went wrong: ${e}` }],
       };
     }
-  },
-};
+  }
+}
 
-export default emailService;
+export default new EmailService();

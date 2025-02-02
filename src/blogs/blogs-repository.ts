@@ -1,30 +1,28 @@
 import { ObjectId } from "mongodb";
-import TBlogRepViewModel from "./models/BlogRepViewModel";
-import { BlogModelClass } from "../db/db";
+import BlogRepViewModel from "./models/BlogRepViewModel";
+import { BlogModelMongoose } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
-const blogsRepository = {
-  getBlogById: async (
+class BlogsRepository {
+  async getBlogById(
     id: string
-  ): Promise<HydratedDocument<TBlogRepViewModel> | null> => {
+  ): Promise<HydratedDocument<BlogRepViewModel> | null> {
     if (!ObjectId.isValid(id)) return null;
-    const blog: HydratedDocument<TBlogRepViewModel> | null =
-      await BlogModelClass.findById(new ObjectId(id));
+    const blog: HydratedDocument<BlogRepViewModel> | null =
+      await BlogModelMongoose.findById(new ObjectId(id));
 
     return blog;
-  },
+  }
 
-  saveBlog: async (
-    blog: HydratedDocument<TBlogRepViewModel>
-  ): Promise<void> => {
+  async saveBlog(blog: HydratedDocument<BlogRepViewModel>): Promise<void> {
     await blog.save();
-  },
+  }
 
-  deleteBlogById: async (
-    blog: HydratedDocument<TBlogRepViewModel>
-  ): Promise<void> => {
+  async deleteBlogById(
+    blog: HydratedDocument<BlogRepViewModel>
+  ): Promise<void> {
     await blog.deleteOne();
-  },
-};
+  }
+}
 
-export default blogsRepository;
+export default new BlogsRepository();

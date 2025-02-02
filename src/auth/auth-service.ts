@@ -12,8 +12,8 @@ import { ObjectId } from "mongodb";
 import bcryptService from "../adapters/bcypt-service";
 import { HydratedDocument } from "mongoose";
 
-const authService = {
-  registerUser: async ({
+class AuthService {
+  async registerUser({
     login,
     email,
     password,
@@ -21,7 +21,7 @@ const authService = {
     login: string;
     email: string;
     password: string;
-  }): Promise<Result<string | null>> => {
+  }): Promise<Result<string | null>> {
     // Creating user, check if login and email are unique is inside userService
     const result: Result<string | null> = await usersService.createUserAccount({
       login,
@@ -47,9 +47,9 @@ const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  resendRegistrationEmail: async (email: string): Promise<Result> => {
+  async resendRegistrationEmail(email: string): Promise<Result> {
     const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
     // Check if user with such email exist
@@ -101,9 +101,9 @@ const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  recoverPassword: async (email: string): Promise<Result> => {
+  async recoverPassword(email: string): Promise<Result> {
     // Check if user with such email exist
     const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
@@ -141,9 +141,9 @@ const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  confirmRegistration: async (confirmationCode: string): Promise<Result> => {
+  async confirmRegistration(confirmationCode: string): Promise<Result> {
     const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserByConfirmationCode(confirmationCode);
     // Check if user with such confirmationCode exist
@@ -198,12 +198,12 @@ const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  setNewPassword: async (
+  async setNewPassword(
     newPassword: string,
     recoveryCode: string
-  ): Promise<Result> => {
+  ): Promise<Result> {
     const user: HydratedDocument<TUserAccountRepViewModel> | null =
       await usersRepository.getUserByRecoveryCode(recoveryCode);
     // Check if user with such recoveryCode exist
@@ -263,7 +263,7 @@ const authService = {
       data: null,
       extensions: [],
     };
-  },
-};
+  }
+}
 
-export default authService;
+export default new AuthService();

@@ -9,14 +9,14 @@ export type TCreateJWTResponse = {
   };
 };
 
-const jwtService = {
-  createJWT: async ({
+class JwtService {
+  async createToken({
     payload,
     type,
   }: {
     payload: Record<string, string | number>;
     type?: TOKEN_TYPE.AC_TOKEN | TOKEN_TYPE.R_TOKEN;
-  }): Promise<string> => {
+  }): Promise<string> {
     let token: string;
 
     switch (type) {
@@ -38,15 +38,15 @@ const jwtService = {
     }
 
     return token;
-  },
+  }
 
-  verifyToken: async ({
+  async verifyToken({
     token,
     type,
   }: {
     token: string;
     type?: TOKEN_TYPE.AC_TOKEN | TOKEN_TYPE.R_TOKEN;
-  }): Promise<Result<string | null>> => {
+  }): Promise<Result<string | null>> {
     try {
       let secret = SETTINGS.JWT_SECRET;
       if (type)
@@ -80,18 +80,16 @@ const jwtService = {
         extensions: [{ field: "token", message: `${error}` }],
       };
     }
-  },
+  }
 
-  decodeToken: async (
-    token: string
-  ): Promise<
+  async decodeToken(token: string): Promise<
     Result<{
       iat?: number;
       exp?: number;
       userId?: string;
       deviceId?: string;
     } | null>
-  > => {
+  > {
     try {
       const result = jwt.decode(token);
       if (typeof result === "string") {
@@ -121,7 +119,7 @@ const jwtService = {
         extensions: [{ field: "token", message: `${error}` }],
       };
     }
-  },
-};
+  }
+}
 
-export default jwtService;
+export default new JwtService();

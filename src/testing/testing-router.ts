@@ -4,14 +4,14 @@ import testingRepository from "./testing-repository";
 
 const testingRouter = Router({});
 
-const testingController = {
-  deleteAll: async (_req: Request, res: Response) => {
+class TestingController {
+  async deleteAll(_req: Request, res: Response) {
     await testingRepository.deleteAllData();
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
-};
+  }
+}
 
-testingRouter.delete("/all-data", testingController.deleteAll);
+testingRouter.delete("/all-data", new TestingController().deleteAll);
 
 export default testingRouter;

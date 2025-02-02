@@ -1,30 +1,30 @@
 import { ObjectId } from "mongodb";
-import { CommentModelClass } from "../db/db";
-import TCommentRepViewModel from "./models/CommentRepViewModel";
+import { CommentModelDb } from "../db/db";
+import CommentRepViewModel from "./models/CommentRepViewModel";
 import { HydratedDocument } from "mongoose";
 
-const commentsRepository = {
-  saveComment: async (
-    comment: HydratedDocument<TCommentRepViewModel>
-  ): Promise<void> => {
+class CommentsRepository {
+  async saveComment(
+    comment: HydratedDocument<CommentRepViewModel>
+  ): Promise<void> {
     await comment.save();
-  },
+  }
 
-  deleteCommentById: async (
-    comment: HydratedDocument<TCommentRepViewModel>
-  ): Promise<void> => {
+  async deleteCommentById(
+    comment: HydratedDocument<CommentRepViewModel>
+  ): Promise<void> {
     await comment.deleteOne();
-  },
+  }
 
-  getCommentById: async (
+  async getCommentById(
     id: string
-  ): Promise<HydratedDocument<TCommentRepViewModel> | null> => {
+  ): Promise<HydratedDocument<CommentRepViewModel> | null> {
     if (!ObjectId.isValid(id)) return null;
-    const comment: HydratedDocument<TCommentRepViewModel> | null =
-      await CommentModelClass.findById(new ObjectId(id));
+    const comment: HydratedDocument<CommentRepViewModel> | null =
+      await CommentModelDb.findById(new ObjectId(id));
 
     return comment;
-  },
-};
+  }
+}
 
-export default commentsRepository;
+export default new CommentsRepository();

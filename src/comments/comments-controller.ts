@@ -16,14 +16,14 @@ import commentsQueryRepository from "./comments-query-repository";
 import TPathParamsCommentsModel from "./models/PathParamsCommentModel";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 
-const commentsController = {
-  createCommentForPostById: async (
+class CommentsController {
+  async createCommentForPostById(
     req: TRequestWithParamsAndBody<
       TPathParamsPostModel,
       TPostCommentControllerInputModel
     >,
     res: Response
-  ) => {
+  ): Promise<void> {
     const result: Result<string | null> = await commentsService.createComment({
       content: req.body.content,
       userId: req.userId!,
@@ -40,12 +40,12 @@ const commentsController = {
       await commentsQueryRepository.getCommentById(commentId);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdComment);
-  },
+  }
 
-  getAllCommentsForPostId: async (
+  async getAllCommentsForPostId(
     req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
     res: Response
-  ) => {
+  ): Promise<void> {
     // Validating query in the middleware
     const {
       pageNumber = 1,
@@ -65,12 +65,12 @@ const commentsController = {
       postId: req.params.id,
     });
     res.status(HTTP_STATUS.OK_200).json(comments);
-  },
+  }
 
-  getCommentById: async (
+  async getCommentById(
     req: TRequestWithParams<TPathParamsCommentsModel>,
     res: Response
-  ) => {
+  ): Promise<void> {
     // We are reaching out to postsQueryRepository directly because of CQRS
     const comment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(req.params.id);
@@ -78,15 +78,15 @@ const commentsController = {
     comment
       ? res.status(HTTP_STATUS.OK_200).json(comment)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-  },
+  }
 
-  updateComment: async (
+  async updateComment(
     req: TRequestWithParamsAndBody<
       TPathParamsCommentsModel,
       TPostCommentControllerInputModel
     >,
     res: Response
-  ) => {
+  ): Promise<void> {
     // Check that comment exists
     const comment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(req.params.id);
@@ -105,12 +105,12 @@ const commentsController = {
       content: req.body.content,
     });
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  deleteComment: async (
+  async deleteComment(
     req: TRequestWithParams<TPathParamsCommentsModel>,
     res: Response
-  ) => {
+  ): Promise<void> {
     // Check that comment exists
     const comment: TCommentServiceViewModel | null =
       await commentsQueryRepository.getCommentById(req.params.id);
@@ -127,7 +127,7 @@ const commentsController = {
 
     commentsService.deleteCommentById(req.params.id);
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
-};
+  }
+}
 
-export default commentsController;
+export default new CommentsController();

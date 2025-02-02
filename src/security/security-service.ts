@@ -1,14 +1,14 @@
-import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 import { ObjectId } from "mongodb";
 import securityRepository from "./security-repository";
 import jwtService from "../adapters/jwt-service";
 import { Result } from "../common/types/types";
-import { RefreshTokenModelClass } from "../db/db";
+import { RefreshTokenModelDb } from "../db/db";
 import { RESULT_STATUS } from "../common/settings";
 import { HydratedDocument } from "mongoose";
 
-const securityService = {
-  createRefreshTokenMeta: async ({
+class SecurityService {
+  async createRefreshTokenMeta({
     refreshToken,
     title,
     ip,
@@ -18,7 +18,7 @@ const securityService = {
     title: string;
     ip: string;
     deviceId?: ObjectId;
-  }): Promise<void> => {
+  }): Promise<void> {
     const resultDecode: Result<{
       iat?: number;
       exp?: number;
@@ -26,25 +26,21 @@ const securityService = {
       deviceId?: string;
     } | null> = await jwtService.decodeToken(refreshToken);
 
-    const newRefreshTokenMeta: TRefreshTokensMetaRepViewModel = {
+    const newRefreshTokenMeta: RefreshTokensMetaRepViewModel = {
       _id: deviceId ?? new ObjectId(),
       ip,
       title,
-      lastActiveDate: securityService.convertTimeToISOFromUnix(
-        resultDecode.data?.iat!
-      ),
-      expirationDate: securityService.convertTimeToISOFromUnix(
-        resultDecode.data?.exp!
-      ),
+      lastActiveDate: this.convertTimeToISOFromUnix(resultDecode.data?.iat!),
+      expirationDate: this.convertTimeToISOFromUnix(resultDecode.data?.exp!),
       userId: resultDecode.data?.userId!,
     };
-    const refreshTokenMetaInstance = new RefreshTokenModelClass(
+    const refreshTokenMetaInstance = new RefreshTokenModelDb(
       newRefreshTokenMeta
     );
     await securityRepository.saveRefreshTokenMeta(refreshTokenMetaInstance);
-  },
+  }
 
-  getRefreshTokenMetaByFilters: async ({
+  async getRefreshTokenMetaByFilters({
     deviceId,
     userId,
     lastActiveDate,
@@ -52,19 +48,17 @@ const securityService = {
     deviceId: string;
     userId?: string;
     lastActiveDate?: string;
-  }): Promise<TRefreshTokensMetaRepViewModel | null> => {
+  }): Promise<RefreshTokensMetaRepViewModel | null> {
     // No mapping
     return await securityRepository.getRefreshTokenMetaByFilters({
       deviceId,
       userId,
       lastActiveDate,
     });
-  },
+  }
 
-  deleteRefreshTokenMetaByDeviceId: async (
-    deviceId: string
-  ): Promise<Result> => {
-    const refreshTokenMetaInstance: HydratedDocument<TRefreshTokensMetaRepViewModel> | null =
+  async deleteRefreshTokenMetaByDeviceId(deviceId: string): Promise<Result> {
+    const refreshTokenMetaInstance: HydratedDocument<RefreshTokensMetaRepViewModel> | null =
       await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
     if (!refreshTokenMetaInstance) {
       return {
@@ -82,19 +76,22 @@ const securityService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  deleteAllRefreshTokensMeta: async ({
+  async deleteAllRefreshTokensMeta({
     userId,
     deviceId,
   }: {
     userId: string;
     deviceId: string;
-  }): Promise<void> => {
-    await securityRepository.deleteAllRefreshTokensMeta({ userId, deviceId });
-  },
+  }): Promise<void> {
+    await securityRepository.deleteAllRefreshTokensMeta({
+      userId,
+      deviceId,
+    });
+  }
 
-  updateRefreshTokenMetaTime: async ({
+  async updateRefreshTokenMetaTime({
     deviceId,
     lastActiveDate,
     expirationDate,
@@ -102,8 +99,8 @@ const securityService = {
     deviceId: string;
     lastActiveDate: string;
     expirationDate: string;
-  }): Promise<Result> => {
-    const refreshTokenMetaInstance: HydratedDocument<TRefreshTokensMetaRepViewModel> | null =
+  }): Promise<Result> {
+    const refreshTokenMetaInstance: HydratedDocument<RefreshTokensMetaRepViewModel> | null =
       await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
 
     if (!refreshTokenMetaInstance) {
@@ -125,10 +122,11 @@ const securityService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  convertTimeToISOFromUnix: (unixTime: number): string =>
-    new Date(unixTime * 1000).toISOString(),
-};
+  convertTimeToISOFromUnix(unixTime: number): string {
+    return new Date(unixTime * 1000).toISOString();
+  }
+}
 
-export default securityService;
+export default new SecurityService();

@@ -19,8 +19,8 @@ import TPostCommentControllerInputModel from "../comments/models/PostCommentCont
 import commentsController from "../comments/comments-controller";
 import TQueryCommentsModel from "../comments/models/QueryCommentsModel";
 
-const postsController = {
-  getPosts: async (req: TRequestWithQuery<TQueryPostModel>, res: Response) => {
+class PostsController {
+  async getPosts(req: TRequestWithQuery<TQueryPostModel>, res: Response) {
     // Validating in the middleware
     const {
       pageNumber = 1,
@@ -40,12 +40,12 @@ const postsController = {
       });
 
     res.status(HTTP_STATUS.OK_200).json(posts);
-  },
+  }
 
-  getPost: async (
+  async getPostById(
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
-  ) => {
+  ) {
     // We are reaching out to postsQueryRepository directly because of CQRS
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
@@ -53,12 +53,12 @@ const postsController = {
     post
       ? res.status(HTTP_STATUS.OK_200).json(post)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-  },
+  }
 
-  getAllCommentsForPostById: async (
+  async getAllCommentsForPostById(
     req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
     res: Response
-  ) => {
+  ) {
     // userId is checked in the middlewares
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
@@ -68,12 +68,12 @@ const postsController = {
     }
 
     commentsController.getAllCommentsForPostId(req, res);
-  },
+  }
 
-  createPost: async (
+  async createPost(
     req: TRequestWithBody<TPostControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     const { title, shortDescription, content, blogId } = req.body;
     // Validating blogID in the middlewares
     const result: Result<string | null> = await postsService.createPost({
@@ -91,15 +91,15 @@ const postsController = {
       await postsQueryRepository.getPostById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(newPost);
-  },
+  }
 
-  createCommentForPostById: async (
+  async createCommentForPostById(
     req: TRequestWithParamsAndBody<
       TPathParamsPostModel,
       TPostCommentControllerInputModel
     >,
     res: Response
-  ) => {
+  ) {
     // userId is checked in the middlewares
     const post: TPostControllerViewModel | null =
       await postsQueryRepository.getPostById(req.params.id);
@@ -109,15 +109,15 @@ const postsController = {
     }
 
     commentsController.createCommentForPostById(req, res);
-  },
+  }
 
-  updatePost: async (
+  async updatePostById(
     req: TRequestWithParamsAndBody<
       TPathParamsPostModel,
       TPostControllerInputModel
     >,
     res: Response
-  ) => {
+  ) {
     const { title, shortDescription, content, blogId } = req.body;
     const result: Result = await postsService.updatePostById({
       id: req.params.id,
@@ -130,12 +130,12 @@ const postsController = {
     result.status === RESULT_STATUS.SUCCESS
       ? res.sendStatus(HTTP_STATUS.NO_CONTENT_204)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
-  },
+  }
 
-  deletePost: async (
+  async deletePostById(
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
-  ) => {
+  ) {
     const result: Result = await postsService.deletePostById(req.params.id);
 
     res.sendStatus(
@@ -143,7 +143,7 @@ const postsController = {
         ? HTTP_STATUS.NO_CONTENT_204
         : HTTP_STATUS.NOT_FOUND_404
     );
-  },
-};
+  }
+}
 
-export default postsController;
+export default new PostsController();

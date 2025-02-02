@@ -1,23 +1,23 @@
 import { ObjectId } from "mongodb";
 import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
 import commentsRepository from "./comments-repository";
-import TCommentRepViewModel, {
+import CommentRepViewModel, {
   TCommentatorInfo,
 } from "./models/CommentRepViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
 import usersRepository from "../users/users-repository";
-import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
+import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import { HydratedDocument } from "mongoose";
-import { CommentModelClass } from "../db/db";
+import { CommentModelDb } from "../db/db";
 
-const commentsService = {
-  createComment: async ({
+class CommentsService {
+  async createComment({
     content,
     userId,
     postId,
-  }: TCommentsServiceInputModel): Promise<Result<string | null>> => {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+  }: TCommentsServiceInputModel): Promise<Result<string | null>> {
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getUserById(userId!);
 
     if (!user) {
@@ -34,16 +34,16 @@ const commentsService = {
       userLogin: user.accountData.userName,
     };
 
-    const newComment: TCommentRepViewModel = {
-      _id: new ObjectId(),
+    const newComment: CommentRepViewModel = new CommentRepViewModel(
+      new ObjectId(),
       content,
       commentatorInfo,
-      createdAt: new Date().toISOString(),
-      postId,
-    };
+      new Date().toISOString(),
+      postId
+    );
 
-    const commentInstance: HydratedDocument<TCommentRepViewModel> =
-      new CommentModelClass(newComment);
+    const commentInstance: HydratedDocument<CommentRepViewModel> =
+      new CommentModelDb(newComment);
 
     await commentsRepository.saveComment(commentInstance);
 
@@ -52,16 +52,16 @@ const commentsService = {
       data: commentInstance._id.toString(),
       extensions: [],
     };
-  },
+  }
 
-  updateCommentById: async ({
+  async updateCommentById({
     id,
     content,
   }: {
     id: string;
     content: string;
-  }): Promise<Result> => {
-    const commentInstance: HydratedDocument<TCommentRepViewModel> | null =
+  }): Promise<Result> {
+    const commentInstance: HydratedDocument<CommentRepViewModel> | null =
       await commentsRepository.getCommentById(id);
     if (!commentInstance) {
       return {
@@ -79,10 +79,10 @@ const commentsService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  deleteCommentById: async (id: string): Promise<Result> => {
-    const commentInstance: HydratedDocument<TCommentRepViewModel> | null =
+  async deleteCommentById(id: string): Promise<Result> {
+    const commentInstance: HydratedDocument<CommentRepViewModel> | null =
       await commentsRepository.getCommentById(id);
     if (!commentInstance) {
       return {
@@ -100,7 +100,7 @@ const commentsService = {
       data: null,
       extensions: [],
     };
-  },
-};
+  }
+}
 
-export default commentsService;
+export default new CommentsService();

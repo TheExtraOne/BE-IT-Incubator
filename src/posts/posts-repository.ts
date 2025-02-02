@@ -1,31 +1,29 @@
 import { ObjectId } from "mongodb";
-import TPostRepViewModel from "./models/PostRepViewModel";
-import { PostModelClass } from "../db/db";
+import PostRepViewModel from "./models/PostRepViewModel";
+import { PostModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
-const postsRepository = {
-  savePost: async (
-    post: HydratedDocument<TPostRepViewModel>
-  ): Promise<void> => {
+class PostsRepository {
+  async savePost(post: HydratedDocument<PostRepViewModel>): Promise<void> {
     await post.save();
-  },
+  }
 
-  getPostById: async (
+  async getPostById(
     id: string
-  ): Promise<HydratedDocument<TPostRepViewModel> | null> => {
+  ): Promise<HydratedDocument<PostRepViewModel> | null> {
     if (!ObjectId.isValid(id)) return null;
 
-    const post: HydratedDocument<TPostRepViewModel> | null =
-      await PostModelClass.findById(new ObjectId(id));
+    const post: HydratedDocument<PostRepViewModel> | null =
+      await PostModelDb.findById(new ObjectId(id));
 
     return post;
-  },
+  }
 
-  deletePostById: async (
-    post: HydratedDocument<TPostRepViewModel>
-  ): Promise<void> => {
+  async deletePostById(
+    post: HydratedDocument<PostRepViewModel>
+  ): Promise<void> {
     await post.deleteOne();
-  },
-};
+  }
+}
 
-export default postsRepository;
+export default new PostsRepository();

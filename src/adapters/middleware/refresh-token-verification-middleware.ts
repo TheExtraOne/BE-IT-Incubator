@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import jwtService from "../../adapters/jwt-service";
 import { Result } from "../../common/types/types";
-import TRefreshTokensMetaRepViewModel from "../../security/models/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "../../security/models/RefreshTokensMetaRepViewModel";
 import securityService from "../../security/security-service";
 
 const refreshTokenVerificationMiddleware = async (
@@ -34,7 +34,7 @@ const refreshTokenVerificationMiddleware = async (
   } | null> = await jwtService.decodeToken(refreshToken);
   const { userId, deviceId, iat } = resultDecode?.data || {};
 
-  const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
+  const refreshTokenMeta: RefreshTokensMetaRepViewModel | null =
     await securityService.getRefreshTokenMetaByFilters({
       userId: userId!,
       deviceId: deviceId!,

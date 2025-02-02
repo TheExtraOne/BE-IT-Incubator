@@ -1,29 +1,33 @@
 import { ObjectId } from "mongodb";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
-import { UserModelClass } from "../db/db";
+import { UserModelDb } from "../db/db";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
-import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
+import UserAccountRepViewModel from "./models/UserAccountRepViewModel";
 
-const mapUser = (user: TUserAccountRepViewModel): TUserControllerViewModel => ({
-  id: user._id.toString(),
-  login: user.accountData.userName,
-  email: user.accountData.email,
-  createdAt: user.accountData.createdAt,
-});
+class UsersQueryRepository {
+  private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
+    return {
+      id: user._id.toString(),
+      login: user.accountData.userName,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt,
+    };
+  }
 
-const mapUsers = (
-  users: TUserAccountRepViewModel[] | []
-): TUserControllerViewModel[] => users.map(mapUser);
+  private mapUsers(
+    users: UserAccountRepViewModel[] | []
+  ): TUserControllerViewModel[] {
+    return users.map(this.mapUser);
+  }
 
-const usersQueryRepository = {
-  _getUsersCount: async ({
+  private async getUsersCount({
     searchEmailTerm,
     searchLoginTerm,
   }: {
     searchEmailTerm: string | null;
     searchLoginTerm: string | null;
-  }): Promise<number> => {
+  }): Promise<number> {
     const filters: Record<string, RegExp>[] = [];
     if (searchEmailTerm)
       filters.push({ "accountData.email": new RegExp(searchEmailTerm, "i") });
@@ -32,22 +36,22 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    return await UserModelClass.countDocuments(
+    return await UserModelDb.countDocuments(
       filters.length ? { $or: filters } : {}
     );
-  },
+  }
 
-  getUserById: async (id: string): Promise<TUserControllerViewModel | null> => {
+  async getUserById(id: string): Promise<TUserControllerViewModel | null> {
     if (!ObjectId.isValid(id)) return null;
 
-    const user: TUserAccountRepViewModel | null = await UserModelClass.findById(
+    const user: UserAccountRepViewModel | null = await UserModelDb.findById(
       new ObjectId(id)
     ).lean();
 
-    return user ? mapUser(user) : null;
-  },
+    return user ? this.mapUser(user) : null;
+  }
 
-  getAllUsers: async ({
+  async getAllUsers({
     searchEmailTerm,
     searchLoginTerm,
     sortBy,
@@ -61,9 +65,9 @@ const usersQueryRepository = {
     sortDirection: TSortDirection;
     pageNumber: number;
     pageSize: number;
-  }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> => {
+  }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> {
     // Pagination
-    const usersCount: number = await usersQueryRepository._getUsersCount({
+    const usersCount: number = await this.getUsersCount({
       searchEmailTerm,
       searchLoginTerm,
     });
@@ -80,7 +84,7 @@ const usersQueryRepository = {
         "accountData.userName": new RegExp(searchLoginTerm, "i"),
       });
 
-    const users: TUserAccountRepViewModel[] | [] = await UserModelClass.find(
+    const users: UserAccountRepViewModel[] | [] = await UserModelDb.find(
       filters.length ? { $or: filters } : {}
     )
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
@@ -93,9 +97,9 @@ const usersQueryRepository = {
       page: pageNumber,
       pageSize,
       totalCount: usersCount,
-      items: mapUsers(users),
+      items: this.mapUsers(users),
     };
-  },
-};
+  }
+}
 
-export default usersQueryRepository;
+export default new UsersQueryRepository();

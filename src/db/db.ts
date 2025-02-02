@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { SETTINGS } from "../common/settings";
 import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
-import TPostRepViewModel from "../posts/models/PostRepViewModel";
-import TCommentRepViewModel from "../comments/models/CommentRepViewModel";
-import TUserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
-import TRefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
+import PostRepViewModel from "../posts/models/PostRepViewModel";
+import CommentRepViewModel from "../comments/models/CommentRepViewModel";
+import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
+import RefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
 import TRateLimitingRepViewModel from "../rate-limiting/models/RateLimitingRepViewModel";
 
 const blogSchema = new mongoose.Schema<BlogRepViewModel>({
@@ -14,7 +14,7 @@ const blogSchema = new mongoose.Schema<BlogRepViewModel>({
   createdAt: { type: String, required: true },
   isMembership: { type: Boolean, required: true },
 });
-const postSchema = new mongoose.Schema<TPostRepViewModel>({
+const postSchema = new mongoose.Schema<PostRepViewModel>({
   title: { type: String, required: true },
   shortDescription: { type: String, required: true },
   content: { type: String, required: true },
@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema<TPostRepViewModel>({
   blogName: { type: String, required: true },
   createdAt: { type: String, required: true },
 });
-const commentSchema = new mongoose.Schema<TCommentRepViewModel>({
+const commentSchema = new mongoose.Schema<CommentRepViewModel>({
   content: { type: String, required: true },
   commentatorInfo: {
     userId: { type: String, required: true },
@@ -31,7 +31,7 @@ const commentSchema = new mongoose.Schema<TCommentRepViewModel>({
   createdAt: { type: String, required: true },
   postId: { type: String, required: true },
 });
-const userSchema = new mongoose.Schema<TUserAccountRepViewModel>({
+const userSchema = new mongoose.Schema<UserAccountRepViewModel>({
   accountData: {
     userName: { type: String, required: true },
     passwordHash: { type: String, required: true },
@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema<TUserAccountRepViewModel>({
     isConfirmed: { type: Boolean, default: null },
   },
 });
-const refreshTokenSchema = new mongoose.Schema<TRefreshTokensMetaRepViewModel>({
+const refreshTokenSchema = new mongoose.Schema<RefreshTokensMetaRepViewModel>({
   ip: { type: String, required: true },
   title: { type: String, required: true },
   lastActiveDate: { type: String, required: true },
@@ -62,27 +62,27 @@ const rateLimitSchema = new mongoose.Schema<TRateLimitingRepViewModel>({
   date: { type: Date, required: true },
 });
 
-export const BlogModelMongoose = mongoose.model(
+export const BlogModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.BLOGS,
   blogSchema
 );
-export const PostModelClass = mongoose.model(
+export const PostModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.POSTS,
   postSchema
 );
-export const CommentModelClass = mongoose.model(
+export const CommentModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.COMMENTS,
   commentSchema
 );
-export const UserModelClass = mongoose.model(
+export const UserModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.USERS,
   userSchema
 );
-export const RefreshTokenModelClass = mongoose.model(
+export const RefreshTokenModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.REFRESH_TOKENS,
   refreshTokenSchema
 );
-export const RateLimitModelClass = mongoose.model(
+export const RateLimitModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.RATE_LIMITS,
   rateLimitSchema
 );

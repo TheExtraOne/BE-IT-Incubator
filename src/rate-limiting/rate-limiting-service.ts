@@ -1,38 +1,39 @@
 import { ObjectId } from "mongodb";
-import TRateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
+import RateLimitingRepViewModel from "./models/RateLimitingRepViewModel";
 import rateLimitingRepository from "./rate-limiting-repository";
 import { HydratedDocument } from "mongoose";
-import { RateLimitModelClass } from "../db/db";
+import { RateLimitModelDb } from "../db/db";
 
-const rateLimitingService = {
-  createNewRequest: async ({
+class RateLimitingService {
+  async createNewRequest({
     ip,
     url,
   }: {
     ip: string;
     url: string;
-  }): Promise<void> => {
-    const newRequest: TRateLimitingRepViewModel = {
-      _id: new ObjectId(),
+  }): Promise<void> {
+    const newRequest: RateLimitingRepViewModel = new RateLimitingRepViewModel(
+      new ObjectId(),
       ip,
-      URL: url,
-      date: new Date(),
-    };
+      url,
+      new Date()
+    );
 
-    const requestInstance: HydratedDocument<TRateLimitingRepViewModel> =
-      new RateLimitModelClass(newRequest);
+    const requestInstance: HydratedDocument<RateLimitingRepViewModel> =
+      new RateLimitModelDb(newRequest);
 
     await rateLimitingRepository.saveNewRequest(requestInstance);
-  },
+  }
 
-  getRequestsCount: async ({
+  async getRequestsCount({
     ip,
     url,
   }: {
     ip: string;
     url: string;
-  }): Promise<number> =>
-    await rateLimitingRepository.getRequestsCount({ ip, url }),
-};
+  }): Promise<number> {
+    return await rateLimitingRepository.getRequestsCount({ ip, url });
+  }
+}
 
-export default rateLimitingService;
+export default new RateLimitingService();

@@ -1,47 +1,52 @@
 import { ObjectId } from "mongodb";
-import { CommentModelClass } from "../db/db";
+import { CommentModelDb } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
-import TCommentRepViewModel from "./models/CommentRepViewModel";
+import CommentRepViewModel from "./models/CommentRepViewModel";
 import TCommentControllerViewModel from "./models/CommentServiceViewModel";
 import { TResponseWithPagination, TSortDirection } from "../common/types/types";
 
-const mapComment = (
-  comment: TCommentRepViewModel
-): TCommentControllerViewModel => ({
-  id: comment._id.toString(),
-  content: comment.content,
-  commentatorInfo: comment.commentatorInfo,
-  createdAt: comment.createdAt,
-});
+class CommentsQueryRepository {
+  private mapComment(
+    comment: CommentRepViewModel
+  ): TCommentControllerViewModel {
+    return {
+      id: comment._id.toString(),
+      content: comment.content,
+      commentatorInfo: comment.commentatorInfo,
+      createdAt: comment.createdAt,
+    };
+  }
 
-const mapComments = (
-  comments: TCommentRepViewModel[] | []
-): TCommentControllerViewModel[] => comments.map(mapComment);
+  private mapComments(
+    comments: CommentRepViewModel[] | []
+  ): TCommentControllerViewModel[] {
+    return comments.map(this.mapComment);
+  }
 
-const commentsQueryRepository = {
-  _getCommentsCount: async ({
+  private async getCommentsCount({
     postId,
   }: {
     postId?: string;
-  }): Promise<number> => {
-    const query = CommentModelClass.countDocuments();
+  }): Promise<number> {
+    const query = CommentModelDb.countDocuments();
     if (postId) query.where("postId", postId);
 
     return await query;
-  },
+  }
 
-  getCommentById: async (
+  async getCommentById(
     id: string
-  ): Promise<TCommentControllerViewModel | null> => {
+  ): Promise<TCommentControllerViewModel | null> {
     if (!ObjectId.isValid(id)) return null;
 
-    const comment: TCommentRepViewModel | null =
-      await CommentModelClass.findById(new ObjectId(id)).lean();
+    const comment: CommentRepViewModel | null = await CommentModelDb.findById(
+      new ObjectId(id)
+    ).lean();
 
-    return comment ? mapComment(comment) : null;
-  },
+    return comment ? this.mapComment(comment) : null;
+  }
 
-  getAllCommentsForPostId: async ({
+  async getAllCommentsForPostId({
     sortBy,
     sortDirection,
     pageNumber,
@@ -53,15 +58,14 @@ const commentsQueryRepository = {
     pageNumber: number;
     pageSize: number;
     postId: string;
-  }): Promise<TResponseWithPagination<TCommentControllerViewModel[] | []>> => {
+  }): Promise<TResponseWithPagination<TCommentControllerViewModel[] | []>> {
     // Pagination
-    const commentsCount: number =
-      await commentsQueryRepository._getCommentsCount({ postId });
+    const commentsCount: number = await this.getCommentsCount({ postId });
     const pagesCount: number =
       commentsCount && pageSize ? Math.ceil(commentsCount / pageSize) : 0;
     const commentsToSkip = (pageNumber - 1) * pageSize;
 
-    const comments: TCommentRepViewModel[] | [] = await CommentModelClass.find()
+    const comments: CommentRepViewModel[] | [] = await CommentModelDb.find()
       .where("postId", postId)
       .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
       .skip(commentsToSkip)
@@ -73,9 +77,9 @@ const commentsQueryRepository = {
       page: pageNumber,
       pageSize,
       totalCount: commentsCount,
-      items: mapComments(comments),
+      items: this.mapComments(comments),
     };
-  },
-};
+  }
+}
 
-export default commentsQueryRepository;
+export default new CommentsQueryRepository();

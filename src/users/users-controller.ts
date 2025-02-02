@@ -15,8 +15,8 @@ import TUserControllerInputModel from "./models/UserControllerInputModel";
 import TPathParamsUserModel from "./models/PathParamsUserModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 
-const usersController = {
-  getUsers: async (req: TRequestWithQuery<TQueryUserModel>, res: Response) => {
+class UsersController {
+  async getUsers(req: TRequestWithQuery<TQueryUserModel>, res: Response) {
     // Validating in the middleware
     const {
       searchEmailTerm = null,
@@ -38,12 +38,12 @@ const usersController = {
       });
 
     res.status(HTTP_STATUS.OK_200).json(users);
-  },
+  }
 
-  createUser: async (
+  async createUser(
     req: TRequestWithBody<TUserControllerInputModel>,
     res: Response
-  ) => {
+  ) {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
     const result: Result<string | null> = await usersService.createUserAccount({
@@ -64,12 +64,12 @@ const usersController = {
       await usersQueryRepository.getUserById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdUser);
-  },
+  }
 
-  deleteUser: async (
+  async deleteUser(
     req: TRequestWithParams<TPathParamsUserModel>,
     res: Response
-  ) => {
+  ) {
     const result: Result = await usersService.deleteUserById(req.params.id);
 
     res.sendStatus(
@@ -77,7 +77,7 @@ const usersController = {
         ? HTTP_STATUS.NO_CONTENT_204
         : HTTP_STATUS.NOT_FOUND_404
     );
-  },
-};
+  }
+}
 
-export default usersController;
+export default new UsersController();

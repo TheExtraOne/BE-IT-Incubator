@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import TBlogServiceInputModel from "./models/BlogServiceInputModel";
 import blogsRepository from "./blogs-repository";
-import { BlogModelMongoose } from "../db/db";
+import { BlogModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
@@ -22,8 +22,9 @@ class BlogService {
       false
     );
 
-    const blogInstance: HydratedDocument<BlogRepViewModel> =
-      new BlogModelMongoose(newBlog);
+    const blogInstance: HydratedDocument<BlogRepViewModel> = new BlogModelDb(
+      newBlog
+    );
     await blogsRepository.saveBlog(blogInstance);
 
     return newBlog._id.toString();

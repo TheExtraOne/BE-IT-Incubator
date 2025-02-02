@@ -4,28 +4,28 @@ import TRefreshTokenMetaControllerViewModel from "./models/RefreshTokenMetaContr
 import securityQueryRepository from "./security-query-repository";
 import { Result, TRequestWithParams } from "../common/types/types";
 import TPathParamsRefreshTokenMetaModel from "./models/PathParamsRefreshTokenMetaModel";
-import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 import securityService from "./security-service";
 import jwtService from "../adapters/jwt-service";
 
-const securityController = {
-  getRefreshTokensMeta: async (req: Request, res: Response) => {
+class SecurityController {
+  async getRefreshTokensMeta(req: Request, res: Response) {
     // Validating userId in the middleware
     const userId: string | null = req.userId;
     const devices: TRefreshTokenMetaControllerViewModel[] =
       await securityQueryRepository.getAllRefreshTokensMetaByUserId(userId!);
 
     res.status(HTTP_STATUS.OK_200).json(devices);
-  },
+  }
 
-  deleteRefreshTokenMetaByDeviceId: async (
+  async deleteRefreshTokenMetaByDeviceId(
     req: TRequestWithParams<TPathParamsRefreshTokenMetaModel>,
     res: Response
-  ) => {
+  ) {
     const { deviceId } = req.params;
     const userId: string | null = req.userId;
 
-    const refreshTokenMeta: TRefreshTokensMetaRepViewModel | null =
+    const refreshTokenMeta: RefreshTokensMetaRepViewModel | null =
       await securityService.getRefreshTokenMetaByFilters({ deviceId });
 
     if (!refreshTokenMeta) {
@@ -40,9 +40,9 @@ const securityController = {
 
     securityService.deleteRefreshTokenMetaByDeviceId(deviceId);
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
+  }
 
-  deleteAllRefreshTokensMeta: async (req: Request, res: Response) => {
+  async deleteAllRefreshTokensMeta(req: Request, res: Response) {
     const refreshToken: string = req.cookies.refreshToken;
     const result: Result<{
       iat?: number;
@@ -58,7 +58,7 @@ const securityController = {
     });
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
-  },
-};
+  }
+}
 
-export default securityController;
+export default new SecurityController();

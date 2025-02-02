@@ -3,47 +3,47 @@ import { Result, TExtension } from "../common/types/types";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
 import usersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
-import TUserAccountRepViewModel from "./models/UserAccountRepViewModel";
+import UserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { add } from "date-fns";
 import bcryptService from "../adapters/bcypt-service";
-import { UserModelClass } from "../db/db";
+import { UserModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
-const mapUser = (user: TUserAccountRepViewModel): TUserControllerViewModel => ({
-  id: user._id.toString(),
-  login: user.accountData.userName,
-  email: user.accountData.email,
-  createdAt: user.accountData.createdAt,
-});
+class UsersService {
+  private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
+    return {
+      id: user._id.toString(),
+      login: user.accountData.userName,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt,
+    };
+  }
 
-const usersService = {
-  checkIsLoginUnique: async (login: string): Promise<boolean> => {
+  async checkIsLoginUnique(login: string): Promise<boolean> {
     return await usersRepository.isUniqueInDatabase({
       fieldName: "accountData.userName",
       fieldValue: login,
     });
-  },
+  }
 
-  checkIsEmailUnique: async (email: string): Promise<boolean> => {
+  async checkIsEmailUnique(email: string): Promise<boolean> {
     return await usersRepository.isUniqueInDatabase({
       fieldName: "accountData.email",
       fieldValue: email,
     });
-  },
+  }
 
-  checkIfFieldIsUnique: async ({
+  async checkIfFieldIsUnique({
     email,
     login,
   }: {
     email: string | null;
     login: string | null;
-  }): Promise<TExtension[] | []> => {
+  }): Promise<TExtension[] | []> {
     const errors: TExtension[] = [];
     if (login) {
-      const isLoginUnique: boolean = await usersService.checkIsLoginUnique(
-        login
-      );
+      const isLoginUnique: boolean = await this.checkIsLoginUnique(login);
       !isLoginUnique &&
         errors.push({
           message: "Login already exists",
@@ -51,9 +51,7 @@ const usersService = {
         });
     }
     if (email) {
-      const isEmailUnique: boolean = await usersService.checkIsEmailUnique(
-        email
-      );
+      const isEmailUnique: boolean = await this.checkIsEmailUnique(email);
       !isEmailUnique &&
         errors.push({
           message: "Email already exists",
@@ -62,15 +60,15 @@ const usersService = {
     }
 
     return errors;
-  },
+  }
 
-  createUserAccount: async ({
+  async createUserAccount({
     login,
     password,
     email,
     isConfirmed = false,
-  }: TUserServiceInputModel): Promise<Result<string | null>> => {
-    const errors: [] | TExtension[] = await usersService.checkIfFieldIsUnique({
+  }: TUserServiceInputModel): Promise<Result<string | null>> {
+    const errors: [] | TExtension[] = await this.checkIfFieldIsUnique({
       login,
       email,
     });
@@ -84,27 +82,27 @@ const usersService = {
     }
 
     const passwordHash: string = await bcryptService.generateHash(password);
-    const newUserAccount: TUserAccountRepViewModel = {
-      _id: new ObjectId(),
-      accountData: {
+    const newUserAccount: UserAccountRepViewModel = new UserAccountRepViewModel(
+      new ObjectId(),
+      {
         userName: login,
         passwordHash,
         email,
         createdAt: new Date().toISOString(),
       },
-      emailConfirmation: {
+      {
         confirmationCode: new ObjectId().toString(),
         expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
         isConfirmed,
       },
-      passwordResetConfirmation: {
+      {
         recoveryCode: null,
         expirationDate: null,
         isConfirmed: null,
-      },
-    };
-    const userAccountInstance: HydratedDocument<TUserAccountRepViewModel> =
-      new UserModelClass(newUserAccount);
+      }
+    );
+    const userAccountInstance: HydratedDocument<UserAccountRepViewModel> =
+      new UserModelDb(newUserAccount);
     await usersRepository.saveUserAccount(userAccountInstance);
 
     return {
@@ -112,10 +110,10 @@ const usersService = {
       data: newUserAccount._id.toString(),
       extensions: [],
     };
-  },
+  }
 
-  deleteUserById: async (id: string): Promise<Result> => {
-    const userAccountInstance: HydratedDocument<TUserAccountRepViewModel> | null =
+  async deleteUserById(id: string): Promise<Result> {
+    const userAccountInstance: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getUserById(id);
     if (!userAccountInstance) {
       return {
@@ -133,16 +131,16 @@ const usersService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
-  checkUserCredentials: async ({
+  async checkUserCredentials({
     loginOrEmail,
     password,
   }: {
     loginOrEmail: string;
     password: string;
-  }): Promise<Result<TUserControllerViewModel | null>> => {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+  }): Promise<Result<TUserControllerViewModel | null>> {
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -178,10 +176,10 @@ const usersService = {
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: mapUser(user),
+      data: this.mapUser(user),
       extensions: [],
     };
-  },
-};
+  }
+}
 
-export default usersService;
+export default new UsersService();

@@ -1,78 +1,76 @@
 import { ObjectId } from "mongodb";
-import { UserModelClass } from "../db/db";
-import TUserAccountRepViewModel, {
-  TEmailConfirmation,
-  TPasswordResetConfirmation,
-} from "./models/UserAccountRepViewModel";
+import { UserModelDb } from "../db/db";
+import UserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import { HydratedDocument } from "mongoose";
 
-const usersRepository = {
-  getUserById: async (
+class UsersRepository {
+  async getUserById(
     id: string
-  ): Promise<HydratedDocument<TUserAccountRepViewModel> | null> => {
+  ): Promise<HydratedDocument<UserAccountRepViewModel> | null> {
     if (!ObjectId.isValid(id)) return null;
 
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
-      await UserModelClass.findById(new ObjectId(id));
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
+      await UserModelDb.findById(new ObjectId(id));
 
     return user;
-  },
+  }
 
-  getUserByConfirmationCode: async (
+  async getUserByConfirmationCode(
     confirmationCode: string
-  ): Promise<HydratedDocument<TUserAccountRepViewModel> | null> => {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
-      await UserModelClass.findOne({
+  ): Promise<HydratedDocument<UserAccountRepViewModel> | null> {
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
+      await UserModelDb.findOne({
         "emailConfirmation.confirmationCode": confirmationCode,
       });
 
     return user;
-  },
+  }
 
-  getUserByRecoveryCode: async (
+  async getUserByRecoveryCode(
     recoveryCode: string
-  ): Promise<HydratedDocument<TUserAccountRepViewModel> | null> => {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
-      await UserModelClass.findOne({
+  ): Promise<HydratedDocument<UserAccountRepViewModel> | null> {
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
+      await UserModelDb.findOne({
         "passwordResetConfirmation.recoveryCode": recoveryCode,
       });
 
     return user;
-  },
+  }
 
-  saveUserAccount: async (
-    userAccount: HydratedDocument<TUserAccountRepViewModel>
-  ): Promise<void> => {
+  async saveUserAccount(
+    userAccount: HydratedDocument<UserAccountRepViewModel>
+  ): Promise<void> {
     await userAccount.save();
-  },
+  }
 
-  deleteUserAccount: async (
-    userAccount: HydratedDocument<TUserAccountRepViewModel>
-  ): Promise<void> => {
+  async deleteUserAccount(
+    userAccount: HydratedDocument<UserAccountRepViewModel>
+  ): Promise<void> {
     await userAccount.deleteOne();
-  },
+  }
 
-  isUniqueInDatabase: async ({
+  async isUniqueInDatabase({
     fieldName,
     fieldValue,
   }: {
     fieldName: string;
     fieldValue: string;
-  }): Promise<boolean> => {
-    const user = await UserModelClass.findOne()
+  }): Promise<boolean> {
+    const user = await UserModelDb.findOne()
       .where(fieldName, fieldValue)
       .lean();
 
     return !user;
-  },
+  }
 
-  getByLoginOrEmail: async (
+  async getByLoginOrEmail(
     loginOrEmail: string
-  ): Promise<HydratedDocument<TUserAccountRepViewModel> | null> =>
-    await UserModelClass.findOne().or([
+  ): Promise<HydratedDocument<UserAccountRepViewModel> | null> {
+    return await UserModelDb.findOne().or([
       { "accountData.userName": loginOrEmail },
       { "accountData.email": loginOrEmail },
-    ]),
-};
+    ]);
+  }
+}
 
-export default usersRepository;
+export default new UsersRepository();

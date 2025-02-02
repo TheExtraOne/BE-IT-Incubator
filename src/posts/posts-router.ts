@@ -48,7 +48,7 @@ const createCommentForPosyById = [
 ];
 
 postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
-postsRouter.get("/:id", postsController.getPost);
+postsRouter.get("/:id", postsController.getPostById);
 postsRouter.get(
   "/:id/comments",
   [...getAllCommentsForPostByIdMiddleware],
@@ -63,12 +63,12 @@ postsRouter.post("/", [...createPostMiddleware], postsController.createPost);
 postsRouter.put(
   "/:id",
   [...updatePostByIdMiddleware],
-  postsController.updatePost
+  postsController.updatePostById
 );
 postsRouter.delete(
   "/:id",
   basicAuthorizationMiddleware,
-  postsController.deletePost
+  postsController.deletePostById
 );
 
 export default postsRouter;

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import BlogRepViewModel from "./models/BlogRepViewModel";
-import { BlogModelMongoose } from "../db/db";
+import { BlogModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
 class BlogsRepository {
@@ -9,7 +9,7 @@ class BlogsRepository {
   ): Promise<HydratedDocument<BlogRepViewModel> | null> {
     if (!ObjectId.isValid(id)) return null;
     const blog: HydratedDocument<BlogRepViewModel> | null =
-      await BlogModelMongoose.findById(new ObjectId(id));
+      await BlogModelDb.findById(new ObjectId(id));
 
     return blog;
   }

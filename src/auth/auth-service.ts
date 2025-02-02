@@ -3,7 +3,7 @@ import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
 import mailManager from "../managers/mail-manager";
 import usersRepository from "../users/users-repository";
-import TUserAccountRepViewModel, {
+import UserAccountRepViewModel, {
   TEmailConfirmation,
   TPasswordResetConfirmation,
 } from "../users/models/UserAccountRepViewModel";
@@ -32,7 +32,7 @@ class AuthService {
     if (result.status !== RESULT_STATUS.SUCCESS) return result;
 
     const createdUserId: string | null = result.data;
-    const createdUser: HydratedDocument<TUserAccountRepViewModel> | null =
+    const createdUser: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getUserById(createdUserId!);
 
     mailManager
@@ -50,7 +50,7 @@ class AuthService {
   }
 
   async resendRegistrationEmail(email: string): Promise<Result> {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
     // Check if user with such email exist
     if (!user) {
@@ -105,7 +105,7 @@ class AuthService {
 
   async recoverPassword(email: string): Promise<Result> {
     // Check if user with such email exist
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getByLoginOrEmail(email);
     if (!user) {
       return {
@@ -144,7 +144,7 @@ class AuthService {
   }
 
   async confirmRegistration(confirmationCode: string): Promise<Result> {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getUserByConfirmationCode(confirmationCode);
     // Check if user with such confirmationCode exist
     if (!user) {
@@ -204,7 +204,7 @@ class AuthService {
     newPassword: string,
     recoveryCode: string
   ): Promise<Result> {
-    const user: HydratedDocument<TUserAccountRepViewModel> | null =
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
       await usersRepository.getUserByRecoveryCode(recoveryCode);
     // Check if user with such recoveryCode exist
     if (!user) {

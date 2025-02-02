@@ -1,21 +1,21 @@
 import {
-  BlogModelMongoose,
-  PostModelClass,
-  UserModelClass,
-  CommentModelClass,
-  RefreshTokenModelClass,
-  RateLimitModelClass,
+  BlogModelDb,
+  PostModelDb,
+  UserModelDb,
+  CommentModelDb,
+  RefreshTokenModelDb,
+  RateLimitModelDb,
 } from "../db/db";
 
-const testingRepository = {
-  deleteAllData: async (): Promise<void> => {
-    await BlogModelMongoose.deleteMany({});
-    await PostModelClass.deleteMany({});
-    await UserModelClass.deleteMany({});
-    await CommentModelClass.deleteMany({});
-    await RefreshTokenModelClass.deleteMany({});
-    await RateLimitModelClass.deleteMany({});
-  },
-};
+class TestingRepository {
+  async deleteAllData(): Promise<void> {
+    await BlogModelDb.deleteMany({});
+    await PostModelDb.deleteMany({});
+    await UserModelDb.deleteMany({});
+    await CommentModelDb.deleteMany({});
+    await RefreshTokenModelDb.deleteMany({});
+    await RateLimitModelDb.deleteMany({});
+  }
+}
 
-export default testingRepository;
+export default new TestingRepository();

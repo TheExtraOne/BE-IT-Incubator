@@ -1,31 +1,34 @@
-import { RefreshTokenModelClass } from "../db/db";
+import { RefreshTokenModelDb } from "../db/db";
 import TRefreshTokenMetaControllerViewModel from "./models/RefreshTokenMetaControllerViewModel";
-import TRefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 
-const mapRefreshTokenMeta = (
-  refreshTokenMeta: TRefreshTokensMetaRepViewModel
-): TRefreshTokenMetaControllerViewModel => ({
-  ip: refreshTokenMeta.ip,
-  title: refreshTokenMeta.title,
-  lastActiveDate: refreshTokenMeta.lastActiveDate,
-  deviceId: refreshTokenMeta._id.toString(),
-});
+class SecurityQueryRepository {
+  private mapRefreshTokenMeta(
+    refreshTokenMeta: RefreshTokensMetaRepViewModel
+  ): TRefreshTokenMetaControllerViewModel {
+    return {
+      ip: refreshTokenMeta.ip,
+      title: refreshTokenMeta.title,
+      lastActiveDate: refreshTokenMeta.lastActiveDate,
+      deviceId: refreshTokenMeta._id.toString(),
+    };
+  }
 
-const mapRefreshTokensMeta = (
-  refreshTokensMeta: TRefreshTokensMetaRepViewModel[] | []
-): TRefreshTokenMetaControllerViewModel[] | [] =>
-  refreshTokensMeta.map(mapRefreshTokenMeta);
+  private mapRefreshTokensMeta(
+    refreshTokensMeta: RefreshTokensMetaRepViewModel[] | []
+  ): TRefreshTokenMetaControllerViewModel[] | [] {
+    return refreshTokensMeta.map(this.mapRefreshTokenMeta);
+  }
 
-const securityQueryRepository = {
-  getAllRefreshTokensMetaByUserId: async (
+  async getAllRefreshTokensMetaByUserId(
     userId: string
-  ): Promise<TRefreshTokenMetaControllerViewModel[] | []> => {
-    const refreshTokensMeta = await RefreshTokenModelClass.find()
+  ): Promise<TRefreshTokenMetaControllerViewModel[] | []> {
+    const refreshTokensMeta = await RefreshTokenModelDb.find()
       .where("userId", userId)
       .lean();
 
-    return mapRefreshTokensMeta(refreshTokensMeta);
-  },
-};
+    return this.mapRefreshTokensMeta(refreshTokensMeta);
+  }
+}
 
-export default securityQueryRepository;
+export default new SecurityQueryRepository();

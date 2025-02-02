@@ -1,15 +1,15 @@
 import emailService from "../adapters/email-service";
 import { Result } from "../common/types/types";
 
-const mailManager = {
-  sendRegistrationMail: async ({
+class MailManager {
+  async sendRegistrationMail({
     email,
     confirmationCode,
   }: {
     confirmationCode: string;
     email: string;
-  }): Promise<Result<string | null>> =>
-    emailService.sendEmail({
+  }): Promise<Result<string | null>> {
+    return emailService.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
       message: `<h1>Thank for your registration</h1>
@@ -19,16 +19,17 @@ const mailManager = {
                     <p>Or use the link below:
                       <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>https://somesite.com/confirm-email?code=${confirmationCode}</a>
                     </p>`,
-    }),
+    });
+  }
 
-  sendPasswordRecoveryMail: async ({
+  async sendPasswordRecoveryMail({
     email,
     recoveryCode,
   }: {
     recoveryCode: string;
     email: string;
-  }): Promise<Result<string | null>> =>
-    emailService.sendEmail({
+  }): Promise<Result<string | null>> {
+    return emailService.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
       message: `<h1>Password recovery</h1>
@@ -38,7 +39,8 @@ const mailManager = {
                     <p>Or use the link below:
                       <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>https://somesite.com/password-recovery?recoveryCode=${recoveryCode}</a>
                     </p>`,
-    }),
-};
+    });
+  }
+}
 
-export default mailManager;
+export default new MailManager();

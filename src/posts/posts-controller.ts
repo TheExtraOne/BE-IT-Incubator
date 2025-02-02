@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { SORT_DIRECTION, HTTP_STATUS, RESULT_STATUS } from "../common/settings";
-import postsService from "./posts-service";
+import PostsService from "./posts-service";
 import {
   Result,
   TRequestWithBody,
@@ -12,14 +12,24 @@ import {
 } from "../common/types/types";
 import TQueryPostModel from "./models/QueryPostModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
-import postsQueryRepository from "./posts-query-repository";
+import PostsQueryRepository from "./posts-query-repository";
 import TPathParamsPostModel from "./models/PathParamsPostModel";
 import TPostControllerInputModel from "./models/PostControllerInputModel";
 import TPostCommentControllerInputModel from "../comments/models/PostCommentControllerInputModel";
-import commentsController from "../comments/comments-controller";
+import CommentsController from "../comments/comments-controller";
 import TQueryCommentsModel from "../comments/models/QueryCommentsModel";
 
 class PostsController {
+  private commentsController: CommentsController;
+  private postsQueryRepository: PostsQueryRepository;
+  private postsService: PostsService = new PostsService();
+
+  constructor() {
+    this.commentsController = new CommentsController();
+    this.postsQueryRepository = new PostsQueryRepository();
+    this.postsService = new PostsService();
+  }
+
   async getPosts(req: TRequestWithQuery<TQueryPostModel>, res: Response) {
     // Validating in the middleware
     const {
@@ -31,7 +41,7 @@ class PostsController {
 
     // We are reaching out to postsQueryRepository directly because of CQRS
     const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await postsQueryRepository.getAllPosts({
+      await this.postsQueryRepository.getAllPosts({
         blogId: null,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -48,7 +58,7 @@ class PostsController {
   ) {
     // We are reaching out to postsQueryRepository directly because of CQRS
     const post: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(req.params.id);
+      await this.postsQueryRepository.getPostById(req.params.id);
 
     post
       ? res.status(HTTP_STATUS.OK_200).json(post)
@@ -61,13 +71,13 @@ class PostsController {
   ) {
     // userId is checked in the middlewares
     const post: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(req.params.id);
+      await this.postsQueryRepository.getPostById(req.params.id);
     if (!post) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
-    commentsController.getAllCommentsForPostId(req, res);
+    this.commentsController.getAllCommentsForPostId(req, res);
   }
 
   async createPost(
@@ -76,7 +86,7 @@ class PostsController {
   ) {
     const { title, shortDescription, content, blogId } = req.body;
     // Validating blogID in the middlewares
-    const result: Result<string | null> = await postsService.createPost({
+    const result: Result<string | null> = await this.postsService.createPost({
       title,
       shortDescription,
       content,
@@ -88,7 +98,7 @@ class PostsController {
     }
 
     const newPost: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(result.data!);
+      await this.postsQueryRepository.getPostById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(newPost);
   }
@@ -102,13 +112,13 @@ class PostsController {
   ) {
     // userId is checked in the middlewares
     const post: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(req.params.id);
+      await this.postsQueryRepository.getPostById(req.params.id);
     if (!post) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
-    commentsController.createCommentForPostById(req, res);
+    this.commentsController.createCommentForPostById(req, res);
   }
 
   async updatePostById(
@@ -119,7 +129,7 @@ class PostsController {
     res: Response
   ) {
     const { title, shortDescription, content, blogId } = req.body;
-    const result: Result = await postsService.updatePostById({
+    const result: Result = await this.postsService.updatePostById({
       id: req.params.id,
       title,
       shortDescription,
@@ -136,7 +146,9 @@ class PostsController {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) {
-    const result: Result = await postsService.deletePostById(req.params.id);
+    const result: Result = await this.postsService.deletePostById(
+      req.params.id
+    );
 
     res.sendStatus(
       result.status === RESULT_STATUS.SUCCESS
@@ -146,4 +158,4 @@ class PostsController {
   }
 }
 
-export default new PostsController();
+export default PostsController;

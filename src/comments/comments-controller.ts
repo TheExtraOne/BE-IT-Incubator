@@ -10,13 +10,21 @@ import {
 import TPostCommentControllerInputModel from "./models/PostCommentControllerInputModel";
 import TPathParamsPostModel from "../posts/models/PathParamsPostModel";
 import TCommentControllerViewModel from "./models/PostCommentControllerViewModel";
-import commentsService from "./comments-service";
+import CommentsService from "./comments-service";
 import TQueryCommentsModel from "./models/QueryCommentsModel";
-import commentsQueryRepository from "./comments-query-repository";
+import CommentsQueryRepository from "./comments-query-repository";
 import TPathParamsCommentsModel from "./models/PathParamsCommentModel";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 
 class CommentsController {
+  private commentsQueryRepository: CommentsQueryRepository;
+  private commentsService: CommentsService;
+
+  constructor() {
+    this.commentsQueryRepository = new CommentsQueryRepository();
+    this.commentsService = new CommentsService();
+  }
+
   async createCommentForPostById(
     req: TRequestWithParamsAndBody<
       TPathParamsPostModel,
@@ -24,11 +32,12 @@ class CommentsController {
     >,
     res: Response
   ): Promise<void> {
-    const result: Result<string | null> = await commentsService.createComment({
-      content: req.body.content,
-      userId: req.userId!,
-      postId: req.params.id,
-    });
+    const result: Result<string | null> =
+      await this.commentsService.createComment({
+        content: req.body.content,
+        userId: req.userId!,
+        postId: req.params.id,
+      });
 
     if (result.status !== RESULT_STATUS.SUCCESS) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
@@ -37,7 +46,7 @@ class CommentsController {
 
     const commentId = result.data!;
     const createdComment: TCommentControllerViewModel | null =
-      await commentsQueryRepository.getCommentById(commentId);
+      await this.commentsQueryRepository.getCommentById(commentId);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdComment);
   }
@@ -57,7 +66,7 @@ class CommentsController {
     // We are reaching out to commentsQueryRepository directly because of CQRS
     const comments: TResponseWithPagination<
       TCommentControllerViewModel[] | []
-    > = await commentsQueryRepository.getAllCommentsForPostId({
+    > = await this.commentsQueryRepository.getAllCommentsForPostId({
       pageNumber: +pageNumber,
       pageSize: +pageSize,
       sortBy,
@@ -73,7 +82,7 @@ class CommentsController {
   ): Promise<void> {
     // We are reaching out to postsQueryRepository directly because of CQRS
     const comment: TCommentServiceViewModel | null =
-      await commentsQueryRepository.getCommentById(req.params.id);
+      await this.commentsQueryRepository.getCommentById(req.params.id);
 
     comment
       ? res.status(HTTP_STATUS.OK_200).json(comment)
@@ -89,7 +98,7 @@ class CommentsController {
   ): Promise<void> {
     // Check that comment exists
     const comment: TCommentServiceViewModel | null =
-      await commentsQueryRepository.getCommentById(req.params.id);
+      await this.commentsQueryRepository.getCommentById(req.params.id);
     if (!comment) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
@@ -100,7 +109,7 @@ class CommentsController {
       return;
     }
 
-    commentsService.updateCommentById({
+    this.commentsService.updateCommentById({
       id: req.params.id,
       content: req.body.content,
     });
@@ -113,7 +122,7 @@ class CommentsController {
   ): Promise<void> {
     // Check that comment exists
     const comment: TCommentServiceViewModel | null =
-      await commentsQueryRepository.getCommentById(req.params.id);
+      await this.commentsQueryRepository.getCommentById(req.params.id);
     if (!comment) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
@@ -125,9 +134,9 @@ class CommentsController {
       return;
     }
 
-    commentsService.deleteCommentById(req.params.id);
+    this.commentsService.deleteCommentById(req.params.id);
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   }
 }
 
-export default new CommentsController();
+export default CommentsController;

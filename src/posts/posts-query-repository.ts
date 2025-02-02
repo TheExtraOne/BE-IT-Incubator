@@ -78,4 +78,4 @@ class PostsQueryRepository {
   }
 }
 
-export default new PostsQueryRepository();
+export default PostsQueryRepository;

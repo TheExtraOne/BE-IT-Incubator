@@ -12,4 +12,4 @@ class BcryptService {
   }
 }
 
-export default new BcryptService();
+export default BcryptService;

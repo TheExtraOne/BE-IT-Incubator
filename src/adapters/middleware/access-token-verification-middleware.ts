@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
-import jwtService from "../../adapters/jwt-service";
+import JwtService from "../../adapters/jwt-service";
 import { Result } from "../../common/types/types";
 
 const accessTokenVerificationMiddleware = async (
@@ -15,7 +15,7 @@ const accessTokenVerificationMiddleware = async (
   }
 
   const accessToken: string = bearerJWT.split(" ")[1];
-  const result: Result<string | null> = await jwtService.verifyToken({
+  const result: Result<string | null> = await new JwtService().verifyToken({
     token: accessToken,
     type: TOKEN_TYPE.AC_TOKEN,
   });

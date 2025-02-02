@@ -65,4 +65,4 @@ class SecurityRepository {
   }
 }
 
-export default new SecurityRepository();
+export default SecurityRepository;

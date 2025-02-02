@@ -7,15 +7,23 @@ import {
   TRequestWithQuery,
   TResponseWithPagination,
 } from "../common/types/types";
-import usersService from "./users-service";
+import UsersService from "./users-service";
 import TQueryUserModel from "./models/QueryUserModel";
 import TUserServiceViewModel from "./models/UserServiceViewModel";
-import usersQueryRepository from "./users-query-repository";
+import UsersQueryRepository from "./users-query-repository";
 import TUserControllerInputModel from "./models/UserControllerInputModel";
 import TPathParamsUserModel from "./models/PathParamsUserModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 
 class UsersController {
+  private usersQueryRepository: UsersQueryRepository;
+  private usersService: UsersService;
+
+  constructor() {
+    this.usersQueryRepository = new UsersQueryRepository();
+    this.usersService = new UsersService();
+  }
+
   async getUsers(req: TRequestWithQuery<TQueryUserModel>, res: Response) {
     // Validating in the middleware
     const {
@@ -28,7 +36,7 @@ class UsersController {
     } = req.query;
     // We are reaching out to usersQueryRepository directly because of CQRS
     const users: TResponseWithPagination<TUserServiceViewModel[] | []> =
-      await usersQueryRepository.getAllUsers({
+      await this.usersQueryRepository.getAllUsers({
         searchEmailTerm,
         searchLoginTerm,
         sortBy: `accountData.${sortBy}`,
@@ -46,12 +54,13 @@ class UsersController {
   ) {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const result: Result<string | null> = await usersService.createUserAccount({
-      login,
-      email,
-      password,
-      isConfirmed: true,
-    });
+    const result: Result<string | null> =
+      await this.usersService.createUserAccount({
+        login,
+        email,
+        password,
+        isConfirmed: true,
+      });
 
     if (result.status !== RESULT_STATUS.SUCCESS) {
       res.status(HTTP_STATUS.BAD_REQUEST_400).json({
@@ -61,7 +70,7 @@ class UsersController {
     }
 
     const createdUser: TUserControllerViewModel | null =
-      await usersQueryRepository.getUserById(result.data!);
+      await this.usersQueryRepository.getUserById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdUser);
   }
@@ -70,7 +79,9 @@ class UsersController {
     req: TRequestWithParams<TPathParamsUserModel>,
     res: Response
   ) {
-    const result: Result = await usersService.deleteUserById(req.params.id);
+    const result: Result = await this.usersService.deleteUserById(
+      req.params.id
+    );
 
     res.sendStatus(
       result.status === RESULT_STATUS.SUCCESS
@@ -80,4 +91,4 @@ class UsersController {
   }
 }
 
-export default new UsersController();
+export default UsersController;

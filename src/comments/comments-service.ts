@@ -1,24 +1,32 @@
 import { ObjectId } from "mongodb";
 import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
-import commentsRepository from "./comments-repository";
+import CommentsRepository from "./comments-repository";
 import CommentRepViewModel, {
   TCommentatorInfo,
 } from "./models/CommentRepViewModel";
 import { RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
-import usersRepository from "../users/users-repository";
+import UsersRepository from "../users/users-repository";
 import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import { HydratedDocument } from "mongoose";
 import { CommentModelDb } from "../db/db";
 
 class CommentsService {
+  private commentRepository: CommentsRepository;
+  private usersRepository: UsersRepository;
+
+  constructor() {
+    this.commentRepository = new CommentsRepository();
+    this.usersRepository = new UsersRepository();
+  }
+
   async createComment({
     content,
     userId,
     postId,
   }: TCommentsServiceInputModel): Promise<Result<string | null>> {
     const user: HydratedDocument<UserAccountRepViewModel> | null =
-      await usersRepository.getUserById(userId!);
+      await this.usersRepository.getUserById(userId!);
 
     if (!user) {
       return {
@@ -45,7 +53,7 @@ class CommentsService {
     const commentInstance: HydratedDocument<CommentRepViewModel> =
       new CommentModelDb(newComment);
 
-    await commentsRepository.saveComment(commentInstance);
+    await this.commentRepository.saveComment(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -62,7 +70,7 @@ class CommentsService {
     content: string;
   }): Promise<Result> {
     const commentInstance: HydratedDocument<CommentRepViewModel> | null =
-      await commentsRepository.getCommentById(id);
+      await this.commentRepository.getCommentById(id);
     if (!commentInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -72,7 +80,7 @@ class CommentsService {
       };
     }
     commentInstance.content = content;
-    await commentsRepository.saveComment(commentInstance);
+    await this.commentRepository.saveComment(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -83,7 +91,7 @@ class CommentsService {
 
   async deleteCommentById(id: string): Promise<Result> {
     const commentInstance: HydratedDocument<CommentRepViewModel> | null =
-      await commentsRepository.getCommentById(id);
+      await this.commentRepository.getCommentById(id);
     if (!commentInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -93,7 +101,7 @@ class CommentsService {
       };
     }
 
-    await commentsRepository.deleteCommentById(commentInstance);
+    await this.commentRepository.deleteCommentById(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -103,4 +111,4 @@ class CommentsService {
   }
 }
 
-export default new CommentsService();
+export default CommentsService;

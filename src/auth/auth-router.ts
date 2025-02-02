@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bodyAuthLoginInputValidator from "./middleware/body-auth-login-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
-import authController from "./auth-controller";
+import AuthController from "./auth-controller";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registration-input-validation-middleware";
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
@@ -46,46 +46,52 @@ const newPasswordMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 
-authRouter.post("/login", [...loginMiddleware], authController.loginUser);
+const authController = new AuthController();
+
+authRouter.post(
+  "/login",
+  [...loginMiddleware],
+  authController.loginUser.bind(authController)
+);
 authRouter.post(
   "/password-recovery",
   [...passwordRecoveryMiddleware],
-  authController.recoverPassword
+  authController.recoverPassword.bind(authController)
 );
 authRouter.post(
   "/new-password",
   [...newPasswordMiddleware],
-  authController.setNewPassword
+  authController.setNewPassword.bind(authController)
 );
 authRouter.post(
   "/registration",
   [...registrationMiddleware],
-  authController.registerUser
+  authController.registerUser.bind(authController)
 );
 authRouter.post(
   "/registration-email-resending",
   [...postEmailResendingInputMiddleware],
-  authController.resendRegistrationEmail
+  authController.resendRegistrationEmail.bind(authController)
 );
 authRouter.post(
   "/registration-confirmation",
   [...confirmationMiddleware],
-  authController.confirmRegistration
+  authController.confirmRegistration.bind(authController)
 );
 authRouter.post(
   "/refresh-token",
   refreshTokenVerificationMiddleware,
-  authController.refreshToken
+  authController.refreshToken.bind(authController)
 );
 authRouter.post(
   "/logout",
   refreshTokenVerificationMiddleware,
-  authController.logoutUser
+  authController.logoutUser.bind(authController)
 );
 authRouter.get(
   "/me",
   accessTokenVerificationMiddleware,
-  authController.getUserInformation
+  authController.getUserInformation.bind(authController)
 );
 
 export default authRouter;

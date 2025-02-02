@@ -31,4 +31,4 @@ class SecurityQueryRepository {
   }
 }
 
-export default new SecurityQueryRepository();
+export default SecurityQueryRepository;

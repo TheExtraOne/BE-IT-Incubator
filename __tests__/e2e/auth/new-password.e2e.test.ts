@@ -5,7 +5,7 @@ import {
   userCredentials,
   testDb,
 } from "../helpers";
-import usersRepository from "../../../src/users/users-repository";
+import UsersRepository from "../../../src/users/users-repository";
 
 describe("POST /auth/new-password", () => {
   beforeAll(async () => await testDb.setup());
@@ -30,7 +30,9 @@ describe("POST /auth/new-password", () => {
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Get user with recovery code
-      const user = await usersRepository.getByLoginOrEmail(correctUserBodyParams.email);
+      const user = await new UsersRepository().getByLoginOrEmail(
+        correctUserBodyParams.email
+      );
       expect(user).not.toBeNull();
       const recoveryCode = user?.passwordResetConfirmation?.recoveryCode;
       expect(recoveryCode).toBeDefined();

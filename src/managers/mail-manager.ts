@@ -1,7 +1,12 @@
-import emailService from "../adapters/email-service";
+import EmailService from "../adapters/email-service";
 import { Result } from "../common/types/types";
 
 class MailManager {
+  private emailService: EmailService;
+  constructor() {
+    this.emailService = new EmailService();
+  }
+
   async sendRegistrationMail({
     email,
     confirmationCode,
@@ -9,7 +14,7 @@ class MailManager {
     confirmationCode: string;
     email: string;
   }): Promise<Result<string | null>> {
-    return emailService.sendEmail({
+    return this.emailService.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
       message: `<h1>Thank for your registration</h1>
@@ -29,7 +34,7 @@ class MailManager {
     recoveryCode: string;
     email: string;
   }): Promise<Result<string | null>> {
-    return emailService.sendEmail({
+    return this.emailService.sendEmail({
       userEmail: email,
       subject: "Blogs&Posts platform",
       message: `<h1>Password recovery</h1>
@@ -43,4 +48,4 @@ class MailManager {
   }
 }
 
-export default new MailManager();
+export default MailManager;

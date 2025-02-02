@@ -27,4 +27,4 @@ class CommentsRepository {
   }
 }
 
-export default new CommentsRepository();
+export default CommentsRepository;

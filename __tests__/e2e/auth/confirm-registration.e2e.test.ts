@@ -1,8 +1,9 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, testDb } from "../helpers";
-import usersRepository from "../../../src/users/users-repository";
+import UsersRepository from "../../../src/users/users-repository";
 import { UserModelDb } from "../../../src/db/db";
 
+const usersRepository = new UsersRepository();
 describe("POST /auth/registration-confirmation", () => {
   beforeAll(async () => await testDb.setup());
 

@@ -1,24 +1,31 @@
 import { ObjectId } from "mongodb";
 import TPostServiceInputModel from "./models/PostServiceInputModel";
 import PostRepViewModel from "./models/PostRepViewModel";
-import postsRepository from "./posts-repository";
+import PostsRepository from "./posts-repository";
 import { Result } from "../common/types/types";
 import { RESULT_STATUS } from "../common/settings";
-import blogsRepository from "../blogs/blogs-repository";
+import BlogsRepository from "../blogs/blogs-repository";
 import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import { PostModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
 class PostsService {
+  private blogsRepository: BlogsRepository;
+  private postsRepository: PostsRepository;
+
+  constructor() {
+    this.blogsRepository = new BlogsRepository();
+    this.postsRepository = new PostsRepository();
+  }
+
   async createPost({
     title,
     shortDescription,
     content,
     blogId,
   }: TPostServiceInputModel): Promise<Result<string | null>> {
-    const blog: BlogRepViewModel | null = await blogsRepository.getBlogById(
-      blogId
-    );
+    const blog: BlogRepViewModel | null =
+      await this.blogsRepository.getBlogById(blogId);
 
     if (!blog) {
       return {
@@ -39,7 +46,7 @@ class PostsService {
       new Date().toISOString()
     );
     const postInstance = new PostModelDb(newPost);
-    await postsRepository.savePost(postInstance);
+    await this.postsRepository.savePost(postInstance);
     const createdPostId = postInstance._id.toString();
 
     return {
@@ -63,7 +70,7 @@ class PostsService {
     blogId: string;
   }): Promise<Result> {
     const postInstance: HydratedDocument<PostRepViewModel> | null =
-      await postsRepository.getPostById(id);
+      await this.postsRepository.getPostById(id);
     if (!postInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -77,7 +84,7 @@ class PostsService {
     postInstance.shortDescription = shortDescription;
     postInstance.content = content;
     postInstance.blogId = blogId;
-    await postsRepository.savePost(postInstance);
+    await this.postsRepository.savePost(postInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -88,7 +95,7 @@ class PostsService {
 
   async deletePostById(id: string): Promise<Result> {
     const postInstance: HydratedDocument<PostRepViewModel> | null =
-      await postsRepository.getPostById(id);
+      await this.postsRepository.getPostById(id);
     if (!postInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -98,7 +105,7 @@ class PostsService {
       };
     }
 
-    await postsRepository.deletePostById(postInstance);
+    await this.postsRepository.deletePostById(postInstance);
     return {
       status: RESULT_STATUS.SUCCESS,
       data: null,
@@ -107,4 +114,4 @@ class PostsService {
   }
 }
 
-export default new PostsService();
+export default PostsService;

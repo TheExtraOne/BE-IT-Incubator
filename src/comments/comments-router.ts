@@ -1,10 +1,11 @@
 import { Router } from "express";
-import commentsController from "./comments-controller";
+import CommentsController from "./comments-controller";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
 
 const commentsRouter = Router({});
+const commentsController = new CommentsController();
 
 const updateCommentMiddleware = [
   accessTokenVerificationMiddleware,
@@ -12,16 +13,19 @@ const updateCommentMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 
-commentsRouter.get("/:id", commentsController.getCommentById);
+commentsRouter.get(
+  "/:id",
+  commentsController.getCommentById.bind(commentsController)
+);
 commentsRouter.put(
   "/:id",
   [...updateCommentMiddleware],
-  commentsController.updateComment
+  commentsController.updateComment.bind(commentsController)
 );
 commentsRouter.delete(
   "/:id",
   accessTokenVerificationMiddleware,
-  commentsController.deleteComment
+  commentsController.deleteComment.bind(commentsController)
 );
 
 export default commentsRouter;

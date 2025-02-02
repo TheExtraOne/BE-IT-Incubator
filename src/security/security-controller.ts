@@ -1,19 +1,31 @@
 import { Response, Request } from "express";
 import { HTTP_STATUS } from "../common/settings";
 import TRefreshTokenMetaControllerViewModel from "./models/RefreshTokenMetaControllerViewModel";
-import securityQueryRepository from "./security-query-repository";
+import SecurityQueryRepository from "./security-query-repository";
 import { Result, TRequestWithParams } from "../common/types/types";
 import TPathParamsRefreshTokenMetaModel from "./models/PathParamsRefreshTokenMetaModel";
 import RefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
-import securityService from "./security-service";
-import jwtService from "../adapters/jwt-service";
+import SecurityService from "./security-service";
+import JwtService from "../adapters/jwt-service";
 
 class SecurityController {
+  private jwtService: JwtService;
+  private securityQueryRepository: SecurityQueryRepository;
+  private securityService: SecurityService;
+
+  constructor() {
+    this.jwtService = new JwtService();
+    this.securityQueryRepository = new SecurityQueryRepository();
+    this.securityService = new SecurityService();
+  }
+
   async getRefreshTokensMeta(req: Request, res: Response) {
     // Validating userId in the middleware
     const userId: string | null = req.userId;
     const devices: TRefreshTokenMetaControllerViewModel[] =
-      await securityQueryRepository.getAllRefreshTokensMetaByUserId(userId!);
+      await this.securityQueryRepository.getAllRefreshTokensMetaByUserId(
+        userId!
+      );
 
     res.status(HTTP_STATUS.OK_200).json(devices);
   }
@@ -26,7 +38,7 @@ class SecurityController {
     const userId: string | null = req.userId;
 
     const refreshTokenMeta: RefreshTokensMetaRepViewModel | null =
-      await securityService.getRefreshTokenMetaByFilters({ deviceId });
+      await this.securityService.getRefreshTokenMetaByFilters({ deviceId });
 
     if (!refreshTokenMeta) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
@@ -38,7 +50,7 @@ class SecurityController {
       return;
     }
 
-    securityService.deleteRefreshTokenMetaByDeviceId(deviceId);
+    this.securityService.deleteRefreshTokenMetaByDeviceId(deviceId);
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   }
 
@@ -49,10 +61,10 @@ class SecurityController {
       exp?: number;
       userId?: string;
       deviceId?: string;
-    } | null> = await jwtService.decodeToken(refreshToken!);
+    } | null> = await this.jwtService.decodeToken(refreshToken!);
     const { userId, deviceId } = result.data || {};
 
-    securityService.deleteAllRefreshTokensMeta({
+    this.securityService.deleteAllRefreshTokensMeta({
       userId: userId!,
       deviceId: deviceId!,
     });
@@ -61,4 +73,4 @@ class SecurityController {
   }
 }
 
-export default new SecurityController();
+export default SecurityController;

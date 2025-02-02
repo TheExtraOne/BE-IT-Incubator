@@ -25,4 +25,4 @@ class BlogsRepository {
   }
 }
 
-export default new BlogsRepository();
+export default BlogsRepository;

@@ -9,18 +9,30 @@ import {
   TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../common/types/types";
-import postsService from "../posts/posts-service";
+import PostsService from "../posts/posts-service";
 import TQueryBlogModel from "./models/QueryBlogModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
-import blogsQueryRepository from "./blogs-query-repository";
+import BlogsQueryRepository from "./blogs-query-repository";
 import TPathParamsBlogModel from "./models/PathParamsBlogModel";
-import blogsService from "./blogs-service";
+import BlogService from "./blogs-service";
 import TQueryPostModel from "../posts/models/QueryPostModel";
 import TPostControllerViewModel from "../posts/models/PostControllerViewModel";
-import postsQueryRepository from "../posts/posts-query-repository";
+import PostsQueryRepository from "../posts/posts-query-repository";
 import TBlogControllerInputModel from "./models/BlogControllerInputModel";
 
 class BlogsController {
+  private blogsQueryRepository: BlogsQueryRepository;
+  private blogService: BlogService;
+  private postsQueryRepository: PostsQueryRepository;
+  private postsService: PostsService;
+
+  constructor() {
+    this.blogsQueryRepository = new BlogsQueryRepository();
+    this.blogService = new BlogService();
+    this.postsQueryRepository = new PostsQueryRepository();
+    this.postsService = new PostsService();
+  }
+
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
     // Query validation is in the middleware
     const {
@@ -33,7 +45,7 @@ class BlogsController {
 
     // We are reaching out to blogsQueryRepository directly because of CQRS
     const blogs: TResponseWithPagination<TBlogControllerViewModel[] | []> =
-      await blogsQueryRepository.getAllBlogs({
+      await this.blogsQueryRepository.getAllBlogs({
         searchNameTerm,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -50,7 +62,7 @@ class BlogsController {
   ) {
     // We are reaching out to blogsQueryRepository directly because of CQRS
     const blog: TBlogControllerViewModel | null =
-      await blogsQueryRepository.getBlogById(req.params.id);
+      await this.blogsQueryRepository.getBlogById(req.params.id);
 
     blog
       ? res.status(HTTP_STATUS.OK_200).json(blog)
@@ -63,7 +75,7 @@ class BlogsController {
   ) {
     // Check if blog exists
     const blog: TBlogControllerViewModel | null =
-      await blogsQueryRepository.getBlogById(req.params.id);
+      await this.blogsQueryRepository.getBlogById(req.params.id);
     if (!blog) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
@@ -77,7 +89,7 @@ class BlogsController {
     } = req.query;
     // We are reaching out to postsQueryRepository directly because of CQRS
     const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await postsQueryRepository.getAllPosts({
+      await this.postsQueryRepository.getAllPosts({
         blogId: req.params.id,
         pageNumber: +pageNumber,
         pageSize: +pageSize,
@@ -93,13 +105,13 @@ class BlogsController {
     res: Response
   ) {
     const { name, description, websiteUrl } = req.body;
-    const newBlogId: string = await blogsService.createBlog({
+    const newBlogId: string = await this.blogService.createBlog({
       name,
       description,
       websiteUrl,
     });
     const newBlog: TBlogControllerViewModel | null =
-      await blogsQueryRepository.getBlogById(newBlogId);
+      await this.blogsQueryRepository.getBlogById(newBlogId);
 
     res.status(HTTP_STATUS.CREATED_201).json(newBlog);
   }
@@ -114,14 +126,14 @@ class BlogsController {
     // Checking that blogId exists
     const blogId: string = req.params.id;
     const blog: TBlogControllerViewModel | null =
-      await blogsQueryRepository.getBlogById(blogId);
+      await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
     const { title, shortDescription, content } = req.body;
-    const result: Result<string | null> = await postsService.createPost({
+    const result: Result<string | null> = await this.postsService.createPost({
       title,
       shortDescription,
       content,
@@ -133,7 +145,7 @@ class BlogsController {
     }
 
     const newPost: TPostControllerViewModel | null =
-      await postsQueryRepository.getPostById(result.data!);
+      await this.postsQueryRepository.getPostById(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(newPost);
   }
@@ -146,7 +158,7 @@ class BlogsController {
     res: Response
   ) {
     const { name, description, websiteUrl } = req.body;
-    const result: Result = await blogsService.updateBlogById({
+    const result: Result = await this.blogService.updateBlogById({
       id: req.params.id,
       name,
       description,
@@ -164,7 +176,7 @@ class BlogsController {
     req: TRequestWithParams<TPathParamsBlogModel>,
     res: Response
   ) {
-    const result: Result = await blogsService.deleteBlogById(req.params.id);
+    const result: Result = await this.blogService.deleteBlogById(req.params.id);
 
     res.sendStatus(
       result.status === RESULT_STATUS.SUCCESS
@@ -174,4 +186,4 @@ class BlogsController {
   }
 }
 
-export default new BlogsController();
+export default BlogsController;

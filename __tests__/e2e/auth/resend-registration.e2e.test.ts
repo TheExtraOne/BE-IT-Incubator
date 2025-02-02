@@ -1,4 +1,4 @@
-import emailService from "../../../src/adapters/email-service";
+import { emailService } from "../../../src/adapters/email-service";
 import {
   HTTP_STATUS,
   RESULT_STATUS,

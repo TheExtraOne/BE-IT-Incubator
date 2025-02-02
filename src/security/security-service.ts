@@ -1,13 +1,21 @@
 import RefreshTokensMetaRepViewModel from "./models/RefreshTokensMetaRepViewModel";
 import { ObjectId } from "mongodb";
-import securityRepository from "./security-repository";
-import jwtService from "../adapters/jwt-service";
+import SecurityRepository from "./security-repository";
+import JwtService from "../adapters/jwt-service";
 import { Result } from "../common/types/types";
 import { RefreshTokenModelDb } from "../db/db";
 import { RESULT_STATUS } from "../common/settings";
 import { HydratedDocument } from "mongoose";
 
 class SecurityService {
+  private jwtService: JwtService;
+  private securityRepository: SecurityRepository;
+
+  constructor() {
+    this.jwtService = new JwtService();
+    this.securityRepository = new SecurityRepository();
+  }
+
   async createRefreshTokenMeta({
     refreshToken,
     title,
@@ -24,7 +32,7 @@ class SecurityService {
       exp?: number;
       userId?: string;
       deviceId?: string;
-    } | null> = await jwtService.decodeToken(refreshToken);
+    } | null> = await this.jwtService.decodeToken(refreshToken);
 
     const newRefreshTokenMeta: RefreshTokensMetaRepViewModel = {
       _id: deviceId ?? new ObjectId(),
@@ -37,7 +45,9 @@ class SecurityService {
     const refreshTokenMetaInstance = new RefreshTokenModelDb(
       newRefreshTokenMeta
     );
-    await securityRepository.saveRefreshTokenMeta(refreshTokenMetaInstance);
+    await this.securityRepository.saveRefreshTokenMeta(
+      refreshTokenMetaInstance
+    );
   }
 
   async getRefreshTokenMetaByFilters({
@@ -50,7 +60,7 @@ class SecurityService {
     lastActiveDate?: string;
   }): Promise<RefreshTokensMetaRepViewModel | null> {
     // No mapping
-    return await securityRepository.getRefreshTokenMetaByFilters({
+    return await this.securityRepository.getRefreshTokenMetaByFilters({
       deviceId,
       userId,
       lastActiveDate,
@@ -59,7 +69,7 @@ class SecurityService {
 
   async deleteRefreshTokenMetaByDeviceId(deviceId: string): Promise<Result> {
     const refreshTokenMetaInstance: HydratedDocument<RefreshTokensMetaRepViewModel> | null =
-      await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
+      await this.securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
     if (!refreshTokenMetaInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -69,7 +79,9 @@ class SecurityService {
       };
     }
 
-    await securityRepository.deleteRefreshTokenMeta(refreshTokenMetaInstance);
+    await this.securityRepository.deleteRefreshTokenMeta(
+      refreshTokenMetaInstance
+    );
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -85,7 +97,7 @@ class SecurityService {
     userId: string;
     deviceId: string;
   }): Promise<void> {
-    await securityRepository.deleteAllRefreshTokensMeta({
+    await this.securityRepository.deleteAllRefreshTokensMeta({
       userId,
       deviceId,
     });
@@ -101,7 +113,7 @@ class SecurityService {
     expirationDate: string;
   }): Promise<Result> {
     const refreshTokenMetaInstance: HydratedDocument<RefreshTokensMetaRepViewModel> | null =
-      await securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
+      await this.securityRepository.getRefreshTokensMetaByDeviceId(deviceId);
 
     if (!refreshTokenMetaInstance) {
       return {
@@ -115,7 +127,9 @@ class SecurityService {
     refreshTokenMetaInstance.lastActiveDate = lastActiveDate;
     refreshTokenMetaInstance.expirationDate = expirationDate;
 
-    await securityRepository.saveRefreshTokenMeta(refreshTokenMetaInstance);
+    await this.securityRepository.saveRefreshTokenMeta(
+      refreshTokenMetaInstance
+    );
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -129,4 +143,4 @@ class SecurityService {
   }
 }
 
-export default new SecurityService();
+export default SecurityService;

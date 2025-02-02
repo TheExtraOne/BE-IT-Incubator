@@ -76,4 +76,4 @@ class BlogsQueryRepository {
   }
 }
 
-export default new BlogsQueryRepository();
+export default BlogsQueryRepository;

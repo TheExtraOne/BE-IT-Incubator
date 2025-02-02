@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import TBlogServiceInputModel from "./models/BlogServiceInputModel";
-import blogsRepository from "./blogs-repository";
+import BlogsRepository from "./blogs-repository";
 import { BlogModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 import { RESULT_STATUS } from "../common/settings";
@@ -8,6 +8,12 @@ import { Result } from "../common/types/types";
 import BlogRepViewModel from "./models/BlogRepViewModel";
 
 class BlogService {
+  private blogsRepository: BlogsRepository;
+
+  constructor() {
+    this.blogsRepository = new BlogsRepository();
+  }
+
   async createBlog({
     name,
     description,
@@ -25,7 +31,7 @@ class BlogService {
     const blogInstance: HydratedDocument<BlogRepViewModel> = new BlogModelDb(
       newBlog
     );
-    await blogsRepository.saveBlog(blogInstance);
+    await this.blogsRepository.saveBlog(blogInstance);
 
     return newBlog._id.toString();
   }
@@ -42,7 +48,7 @@ class BlogService {
     websiteUrl: string;
   }): Promise<Result> {
     const blogInstance: HydratedDocument<BlogRepViewModel> | null =
-      await blogsRepository.getBlogById(id);
+      await this.blogsRepository.getBlogById(id);
     if (!blogInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -55,7 +61,7 @@ class BlogService {
     blogInstance.name = name;
     blogInstance.description = description;
     blogInstance.websiteUrl = websiteUrl;
-    await blogsRepository.saveBlog(blogInstance);
+    await this.blogsRepository.saveBlog(blogInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -66,7 +72,7 @@ class BlogService {
 
   async deleteBlogById(id: string): Promise<Result> {
     const blogInstance: HydratedDocument<BlogRepViewModel> | null =
-      await blogsRepository.getBlogById(id);
+      await this.blogsRepository.getBlogById(id);
     if (!blogInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -76,7 +82,7 @@ class BlogService {
       };
     }
 
-    await blogsRepository.deleteBlogById(blogInstance);
+    await this.blogsRepository.deleteBlogById(blogInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -86,4 +92,4 @@ class BlogService {
   }
 }
 
-export default new BlogService();
+export default BlogService;

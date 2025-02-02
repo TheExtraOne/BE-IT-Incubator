@@ -1,5 +1,5 @@
 import { Router } from "express";
-import usersController from "./users-controller";
+import UsersController from "./users-controller";
 import bodyUserInputValidator from "./middleware/body-user-input-validation-middleware";
 import {
   basicAuthorizationMiddleware,
@@ -27,12 +27,22 @@ const createUserMiddleWare = [
   inputCheckErrorsMiddleware,
 ];
 
-usersRouter.get("/", [...getAllUsersMiddleware], usersController.getUsers);
-usersRouter.post("/", [...createUserMiddleWare], usersController.createUser);
+const usersController = new UsersController();
+
+usersRouter.get(
+  "/",
+  [...getAllUsersMiddleware],
+  usersController.getUsers.bind(usersController)
+);
+usersRouter.post(
+  "/",
+  [...createUserMiddleWare],
+  usersController.createUser.bind(usersController)
+);
 usersRouter.delete(
   "/:id",
   basicAuthorizationMiddleware,
-  usersController.deleteUser
+  usersController.deleteUser.bind(usersController)
 );
 
 export default usersRouter;

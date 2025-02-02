@@ -5,7 +5,7 @@ import {
   queryInputValidator,
 } from "../common/middlewares";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
-import postsController from "./posts-controller";
+import PostsController from "./posts-controller";
 import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 
@@ -47,28 +47,38 @@ const createCommentForPosyById = [
   inputCheckErrorsMiddleware,
 ];
 
-postsRouter.get("/", [...getAllPostsMiddleware], postsController.getPosts);
-postsRouter.get("/:id", postsController.getPostById);
+const postsController = new PostsController();
+
+postsRouter.get(
+  "/",
+  [...getAllPostsMiddleware],
+  postsController.getPosts.bind(postsController)
+);
+postsRouter.get("/:id", postsController.getPostById.bind(postsController));
 postsRouter.get(
   "/:id/comments",
   [...getAllCommentsForPostByIdMiddleware],
-  postsController.getAllCommentsForPostById
+  postsController.getAllCommentsForPostById.bind(postsController)
 );
 postsRouter.post(
   "/:id/comments",
   [...createCommentForPosyById],
-  postsController.createCommentForPostById
+  postsController.createCommentForPostById.bind(postsController)
 );
-postsRouter.post("/", [...createPostMiddleware], postsController.createPost);
+postsRouter.post(
+  "/",
+  [...createPostMiddleware],
+  postsController.createPost.bind(postsController)
+);
 postsRouter.put(
   "/:id",
   [...updatePostByIdMiddleware],
-  postsController.updatePostById
+  postsController.updatePostById.bind(postsController)
 );
 postsRouter.delete(
   "/:id",
   basicAuthorizationMiddleware,
-  postsController.deletePostById
+  postsController.deletePostById.bind(postsController)
 );
 
 export default postsRouter;

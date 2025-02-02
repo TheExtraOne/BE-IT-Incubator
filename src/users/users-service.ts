@@ -1,16 +1,24 @@
 import { ObjectId } from "mongodb";
 import { Result, TExtension } from "../common/types/types";
 import TUserServiceInputModel from "./models/UserServiceInputModel";
-import usersRepository from "./users-repository";
+import UsersRepository from "./users-repository";
 import { RESULT_STATUS } from "../common/settings";
 import UserAccountRepViewModel from "./models/UserAccountRepViewModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { add } from "date-fns";
-import bcryptService from "../adapters/bcypt-service";
+import BcryptService from "../adapters/bcrypt-service";
 import { UserModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
 class UsersService {
+  private bcryptService: BcryptService;
+  private usersRepository: UsersRepository;
+
+  constructor() {
+    this.bcryptService = new BcryptService();
+    this.usersRepository = new UsersRepository();
+  }
+
   private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
     return {
       id: user._id.toString(),
@@ -21,14 +29,14 @@ class UsersService {
   }
 
   async checkIsLoginUnique(login: string): Promise<boolean> {
-    return await usersRepository.isUniqueInDatabase({
+    return await this.usersRepository.isUniqueInDatabase({
       fieldName: "accountData.userName",
       fieldValue: login,
     });
   }
 
   async checkIsEmailUnique(email: string): Promise<boolean> {
-    return await usersRepository.isUniqueInDatabase({
+    return await this.usersRepository.isUniqueInDatabase({
       fieldName: "accountData.email",
       fieldValue: email,
     });
@@ -81,7 +89,9 @@ class UsersService {
       };
     }
 
-    const passwordHash: string = await bcryptService.generateHash(password);
+    const passwordHash: string = await this.bcryptService.generateHash(
+      password
+    );
     const newUserAccount: UserAccountRepViewModel = new UserAccountRepViewModel(
       new ObjectId(),
       {
@@ -103,7 +113,7 @@ class UsersService {
     );
     const userAccountInstance: HydratedDocument<UserAccountRepViewModel> =
       new UserModelDb(newUserAccount);
-    await usersRepository.saveUserAccount(userAccountInstance);
+    await this.usersRepository.saveUserAccount(userAccountInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -114,7 +124,7 @@ class UsersService {
 
   async deleteUserById(id: string): Promise<Result> {
     const userAccountInstance: HydratedDocument<UserAccountRepViewModel> | null =
-      await usersRepository.getUserById(id);
+      await this.usersRepository.getUserById(id);
     if (!userAccountInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,
@@ -124,7 +134,7 @@ class UsersService {
       };
     }
 
-    await usersRepository.deleteUserAccount(userAccountInstance);
+    await this.usersRepository.deleteUserAccount(userAccountInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,
@@ -141,7 +151,7 @@ class UsersService {
     password: string;
   }): Promise<Result<TUserControllerViewModel | null>> {
     const user: HydratedDocument<UserAccountRepViewModel> | null =
-      await usersRepository.getByLoginOrEmail(loginOrEmail);
+      await this.usersRepository.getByLoginOrEmail(loginOrEmail);
 
     if (!user) {
       return {
@@ -152,7 +162,7 @@ class UsersService {
       };
     }
 
-    const isPasswordCorrect: boolean = await bcryptService.checkPassword(
+    const isPasswordCorrect: boolean = await this.bcryptService.checkPassword(
       password,
       user.accountData.passwordHash
     );
@@ -182,4 +192,4 @@ class UsersService {
   }
 }
 
-export default new UsersService();
+export default UsersService;

@@ -102,4 +102,4 @@ class UsersQueryRepository {
   }
 }
 
-export default new UsersQueryRepository();
+export default UsersQueryRepository;

@@ -27,4 +27,4 @@ class RateLimitingRepository {
   }
 }
 
-export default new RateLimitingRepository();
+export default RateLimitingRepository;

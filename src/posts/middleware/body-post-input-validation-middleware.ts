@@ -1,5 +1,7 @@
 import { body } from "express-validator";
-import blogsQueryRepository from "../../blogs/blogs-query-repository";
+import BlogsQueryRepository from "../../blogs/blogs-query-repository";
+
+const blogQueryRepository = new BlogsQueryRepository();
 
 const bodyPostsInputValidator = {
   titleValidation: body("title")
@@ -33,7 +35,7 @@ const bodyPostsInputValidator = {
     .isMongoId()
     .withMessage("Incorrect type")
     .custom(async (value) => {
-      const isBlogExist = await blogsQueryRepository.getBlogById(value);
+      const isBlogExist = await blogQueryRepository.getBlogById(value);
 
       if (!isBlogExist) throw new Error("BlogId does not exist");
       return !!isBlogExist;

@@ -1,18 +1,32 @@
 import { Response, Request } from "express";
-import usersService from "../users/users-service";
+import UsersService from "../users/users-service";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../common/settings";
 import TAuthLoginControllerInputModel from "./models/AuthLoginControllerInputModel";
-import jwtService from "../adapters/jwt-service";
-import usersQueryRepository from "../users/users-query-repository";
+import JwtService from "../adapters/jwt-service";
+import UsersQueryRepository from "../users/users-query-repository";
 import TUserControllerViewModel from "../users/models/UserControllerViewModel";
 import { Result, TRequestWithBody } from "../common/types/types";
 import TAuthRegistrationControllerInputModel from "./models/AuthRegistrationControllerInputModel";
-import authService from "./auth-service";
-import securityService from "../security/security-service";
+import AuthService from "./auth-service";
+import SecurityService from "../security/security-service";
 import { ObjectId } from "mongodb";
 import TAuthNewPasswordControllerInputModel from "./models/AuthNewPasswordControllerInputModel";
 
 class AuthController {
+  private jwtService: JwtService;
+  private authService: AuthService;
+  private usersService: UsersService;
+  private usersQueryRepository: UsersQueryRepository;
+  private securityService: SecurityService;
+
+  constructor() {
+    this.jwtService = new JwtService();
+    this.authService = new AuthService();
+    this.usersService = new UsersService();
+    this.usersQueryRepository = new UsersQueryRepository();
+    this.securityService = new SecurityService();
+  }
+
   async loginUser(
     req: TRequestWithBody<TAuthLoginControllerInputModel>,
     res: Response
@@ -20,7 +34,7 @@ class AuthController {
     // Login/mail and password validation is in the middleware
     const { loginOrEmail, password } = req.body;
     const result: Result<TUserControllerViewModel | null> =
-      await usersService.checkUserCredentials({
+      await this.usersService.checkUserCredentials({
         loginOrEmail,
         password,
       });
@@ -32,16 +46,16 @@ class AuthController {
 
     const userId = result.data?.id!;
     const deviceId = new ObjectId();
-    const accessToken: string = await jwtService.createToken({
+    const accessToken: string = await this.jwtService.createToken({
       payload: { userId },
       type: TOKEN_TYPE.AC_TOKEN,
     });
-    const refreshToken: string = await jwtService.createToken({
+    const refreshToken: string = await this.jwtService.createToken({
       payload: { userId, deviceId: deviceId.toString() },
       type: TOKEN_TYPE.R_TOKEN,
     });
 
-    await securityService.createRefreshTokenMeta({
+    await this.securityService.createRefreshTokenMeta({
       refreshToken,
       title: req.headers["user-agent"] || "Unknown device",
       ip: req.ip || "::1",
@@ -57,7 +71,7 @@ class AuthController {
     res: Response
   ) {
     const { email } = req.body;
-    await authService.recoverPassword(email);
+    await this.authService.recoverPassword(email);
 
     // Even if current email is not registered (for prevent user's email detection) we are returning 204
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
@@ -71,10 +85,10 @@ class AuthController {
       exp?: number;
       userId?: string;
       deviceId?: string;
-    } | null> = await jwtService.decodeToken(refreshToken);
+    } | null> = await this.jwtService.decodeToken(refreshToken);
     const { deviceId } = result.data || {};
 
-    securityService.deleteRefreshTokenMetaByDeviceId(deviceId!);
+    this.securityService.deleteRefreshTokenMetaByDeviceId(deviceId!);
 
     res.clearCookie("refreshToken", { path: "/" });
     res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
@@ -84,7 +98,7 @@ class AuthController {
     // Validating userId and it's presence in the middleware
     const userId: string | null = req.userId;
     const user: TUserControllerViewModel | null =
-      await usersQueryRepository.getUserById(userId!);
+      await this.usersQueryRepository.getUserById(userId!);
 
     if (!user) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
@@ -104,7 +118,7 @@ class AuthController {
   ) {
     const { login, email, password } = req.body;
 
-    const result: Result<string | null> = await authService.registerUser({
+    const result: Result<string | null> = await this.authService.registerUser({
       login,
       email,
       password,
@@ -125,7 +139,7 @@ class AuthController {
   ) {
     const { email } = req.body;
     const result: Result<string | null> =
-      await authService.resendRegistrationEmail(email);
+      await this.authService.resendRegistrationEmail(email);
     if (result.status !== RESULT_STATUS.SUCCESS) {
       res
         .status(HTTP_STATUS.BAD_REQUEST_400)
@@ -141,7 +155,7 @@ class AuthController {
     res: Response
   ) {
     const { code: confirmationCode } = req.body;
-    const result: Result = await authService.confirmRegistration(
+    const result: Result = await this.authService.confirmRegistration(
       confirmationCode
     );
     if (result.status !== RESULT_STATUS.SUCCESS) {
@@ -160,7 +174,7 @@ class AuthController {
     // Validation in the middlewares
     // Check if recovery code is correct in the BLL
     const { newPassword, recoveryCode } = req.body;
-    const result: Result = await authService.setNewPassword(
+    const result: Result = await this.authService.setNewPassword(
       newPassword,
       recoveryCode
     );
@@ -182,15 +196,15 @@ class AuthController {
       exp?: number;
       userId?: string;
       deviceId?: string;
-    } | null> = await jwtService.decodeToken(refreshToken);
+    } | null> = await this.jwtService.decodeToken(refreshToken);
     const { userId, deviceId } = resultDecode?.data || {};
 
     // Generate new tokens
-    const newAccessToken: string = await jwtService.createToken({
+    const newAccessToken: string = await this.jwtService.createToken({
       payload: { userId: userId! },
       type: TOKEN_TYPE.AC_TOKEN,
     });
-    const newRefreshToken: string = await jwtService.createToken({
+    const newRefreshToken: string = await this.jwtService.createToken({
       payload: { userId: userId!, deviceId: deviceId! },
       type: TOKEN_TYPE.R_TOKEN,
     });
@@ -200,13 +214,13 @@ class AuthController {
       exp?: number;
       userId?: string;
       deviceId?: string;
-    } | null> = await jwtService.decodeToken(newRefreshToken);
+    } | null> = await this.jwtService.decodeToken(newRefreshToken);
     const { iat, exp } = resultDecodeNewRefreshToken?.data || {};
     // Update time
-    securityService.updateRefreshTokenMetaTime({
+    this.securityService.updateRefreshTokenMetaTime({
       deviceId: deviceId!,
-      lastActiveDate: securityService.convertTimeToISOFromUnix(iat!),
-      expirationDate: securityService.convertTimeToISOFromUnix(exp!),
+      lastActiveDate: this.securityService.convertTimeToISOFromUnix(iat!),
+      expirationDate: this.securityService.convertTimeToISOFromUnix(exp!),
     });
 
     res.cookie("refreshToken", newRefreshToken, {
@@ -217,4 +231,4 @@ class AuthController {
   }
 }
 
-export default new AuthController();
+export default AuthController;

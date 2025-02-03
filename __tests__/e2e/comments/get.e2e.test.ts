@@ -1,4 +1,8 @@
-import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
+import {
+  SETTINGS,
+  HTTP_STATUS,
+  LIKE_STATUS,
+} from "../../../src/common/settings";
 import {
   incorrectId,
   req,
@@ -107,6 +111,11 @@ describe("GET /comments", () => {
           userLogin: correctUserBodyParams.login,
         },
         createdAt: expect.any(String),
+        likesInfo: {
+          likesCount: expect.any(Number),
+          dislikesCount: expect.any(Number),
+          myStatus: LIKE_STATUS.NONE,
+        },
       });
     });
   });

@@ -63,3 +63,9 @@ export enum TOKEN_TYPE {
   AC_TOKEN = "AC_TOKEN",
   R_TOKEN = "REFRESH_TOKEN",
 }
+
+export enum LIKE_STATUS {
+  NONE = "None",
+  LIKE = "Like",
+  DISLIKE = "Dislike",
+}

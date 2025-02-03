@@ -3,8 +3,9 @@ import TCommentsServiceInputModel from "./models/CommentServiceInputModel";
 import CommentsRepository from "./comments-repository";
 import CommentRepViewModel, {
   TCommentatorInfo,
+  TLikesInfo,
 } from "./models/CommentRepViewModel";
-import { RESULT_STATUS } from "../common/settings";
+import { LIKE_STATUS, RESULT_STATUS } from "../common/settings";
 import { Result } from "../common/types/types";
 import UsersRepository from "../users/users-repository";
 import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
@@ -38,13 +39,20 @@ class CommentsService {
       userId: userId,
       userLogin: user.accountData.userName,
     };
+    // TODO: add logic for defining user status based on if he added access token or not
+    const likesInfo: TLikesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LIKE_STATUS.NONE,
+    };
 
     const newComment: CommentRepViewModel = new CommentRepViewModel(
       new ObjectId(),
       content,
       commentatorInfo,
       new Date().toISOString(),
-      postId
+      postId,
+      likesInfo
     );
 
     const commentInstance: HydratedDocument<CommentRepViewModel> =

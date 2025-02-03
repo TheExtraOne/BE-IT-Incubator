@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { SETTINGS } from "../common/settings";
+import { LIKE_STATUS, SETTINGS } from "../common/settings";
 import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import PostRepViewModel from "../posts/models/PostRepViewModel";
 import CommentRepViewModel from "../comments/models/CommentRepViewModel";
@@ -30,6 +30,11 @@ const commentSchema = new mongoose.Schema<CommentRepViewModel>({
   },
   createdAt: { type: String, required: true },
   postId: { type: String, required: true },
+  likesInfo: {
+    likesCount: { type: Number, required: true },
+    dislikesCount: { type: Number, required: true },
+    myStatus: { type: String, enum: LIKE_STATUS, required: true },
+  },
 });
 const userSchema = new mongoose.Schema<UserAccountRepViewModel>({
   accountData: {

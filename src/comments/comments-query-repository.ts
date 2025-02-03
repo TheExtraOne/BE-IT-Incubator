@@ -14,6 +14,7 @@ class CommentsQueryRepository {
       content: comment.content,
       commentatorInfo: comment.commentatorInfo,
       createdAt: comment.createdAt,
+      likesInfo: comment.likesInfo,
     };
   }
 

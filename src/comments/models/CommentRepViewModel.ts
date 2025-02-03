@@ -1,8 +1,15 @@
 import { ObjectId } from "mongodb";
+import { LIKE_STATUS } from "../../common/settings";
 
 export type TCommentatorInfo = {
   userId: string;
   userLogin: string;
+};
+
+export type TLikesInfo = {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: LIKE_STATUS.DISLIKE | LIKE_STATUS.LIKE | LIKE_STATUS.NONE;
 };
 // type TCommentRepViewModel = WithId<{
 //   /**
@@ -21,6 +28,10 @@ export type TCommentatorInfo = {
 //    * id of the post
 //    */
 //   postId: string;
+//   /**
+//    * Likes information: count, userStatus
+//    */
+//   likesInfo:TLikesInfo;
 // }>;
 class CommentRepViewModel {
   constructor(
@@ -28,7 +39,8 @@ class CommentRepViewModel {
     public content: string,
     public commentatorInfo: TCommentatorInfo,
     public createdAt: string,
-    public postId: string
+    public postId: string,
+    public likesInfo: TLikesInfo
   ) {}
 }
 

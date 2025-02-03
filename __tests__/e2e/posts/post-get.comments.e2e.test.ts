@@ -1,4 +1,8 @@
-import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
+import {
+  SETTINGS,
+  HTTP_STATUS,
+  LIKE_STATUS,
+} from "../../../src/common/settings";
 import {
   correctBlogBodyParams,
   correctPostBodyParams,
@@ -182,6 +186,11 @@ describe("GET /posts/:id/comments", () => {
           userLogin: expect.any(String),
         },
         createdAt: expect.any(String),
+        likesInfo: {
+          likesCount: expect.any(Number),
+          dislikesCount: expect.any(Number),
+          myStatus: LIKE_STATUS.NONE,
+        },
       });
     });
 
@@ -221,6 +230,11 @@ describe("GET /posts/:id/comments", () => {
               userLogin: expect.any(String),
             },
             createdAt: expect.any(String),
+            likesInfo: {
+              likesCount: expect.any(Number),
+              dislikesCount: expect.any(Number),
+              myStatus: LIKE_STATUS.NONE,
+            },
           },
         ],
         page: 2,

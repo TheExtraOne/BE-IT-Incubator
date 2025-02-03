@@ -11,6 +11,10 @@ A robust REST API platform for blogging with TypeScript and Express.js. Features
 - **Authentication**: JWT, bcrypt
 - **Email Service**: Nodemailer
 - **Testing**: Jest, Supertest
+- **Architecture**:
+  - Object-Oriented Programming with TypeScript classes
+  - Dependency Injection for better testability and maintainability
+  - Composition Root pattern for centralized dependency management
 
 ## Development Setup
 
@@ -46,10 +50,11 @@ Create a `.env` file in the root directory with:
 src/
 ├── app.ts                # Express configuration
 ├── index.ts             # Entry point
-├── adapters/            # External service adapters
-│   ├── bcypt-service.ts # Password encryption
+├── composition-root.ts  # Centralized dependency injection setup
+├── adapters/            # External service adapters (implemented as classes)
+│   ├── bcrypt-service.ts # Password encryption service
 │   ├── email-service.ts # Email service
-│   ├── jwt-service.ts   # JWT operations
+│   ├── jwt-service.ts   # JWT operations service
 │   └── middleware/      # Token verification middleware
 ├── auth/                # Authentication
 ├── blogs/              # Blog management
@@ -201,6 +206,37 @@ __tests__/
 - ✅ Per-endpoint rate limit configuration
 - ✅ Automatic request tracking and limiting
 - ✅ Protection against DDoS and brute-force attacks
+
+## Architecture Highlights
+
+### Class-Based Architecture
+
+- ✅ Fully implemented using TypeScript classes for better code organization and OOP principles
+- ✅ Clear separation of concerns with Controller, Service, and Repository layers
+- ✅ Domain models implemented as classes with strong typing
+- ✅ Encapsulated business logic within service classes
+
+### Dependency Injection
+
+- ✅ Centralized dependency management in composition-root.ts
+- ✅ Constructor-based dependency injection
+- ✅ Loose coupling between components
+- ✅ Improved testability with easy dependency mocking
+
+### Design Patterns
+
+- ✅ Repository Pattern for data access
+- ✅ Factory Pattern for object creation
+- ✅ Singleton Pattern for shared services
+- ✅ Adapter Pattern for external services
+- ✅ Composition Root Pattern for DI configuration
+
+### Testing Benefits
+
+- ✅ Easy mocking of dependencies in tests
+- ✅ Isolated component testing
+- ✅ Improved test maintainability
+- ✅ Clear test structure following class organization
 
 ## Development Scripts
 

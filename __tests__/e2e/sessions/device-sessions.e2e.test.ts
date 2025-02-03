@@ -95,8 +95,6 @@ describe("security/devices endpoints", () => {
       // Verify lastActiveDate changed only for first device
       const updatedLastActiveDate =
         updatedDevicesResponse.body[0].lastActiveDate;
-      console.log("updatedLastActiveDate", updatedLastActiveDate);
-      console.log("initialLastActiveDate", initialLastActiveDate);
       expect(updatedLastActiveDate).not.toBe(initialLastActiveDate);
 
       // Other devices should have same lastActiveDate

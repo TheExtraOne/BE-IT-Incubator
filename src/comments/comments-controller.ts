@@ -54,7 +54,9 @@ class CommentsController {
     const createdComment: TCommentControllerViewModel | null =
       await this.commentsQueryRepository.getCommentById(commentId);
 
-    res.status(HTTP_STATUS.CREATED_201).json(createdComment);
+    res
+      .status(HTTP_STATUS.CREATED_201)
+      .json({ ...createdComment, likesInfo: { myStatus: LIKE_STATUS.NONE } });
   }
 
   async getAllCommentsForPostId(
@@ -91,7 +93,7 @@ class CommentsController {
       };
     });
     const userId: string | null = req.userId;
-    console.log(userId);
+
     if (!userId) {
       res
         .status(HTTP_STATUS.OK_200)
@@ -113,7 +115,6 @@ class CommentsController {
       };
     });
     const test = await Promise.all(itemsResponse);
-    console.log("itemsResponse", itemsResponse);
 
     res.status(HTTP_STATUS.OK_200).json({ ...comments, items: test });
   }

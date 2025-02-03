@@ -94,6 +94,36 @@ class CommentsService {
     };
   }
 
+  async updateLikesAmountById({
+    id,
+    deltaLikesCount = 0,
+    deltaDislikesCount = 0,
+  }: {
+    id: string;
+    deltaLikesCount?: number;
+    deltaDislikesCount?: number;
+  }): Promise<Result> {
+    // Update total amount of likes/dislikes in comments bd
+    const comment = await this.commentRepository.getCommentById(id);
+    if (!comment) {
+      return {
+        status: RESULT_STATUS.NOT_FOUND,
+        data: null,
+        extensions: [{ field: "commentId", message: "Not Found" }],
+      };
+    }
+    comment.likesInfo.likesCount += deltaLikesCount;
+    comment.likesInfo.dislikesCount += deltaDislikesCount;
+
+    await this.commentRepository.saveComment(comment);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
+      extensions: [],
+    };
+  }
+
   async deleteCommentById(id: string): Promise<Result> {
     const commentInstance: HydratedDocument<CommentRepViewModel> | null =
       await this.commentRepository.getCommentById(id);
@@ -106,7 +136,7 @@ class CommentsService {
       };
     }
 
-    await this.commentRepository.deleteCommentById(commentInstance);
+    await this.commentRepository.deleteComment(commentInstance);
 
     return {
       status: RESULT_STATUS.SUCCESS,

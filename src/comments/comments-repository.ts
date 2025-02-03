@@ -10,7 +10,7 @@ class CommentsRepository {
     await comment.save();
   }
 
-  async deleteCommentById(
+  async deleteComment(
     comment: HydratedDocument<CommentRepViewModel>
   ): Promise<void> {
     await comment.deleteOne();

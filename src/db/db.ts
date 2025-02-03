@@ -34,7 +34,6 @@ const commentSchema = new mongoose.Schema<CommentRepViewModel>({
   likesInfo: {
     likesCount: { type: Number, required: true },
     dislikesCount: { type: Number, required: true },
-    myStatus: { type: String, enum: LIKE_STATUS, required: true },
   },
 });
 const userSchema = new mongoose.Schema<UserAccountRepViewModel>({

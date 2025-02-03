@@ -8,6 +8,7 @@ import bodyPostsInputValidator from "./middleware/body-post-input-validation-mid
 import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 import { postsController } from "../composition-root";
+import optionalAccessTokenVerificationMiddleware from "../adapters/middleware/optional-access-token-verification-middleware";
 
 const postsRouter = Router({});
 
@@ -23,6 +24,7 @@ const getAllCommentsForPostByIdMiddleware = [
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
+  optionalAccessTokenVerificationMiddleware,
   inputCheckErrorsMiddleware,
 ];
 const createPostMiddleware = [

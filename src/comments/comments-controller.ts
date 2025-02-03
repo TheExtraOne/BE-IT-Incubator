@@ -4,6 +4,7 @@ import {
   HTTP_STATUS,
   RESULT_STATUS,
   LIKE_TYPE,
+  LIKE_STATUS,
 } from "../common/settings";
 import {
   Result,
@@ -78,20 +79,87 @@ class CommentsController {
       sortDirection,
       postId: req.params.id,
     });
-    res.status(HTTP_STATUS.OK_200).json(comments);
+
+    // TODO: refactor
+    const defaultItemsResponse = comments.items.map((comment) => {
+      return {
+        ...comment,
+        likesInfo: {
+          ...comment.likesInfo,
+          myStatus: LIKE_STATUS.NONE,
+        },
+      };
+    });
+    const userId: string | null = req.userId;
+    console.log(userId);
+    if (!userId) {
+      res
+        .status(HTTP_STATUS.OK_200)
+        .json({ ...comments, items: defaultItemsResponse });
+      return;
+    }
+    // TODO: refactor
+    const itemsResponse = comments.items.map(async (comment) => {
+      const like = await this.likesService.getLikeByUserAndCommentId(
+        userId,
+        comment.id
+      );
+      return {
+        ...comment,
+        likesInfo: {
+          ...comment.likesInfo,
+          myStatus: like ? like.status : LIKE_STATUS.NONE,
+        },
+      };
+    });
+    const test = await Promise.all(itemsResponse);
+    console.log("itemsResponse", itemsResponse);
+
+    res.status(HTTP_STATUS.OK_200).json({ ...comments, items: test });
   }
 
   async getCommentById(
     req: TRequestWithParams<TPathParamsCommentsModel>,
     res: Response
   ): Promise<void> {
-    // We are reaching out to postsQueryRepository directly because of CQRS
-    const comment: TCommentServiceViewModel | null =
-      await this.commentsQueryRepository.getCommentById(req.params.id);
+    const userId: string | null = req.userId;
+    const commentId = req.params.id;
 
-    comment
-      ? res.status(HTTP_STATUS.OK_200).json(comment)
-      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+    const comment: TCommentServiceViewModel | null =
+      await this.commentsQueryRepository.getCommentById(commentId);
+    if (!comment) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+    // TODO: refactor
+    const defaultResponse = {
+      ...comment,
+      likesInfo: {
+        ...comment.likesInfo,
+        myStatus: LIKE_STATUS.NONE,
+      },
+    };
+
+    if (!userId) {
+      res.status(HTTP_STATUS.OK_200).json(defaultResponse);
+      return;
+    }
+
+    const like = await this.likesService.getLikeByUserAndCommentId(
+      userId,
+      commentId
+    );
+    const response = like
+      ? {
+          ...comment,
+          likesInfo: {
+            ...comment.likesInfo,
+            myStatus: like.status,
+          },
+        }
+      : defaultResponse;
+
+    res.status(HTTP_STATUS.OK_200).json(response);
   }
 
   async changeLikeStatus(

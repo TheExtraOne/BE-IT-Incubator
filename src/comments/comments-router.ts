@@ -4,6 +4,7 @@ import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
 import { commentsController } from "../composition-root";
 import likeStatusInputValidator from "./middleware/like-status-input-middleware";
+import optionalAccessTokenVerificationMiddleware from "../adapters/middleware/optional-access-token-verification-middleware";
 
 const commentsRouter = Router({});
 
@@ -20,6 +21,7 @@ const likeStatusCommentMiddleware = [
 
 commentsRouter.get(
   "/:id",
+  optionalAccessTokenVerificationMiddleware,
   commentsController.getCommentById.bind(commentsController)
 );
 commentsRouter.put(

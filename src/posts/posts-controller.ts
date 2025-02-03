@@ -65,7 +65,6 @@ class PostsController {
     req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
     res: Response
   ) {
-    // userId is checked in the middlewares
     const post: TPostControllerViewModel | null =
       await this.postsQueryRepository.getPostById(req.params.id);
     if (!post) {

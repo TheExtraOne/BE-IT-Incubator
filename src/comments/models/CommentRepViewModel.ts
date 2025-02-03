@@ -9,7 +9,6 @@ export type TCommentatorInfo = {
 export type TLikesInfo = {
   likesCount: number;
   dislikesCount: number;
-  myStatus: LIKE_STATUS.DISLIKE | LIKE_STATUS.LIKE | LIKE_STATUS.NONE;
 };
 // type TCommentRepViewModel = WithId<{
 //   /**

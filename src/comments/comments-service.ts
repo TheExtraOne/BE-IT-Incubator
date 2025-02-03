@@ -39,11 +39,9 @@ class CommentsService {
       userId: userId,
       userLogin: user.accountData.userName,
     };
-    // TODO: add logic for defining user status based on if he added access token or not
     const likesInfo: TLikesInfo = {
       likesCount: 0,
       dislikesCount: 0,
-      myStatus: LIKE_STATUS.NONE,
     };
 
     const newComment: CommentRepViewModel = new CommentRepViewModel(

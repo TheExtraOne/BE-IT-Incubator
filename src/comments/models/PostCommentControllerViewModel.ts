@@ -1,3 +1,5 @@
+import { TLikesInfo } from "./CommentRepViewModel";
+
 type TCommentControllerViewModel = {
   /**
    * id of the comment
@@ -15,6 +17,10 @@ type TCommentControllerViewModel = {
    * Date of creating in ISO format
    */
   createdAt: string;
+  /**
+   * Likes information: count, userStatus
+   */
+  likesInfo: TLikesInfo;
 };
 
 export default TCommentControllerViewModel;

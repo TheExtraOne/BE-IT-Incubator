@@ -119,6 +119,16 @@ class LikesService {
     };
   }
 
+  async getLikeByUserAndCommentId(
+    userId: string,
+    commentId: string
+  ): Promise<HydratedDocument<LikesRepViewModel> | null> {
+    return await this.likesRepository.getLikeByUserAndCommentId(
+      userId,
+      commentId
+    );
+  }
+
   async changeLikeStatus({
     userId,
     commentId,
@@ -132,7 +142,7 @@ class LikesService {
   }): Promise<Result> {
     // Check if user already liked/disliked the comment
     const like: HydratedDocument<LikesRepViewModel> | null =
-      await this.likesRepository.getLikeByUserAndCommentId(userId, commentId);
+      await this.getLikeByUserAndCommentId(userId, commentId);
 
     if (like) {
       // If user has already liked/disliked the comment, update the like status

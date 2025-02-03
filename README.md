@@ -153,6 +153,10 @@ __tests__/
   - CRUD operations
   - Error cases and validation
   - Rate limiting
+  - Comment interactions:
+    - Like/Dislike functionality
+    - Multiple user scenarios
+    - Status updates and counts
 - ✅ Isolated test environment with MongoDB Memory Server
 - ✅ TypeScript type safety
 - ✅ Input validation middleware
@@ -197,6 +201,11 @@ __tests__/
 - Comment management (update, delete)
 - Pagination and sorting
 - Authentication-based actions
+- Like/Dislike system:
+  - User-specific like status (Like, Dislike, None)
+  - Like/Dislike counts tracking
+  - Status updates with authentication
+  - Multiple user interaction support
 
 ### Rate Limiting
 

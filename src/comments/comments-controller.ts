@@ -54,12 +54,10 @@ class CommentsController {
     const createdComment: TCommentControllerViewModel | null =
       await this.commentsQueryRepository.getCommentById(commentId);
 
-    res
-      .status(HTTP_STATUS.CREATED_201)
-      .json({
-        ...createdComment,
-        likesInfo: { ...createdComment?.likesInfo, myStatus: LIKE_STATUS.NONE },
-      });
+    res.status(HTTP_STATUS.CREATED_201).json({
+      ...createdComment,
+      likesInfo: { ...createdComment?.likesInfo, myStatus: LIKE_STATUS.NONE },
+    });
   }
 
   async getAllCommentsForPostId(
@@ -86,11 +84,11 @@ class CommentsController {
     });
 
     // TODO: refactor
-    const defaultItemsResponse = comments.items.map((comment) => {
+    const defaultItemsResponse = comments.items.map((item) => {
       return {
-        ...comment,
+        ...item,
         likesInfo: {
-          ...comment.likesInfo,
+          ...item.likesInfo,
           myStatus: LIKE_STATUS.NONE,
         },
       };
@@ -104,15 +102,15 @@ class CommentsController {
       return;
     }
     // TODO: refactor
-    const itemsResponse = comments.items.map(async (comment) => {
+    const itemsResponse = comments.items.map(async (item) => {
       const like = await this.likesService.getLikeByUserAndCommentId(
         userId,
-        comment.id
+        item.id
       );
       return {
-        ...comment,
+        ...item,
         likesInfo: {
-          ...comment.likesInfo,
+          ...item.likesInfo,
           myStatus: like ? like.status : LIKE_STATUS.NONE,
         },
       };

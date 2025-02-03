@@ -5,9 +5,9 @@ import {
   queryInputValidator,
 } from "../common/middlewares";
 import bodyPostsInputValidator from "./middleware/body-post-input-validation-middleware";
-import PostsController from "./posts-controller";
 import bodyPostCommentInputValidator from "../comments/middleware/body-post-comment-input-validation-middleware";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
+import { postsController } from "../composition-root";
 
 const postsRouter = Router({});
 
@@ -46,8 +46,6 @@ const createCommentForPosyById = [
   bodyPostCommentInputValidator.contentValidation,
   inputCheckErrorsMiddleware,
 ];
-
-const postsController = new PostsController();
 
 postsRouter.get(
   "/",

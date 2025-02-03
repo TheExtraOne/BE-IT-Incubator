@@ -21,17 +21,12 @@ import PostsQueryRepository from "../posts/posts-query-repository";
 import TBlogControllerInputModel from "./models/BlogControllerInputModel";
 
 class BlogsController {
-  private blogsQueryRepository: BlogsQueryRepository;
-  private blogService: BlogService;
-  private postsQueryRepository: PostsQueryRepository;
-  private postsService: PostsService;
-
-  constructor() {
-    this.blogsQueryRepository = new BlogsQueryRepository();
-    this.blogService = new BlogService();
-    this.postsQueryRepository = new PostsQueryRepository();
-    this.postsService = new PostsService();
-  }
+  constructor(
+    protected blogService: BlogService,
+    protected blogsQueryRepository: BlogsQueryRepository,
+    protected postsService: PostsService,
+    protected postsQueryRepository: PostsQueryRepository
+  ) {}
 
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
     // Query validation is in the middleware

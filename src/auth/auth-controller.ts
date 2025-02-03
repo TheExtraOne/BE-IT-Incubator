@@ -13,19 +13,13 @@ import { ObjectId } from "mongodb";
 import TAuthNewPasswordControllerInputModel from "./models/AuthNewPasswordControllerInputModel";
 
 class AuthController {
-  private jwtService: JwtService;
-  private authService: AuthService;
-  private usersService: UsersService;
-  private usersQueryRepository: UsersQueryRepository;
-  private securityService: SecurityService;
-
-  constructor() {
-    this.jwtService = new JwtService();
-    this.authService = new AuthService();
-    this.usersService = new UsersService();
-    this.usersQueryRepository = new UsersQueryRepository();
-    this.securityService = new SecurityService();
-  }
+  constructor(
+    private jwtService: JwtService,
+    private authService: AuthService,
+    private usersService: UsersService,
+    private usersQueryRepository: UsersQueryRepository,
+    private securityService: SecurityService
+  ) {}
 
   async loginUser(
     req: TRequestWithBody<TAuthLoginControllerInputModel>,

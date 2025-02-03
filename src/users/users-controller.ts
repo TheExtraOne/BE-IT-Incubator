@@ -16,13 +16,10 @@ import TPathParamsUserModel from "./models/PathParamsUserModel";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 
 class UsersController {
-  private usersQueryRepository: UsersQueryRepository;
-  private usersService: UsersService;
-
-  constructor() {
-    this.usersQueryRepository = new UsersQueryRepository();
-    this.usersService = new UsersService();
-  }
+  constructor(
+    private usersQueryRepository: UsersQueryRepository,
+    private usersService: UsersService
+  ) {}
 
   async getUsers(req: TRequestWithQuery<TQueryUserModel>, res: Response) {
     // Validating in the middleware

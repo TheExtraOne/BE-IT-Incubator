@@ -10,13 +10,10 @@ import { PostModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
 class PostsService {
-  private blogsRepository: BlogsRepository;
-  private postsRepository: PostsRepository;
-
-  constructor() {
-    this.blogsRepository = new BlogsRepository();
-    this.postsRepository = new PostsRepository();
-  }
+  constructor(
+    private blogsRepository: BlogsRepository,
+    private postsRepository: PostsRepository
+  ) {}
 
   async createPost({
     title,

@@ -8,11 +8,7 @@ import { Result } from "../common/types/types";
 import BlogRepViewModel from "./models/BlogRepViewModel";
 
 class BlogService {
-  private blogsRepository: BlogsRepository;
-
-  constructor() {
-    this.blogsRepository = new BlogsRepository();
-  }
+  constructor(protected blogsRepository: BlogsRepository) {}
 
   async createBlog({
     name,

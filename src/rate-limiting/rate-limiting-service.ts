@@ -5,11 +5,7 @@ import { HydratedDocument } from "mongoose";
 import { RateLimitModelDb } from "../db/db";
 
 class RateLimitingService {
-  private rateLimitingRepository: RateLimitingRepository;
-
-  constructor() {
-    this.rateLimitingRepository = new RateLimitingRepository();
-  }
+  constructor(private rateLimitingRepository: RateLimitingRepository) {}
 
   async createNewRequest({
     ip,
@@ -42,4 +38,4 @@ class RateLimitingService {
   }
 }
 
-export default new RateLimitingService();
+export default RateLimitingService;

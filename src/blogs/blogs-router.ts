@@ -4,9 +4,9 @@ import {
   inputCheckErrorsMiddleware,
   queryInputValidator,
 } from "../common/middlewares";
-import BlogsController from "./blogs-controller";
 import bodyPostsInputValidator from "../posts/middleware/body-post-input-validation-middleware";
 import bodyBlogInputValidator from "./middlewares/body-blog-input-validation-middleware";
+import { blogController } from "../composition-root";
 
 const blogsRouter = Router({});
 
@@ -38,8 +38,6 @@ const updateBlogByIdMiddleware = [
   ...Object.values(bodyBlogInputValidator),
   inputCheckErrorsMiddleware,
 ];
-
-const blogController = new BlogsController();
 
 blogsRouter.get(
   "/",

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, SETTINGS } from "../../common/settings";
-import rateLimitingService from "../rate-limiting-service";
+import { rateLimitingService } from "../../composition-root";
 
 const rateLimitingMiddleware = async (
   req: Request,

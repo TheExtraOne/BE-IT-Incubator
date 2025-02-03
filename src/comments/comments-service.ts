@@ -12,13 +12,10 @@ import { HydratedDocument } from "mongoose";
 import { CommentModelDb } from "../db/db";
 
 class CommentsService {
-  private commentRepository: CommentsRepository;
-  private usersRepository: UsersRepository;
-
-  constructor() {
-    this.commentRepository = new CommentsRepository();
-    this.usersRepository = new UsersRepository();
-  }
+  constructor(
+    private commentRepository: CommentsRepository,
+    private usersRepository: UsersRepository
+  ) {}
 
   async createComment({
     content,

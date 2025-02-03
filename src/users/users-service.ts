@@ -11,13 +11,10 @@ import { UserModelDb } from "../db/db";
 import { HydratedDocument } from "mongoose";
 
 class UsersService {
-  private bcryptService: BcryptService;
-  private usersRepository: UsersRepository;
-
-  constructor() {
-    this.bcryptService = new BcryptService();
-    this.usersRepository = new UsersRepository();
-  }
+  constructor(
+    private bcryptService: BcryptService,
+    private usersRepository: UsersRepository
+  ) {}
 
   private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
     return {

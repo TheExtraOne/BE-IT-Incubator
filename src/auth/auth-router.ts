@@ -1,13 +1,13 @@
 import { Router } from "express";
 import bodyAuthLoginInputValidator from "./middleware/body-auth-login-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
-import AuthController from "./auth-controller";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 import bodyAuthRegistrationInputValidator from "./middleware/body-auth-registration-input-validation-middleware";
 import bodyAuthConfirmationInputValidator from "./middleware/body-auth-confirmation-input-validation-middleware";
 import refreshTokenVerificationMiddleware from "../adapters/middleware/refresh-token-verification-middleware";
 import rateLimitingMiddleware from "../rate-limiting/middleware/rate-limiting-middleware";
 import bodyAuthNewPasswordInputValidator from "./middleware/body-auth-new-password-input-validation";
+import { authController } from "../composition-root";
 
 const authRouter = Router({});
 
@@ -45,8 +45,6 @@ const newPasswordMiddleware = [
   bodyAuthNewPasswordInputValidator.recoveryCodeValidation,
   inputCheckErrorsMiddleware,
 ];
-
-const authController = new AuthController();
 
 authRouter.post(
   "/login",

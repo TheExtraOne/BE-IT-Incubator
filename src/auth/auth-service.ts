@@ -13,17 +13,12 @@ import BcryptService from "../adapters/bcrypt-service";
 import { HydratedDocument } from "mongoose";
 
 class AuthService {
-  private bcryptService: BcryptService;
-  private mailManager: MailManager;
-  private usersService: UsersService;
-  private usersRepository: UsersRepository;
-
-  constructor() {
-    this.bcryptService = new BcryptService();
-    this.mailManager = new MailManager();
-    this.usersService = new UsersService();
-    this.usersRepository = new UsersRepository();
-  }
+  constructor(
+    private bcryptService: BcryptService,
+    private mailManager: MailManager,
+    private usersService: UsersService,
+    private usersRepository: UsersRepository
+  ) {}
 
   async registerUser({
     login,

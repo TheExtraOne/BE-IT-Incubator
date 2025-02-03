@@ -8,13 +8,10 @@ import { RESULT_STATUS } from "../common/settings";
 import { HydratedDocument } from "mongoose";
 
 class SecurityService {
-  private jwtService: JwtService;
-  private securityRepository: SecurityRepository;
-
-  constructor() {
-    this.jwtService = new JwtService();
-    this.securityRepository = new SecurityRepository();
-  }
+  constructor(
+    private jwtService: JwtService,
+    private securityRepository: SecurityRepository
+  ) {}
 
   async createRefreshTokenMeta({
     refreshToken,

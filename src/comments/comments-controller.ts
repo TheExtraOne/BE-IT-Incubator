@@ -17,13 +17,10 @@ import TPathParamsCommentsModel from "./models/PathParamsCommentModel";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
 
 class CommentsController {
-  private commentsQueryRepository: CommentsQueryRepository;
-  private commentsService: CommentsService;
-
-  constructor() {
-    this.commentsQueryRepository = new CommentsQueryRepository();
-    this.commentsService = new CommentsService();
-  }
+  constructor(
+    private commentsQueryRepository: CommentsQueryRepository,
+    private commentsService: CommentsService
+  ) {}
 
   async createCommentForPostById(
     req: TRequestWithParamsAndBody<

@@ -1,11 +1,10 @@
 import { Router } from "express";
-import CommentsController from "./comments-controller";
 import accessTokenVerificationMiddleware from "../adapters/middleware/access-token-verification-middleware";
 import bodyPostCommentInputValidator from "./middleware/body-post-comment-input-validation-middleware";
 import { inputCheckErrorsMiddleware } from "../common/middlewares";
+import { commentsController } from "../composition-root";
 
 const commentsRouter = Router({});
-const commentsController = new CommentsController();
 
 const updateCommentMiddleware = [
   accessTokenVerificationMiddleware,

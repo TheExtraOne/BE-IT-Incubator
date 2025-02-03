@@ -20,15 +20,11 @@ import CommentsController from "../comments/comments-controller";
 import TQueryCommentsModel from "../comments/models/QueryCommentsModel";
 
 class PostsController {
-  private commentsController: CommentsController;
-  private postsQueryRepository: PostsQueryRepository;
-  private postsService: PostsService = new PostsService();
-
-  constructor() {
-    this.commentsController = new CommentsController();
-    this.postsQueryRepository = new PostsQueryRepository();
-    this.postsService = new PostsService();
-  }
+  constructor(
+    private commentsController: CommentsController,
+    private postsQueryRepository: PostsQueryRepository,
+    private postsService: PostsService
+  ) {}
 
   async getPosts(req: TRequestWithQuery<TQueryPostModel>, res: Response) {
     // Validating in the middleware

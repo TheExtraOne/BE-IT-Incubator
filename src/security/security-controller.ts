@@ -9,15 +9,11 @@ import SecurityService from "./security-service";
 import JwtService from "../adapters/jwt-service";
 
 class SecurityController {
-  private jwtService: JwtService;
-  private securityQueryRepository: SecurityQueryRepository;
-  private securityService: SecurityService;
-
-  constructor() {
-    this.jwtService = new JwtService();
-    this.securityQueryRepository = new SecurityQueryRepository();
-    this.securityService = new SecurityService();
-  }
+  constructor(
+    private jwtService: JwtService,
+    private securityQueryRepository: SecurityQueryRepository,
+    private securityService: SecurityService
+  ) {}
 
   async getRefreshTokensMeta(req: Request, res: Response) {
     // Validating userId in the middleware

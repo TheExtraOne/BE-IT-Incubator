@@ -1,16 +1,14 @@
 import { Router } from "express";
-import SecurityController from "./security-controller";
 import refreshTokenVerificationMiddleware from "../adapters/middleware/refresh-token-verification-middleware";
+import { securityController } from "../composition-root";
 
 const securityRouter = Router({});
 
-const securityController = new SecurityController();
 securityRouter.get(
   "/devices",
   refreshTokenVerificationMiddleware,
   securityController.getRefreshTokensMeta.bind(securityController)
 );
-
 securityRouter.delete(
   "/devices/:deviceId",
   refreshTokenVerificationMiddleware,

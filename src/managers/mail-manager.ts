@@ -2,10 +2,7 @@ import EmailService from "../adapters/email-service";
 import { Result } from "../common/types/types";
 
 class MailManager {
-  private emailService: EmailService;
-  constructor() {
-    this.emailService = new EmailService();
-  }
+  constructor(private emailService: EmailService) {}
 
   async sendRegistrationMail({
     email,

@@ -1,11 +1,11 @@
 import { Router } from "express";
-import UsersController from "./users-controller";
 import bodyUserInputValidator from "./middleware/body-user-input-validation-middleware";
 import {
   basicAuthorizationMiddleware,
   inputCheckErrorsMiddleware,
   queryInputValidator,
 } from "../common/middlewares";
+import { usersController } from "../composition-root";
 
 const usersRouter = Router({});
 
@@ -26,8 +26,6 @@ const createUserMiddleWare = [
   bodyUserInputValidator.passwordValidation,
   inputCheckErrorsMiddleware,
 ];
-
-const usersController = new UsersController();
 
 usersRouter.get(
   "/",

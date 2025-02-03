@@ -56,7 +56,10 @@ class CommentsController {
 
     res
       .status(HTTP_STATUS.CREATED_201)
-      .json({ ...createdComment, likesInfo: { myStatus: LIKE_STATUS.NONE } });
+      .json({
+        ...createdComment,
+        likesInfo: { ...createdComment?.likesInfo, myStatus: LIKE_STATUS.NONE },
+      });
   }
 
   async getAllCommentsForPostId(

@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
-import { LIKE_STATUS, SETTINGS } from "../common/settings";
+import { LIKE_STATUS, LIKE_TYPE, SETTINGS } from "../common/settings";
 import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
 import PostRepViewModel from "../posts/models/PostRepViewModel";
 import CommentRepViewModel from "../comments/models/CommentRepViewModel";
 import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
 import RefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
 import TRateLimitingRepViewModel from "../rate-limiting/models/RateLimitingRepViewModel";
+import LikeRepViewModel from "../likes/models/LikeRepViewModel";
 
 const blogSchema = new mongoose.Schema<BlogRepViewModel>({
   name: { type: String, required: true },
@@ -66,6 +67,13 @@ const rateLimitSchema = new mongoose.Schema<TRateLimitingRepViewModel>({
   URL: { type: String, required: true },
   date: { type: Date, required: true },
 });
+const likeSchema = new mongoose.Schema<LikeRepViewModel>({
+  status: { type: String, enum: LIKE_STATUS, required: true },
+  authorId: { type: String, required: true },
+  parentId: { type: String, required: true },
+  createdAt: { type: Date, required: true },
+  likeType: { type: String, enum: LIKE_TYPE, required: true },
+});
 
 export const BlogModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.BLOGS,
@@ -90,6 +98,10 @@ export const RefreshTokenModelDb = mongoose.model(
 export const RateLimitModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.RATE_LIMITS,
   rateLimitSchema
+);
+export const LikeModelDb = mongoose.model(
+  SETTINGS.COLLECTION_NAMES.LIKES,
+  likeSchema
 );
 
 export const connectToDb = async (url: string): Promise<boolean> => {

@@ -1,4 +1,4 @@
-import { TSortDirection } from "../../common/types/types";
+import { SORT_DIRECTION } from "../../common/settings";
 
 type TQueryUserModel = {
   /**
@@ -16,7 +16,7 @@ type TQueryUserModel = {
   /**
    * direction of sorting
    */
-  sortDirection?: TSortDirection;
+  sortDirection?: SORT_DIRECTION;
   /**
    * filter by login
    */

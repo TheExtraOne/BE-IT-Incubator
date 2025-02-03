@@ -5,6 +5,7 @@ import {
   CommentModelDb,
   RefreshTokenModelDb,
   RateLimitModelDb,
+  LikeModelDb,
 } from "../db/db";
 
 class TestingRepository {
@@ -15,6 +16,7 @@ class TestingRepository {
     await CommentModelDb.deleteMany({});
     await RefreshTokenModelDb.deleteMany({});
     await RateLimitModelDb.deleteMany({});
+    await LikeModelDb.deleteMany({});
   }
 }
 

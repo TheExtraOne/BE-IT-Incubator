@@ -1,4 +1,4 @@
-import { TSortDirection } from "../../common/types/types";
+import { SORT_DIRECTION } from "../../common/settings";
 
 type TQueryBlogModel = {
   /**
@@ -20,7 +20,7 @@ type TQueryBlogModel = {
   /**
    * direction of sorting
    */
-  sortDirection?: TSortDirection;
+  sortDirection?: SORT_DIRECTION;
 };
 
 export default TQueryBlogModel;

@@ -15,7 +15,7 @@ class JwtService {
     type,
   }: {
     payload: Record<string, string | number>;
-    type?: TOKEN_TYPE.AC_TOKEN | TOKEN_TYPE.R_TOKEN;
+    type?: TOKEN_TYPE;
   }): Promise<string> {
     let token: string;
 
@@ -45,7 +45,7 @@ class JwtService {
     type,
   }: {
     token: string;
-    type?: TOKEN_TYPE.AC_TOKEN | TOKEN_TYPE.R_TOKEN;
+    type?: TOKEN_TYPE;
   }): Promise<Result<string | null>> {
     try {
       let secret = SETTINGS.JWT_SECRET;

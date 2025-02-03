@@ -3,7 +3,7 @@ import BlogRepViewModel from "./models/BlogRepViewModel";
 import TBlogControllerViewModel from "./models/BlogControllerViewModel";
 import { BlogModelDb } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
-import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { TResponseWithPagination } from "../common/types/types";
 
 class BlogsQueryRepository {
   private mapBlog(blog: BlogRepViewModel): TBlogControllerViewModel {
@@ -39,7 +39,7 @@ class BlogsQueryRepository {
     pageNumber: number;
     pageSize: number;
     sortBy: string;
-    sortDirection: TSortDirection;
+    sortDirection: SORT_DIRECTION;
   }): Promise<TResponseWithPagination<TBlogControllerViewModel[] | []>> {
     // Pagination
     const blogsCount: number = await this.getBlogsCount(searchNameTerm);

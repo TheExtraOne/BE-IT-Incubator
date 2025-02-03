@@ -21,6 +21,7 @@ export const SETTINGS = {
     COMMENTS: "comments",
     REFRESH_TOKENS: "refresh_tokens",
     RATE_LIMITS: "rate_limits",
+    LIKES: "likes",
   },
   MONGO_URL: process.env.MONGO_URL || "mongodb://0.0.0.0:27017",
   JWT_SECRET: process.env.JWT_SECRET as string,
@@ -68,4 +69,9 @@ export enum LIKE_STATUS {
   NONE = "None",
   LIKE = "Like",
   DISLIKE = "Dislike",
+}
+
+export enum LIKE_TYPE {
+  COMMENT = "Comment",
+  POST = "Post",
 }

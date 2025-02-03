@@ -1,4 +1,4 @@
-import { TSortDirection } from "../../common/types/types";
+import { SORT_DIRECTION } from "../../common/settings";
 
 type TQueryPostModel = {
   /**
@@ -16,7 +16,7 @@ type TQueryPostModel = {
   /**
    * direction of sorting
    */
-  sortDirection?: TSortDirection;
+  sortDirection?: SORT_DIRECTION;
 };
 
 export default TQueryPostModel;

@@ -64,12 +64,10 @@ const queryInputValidator = {
 
   sortDirectionValidator: query("sortDirection")
     .optional({ values: "undefined" })
-    .custom((value) => {
-      const hasError = !Object.values(SORT_DIRECTION).includes(value);
-      if (hasError) throw new Error("Should be 'asc' or 'desc'");
-
-      return !hasError;
-    }),
+    .isIn(Object.values(SORT_DIRECTION))
+    .withMessage(
+      `Incorrect value. Value must be ${Object.values(SORT_DIRECTION)}`
+    ),
 };
 
 export default queryInputValidator;

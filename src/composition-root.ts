@@ -26,6 +26,8 @@ import SecurityQueryRepository from "./security/security-query-repository";
 import SecurityRepository from "./security/security-repository";
 import SecurityController from "./security/security-controller";
 import UsersController from "./users/users-controller";
+import LikesService from "./likes/likes-service";
+import LikesRepository from "./likes/likes-repository";
 
 // Adapters
 const emailService = new EmailService();
@@ -67,6 +69,9 @@ const authService = new AuthService(
   usersService,
   usersRepository
 );
+// Likes
+const likesRepository = new LikesRepository();
+const likesService = new LikesService(likesRepository, commentRepository);
 
 // Controllers
 export const blogController = new BlogsController(
@@ -86,7 +91,8 @@ export const authController = new AuthController(
 
 export const commentsController = new CommentsController(
   commentsQueryRepository,
-  commentsService
+  commentsService,
+  likesService
 );
 
 export const postsController = new PostsController(

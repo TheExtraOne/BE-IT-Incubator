@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import TUserControllerViewModel from "./models/UserControllerViewModel";
 import { UserModelDb } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { TResponseWithPagination } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
 import UserAccountRepViewModel from "./models/UserAccountRepViewModel";
 
@@ -62,7 +62,7 @@ class UsersQueryRepository {
     searchEmailTerm: string | null;
     searchLoginTerm: string | null;
     sortBy: string;
-    sortDirection: TSortDirection;
+    sortDirection: SORT_DIRECTION;
     pageNumber: number;
     pageSize: number;
   }): Promise<TResponseWithPagination<TUserControllerViewModel[] | []>> {

@@ -234,7 +234,7 @@ describe("GET /posts", () => {
 
       expect(res.body.errorsMessages).toEqual([
         {
-          message: "Should be 'asc' or 'desc'",
+          message: "Incorrect value. Value must be asc,desc",
           field: "sortDirection",
         },
       ]);

@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import PostRepViewModel from "./models/PostRepViewModel";
 import TPostControllerViewModel from "./models/PostControllerViewModel";
 import { PostModelDb } from "../db/db";
-import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { TResponseWithPagination } from "../common/types/types";
 import { SORT_DIRECTION } from "../common/settings";
 
 class PostsQueryRepository {
@@ -42,7 +42,7 @@ class PostsQueryRepository {
     pageNumber: number;
     pageSize: number;
     sortBy: string;
-    sortDirection: TSortDirection;
+    sortDirection: SORT_DIRECTION;
   }): Promise<TResponseWithPagination<TPostControllerViewModel[] | []>> {
     const postsCount: number = await this.getPostsCount(blogId);
     const pagesCount: number =

@@ -3,7 +3,7 @@ import { CommentModelDb } from "../db/db";
 import { SORT_DIRECTION } from "../common/settings";
 import CommentRepViewModel from "./models/CommentRepViewModel";
 import TCommentControllerViewModel from "./models/CommentServiceViewModel";
-import { TResponseWithPagination, TSortDirection } from "../common/types/types";
+import { TResponseWithPagination } from "../common/types/types";
 
 class CommentsQueryRepository {
   private mapComment(
@@ -55,7 +55,7 @@ class CommentsQueryRepository {
     postId,
   }: {
     sortBy: string;
-    sortDirection: TSortDirection;
+    sortDirection: SORT_DIRECTION;
     pageNumber: number;
     pageSize: number;
     postId: string;

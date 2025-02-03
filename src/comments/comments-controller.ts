@@ -1,5 +1,10 @@
 import { Response } from "express";
-import { SORT_DIRECTION, HTTP_STATUS, RESULT_STATUS } from "../common/settings";
+import {
+  SORT_DIRECTION,
+  HTTP_STATUS,
+  RESULT_STATUS,
+  LIKE_TYPE,
+} from "../common/settings";
 import {
   Result,
   TRequestWithParams,
@@ -15,11 +20,14 @@ import TQueryCommentsModel from "./models/QueryCommentsModel";
 import CommentsQueryRepository from "./comments-query-repository";
 import TPathParamsCommentsModel from "./models/PathParamsCommentModel";
 import TCommentServiceViewModel from "./models/CommentServiceViewModel";
+import TCommentsLikeInputModel from "./models/CommentLikeInputModel";
+import LikesService from "../likes/likes-service";
 
 class CommentsController {
   constructor(
     private commentsQueryRepository: CommentsQueryRepository,
-    private commentsService: CommentsService
+    private commentsService: CommentsService,
+    private likesService: LikesService
   ) {}
 
   async createCommentForPostById(
@@ -84,6 +92,35 @@ class CommentsController {
     comment
       ? res.status(HTTP_STATUS.OK_200).json(comment)
       : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+  }
+
+  async changeLikeStatus(
+    req: TRequestWithParamsAndBody<
+      TPathParamsCommentsModel,
+      TCommentsLikeInputModel
+    >,
+    res: Response
+  ): Promise<void> {
+    // Validation if user authorized and if the inputModel has incorrect values happens in the middleware
+    // Check if comment exists
+    const commentId = req.params.id;
+    const comment = await this.commentsQueryRepository.getCommentById(
+      commentId
+    );
+    if (!comment) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+    // Check and extract userId in the middlewares
+    const userId = req.userId!;
+    const likeStatus = req.body.likeStatus;
+    await this.likesService.changeLikeStatus({
+      userId,
+      commentId,
+      likeStatus,
+      likeType: LIKE_TYPE.COMMENT,
+    });
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   }
 
   async updateComment(

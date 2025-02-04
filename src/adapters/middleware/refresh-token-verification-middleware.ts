@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import { Result } from "../../common/types/types";
-import RefreshTokensMetaRepViewModel from "../../security/models/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "../../security/domain/RefreshTokensMetaRepViewModel";
 import { jwtService, securityService } from "../../composition-root";
 
 const refreshTokenVerificationMiddleware = async (

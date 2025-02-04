@@ -4,7 +4,7 @@ import {
   RESULT_STATUS,
   SETTINGS,
 } from "../../../src/common/settings";
-import UsersRepository from "../../../src/users/users-repository";
+import UsersRepository from "../../../src/users/infrastructure/users-repository";
 import { correctUserBodyParams, req, testDb } from "../helpers";
 
 describe("POST /auth/registration", () => {

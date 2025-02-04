@@ -1,5 +1,5 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import TRefreshTokenMetaControllerViewModel from "../../../src/security/models/RefreshTokenMetaControllerViewModel";
+import TRefreshTokenMetaControllerViewModel from "../../../src/security/domain/RefreshTokenMetaControllerViewModel";
 import {
   correctUserBodyParams,
   req,

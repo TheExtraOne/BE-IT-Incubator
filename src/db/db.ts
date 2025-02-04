@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import { LIKE_STATUS, LIKE_TYPE, SETTINGS } from "../common/settings";
-import BlogRepViewModel from "../blogs/models/BlogRepViewModel";
-import PostRepViewModel from "../posts/models/PostRepViewModel";
-import CommentRepViewModel from "../comments/models/CommentRepViewModel";
-import UserAccountRepViewModel from "../users/models/UserAccountRepViewModel";
-import RefreshTokensMetaRepViewModel from "../security/models/RefreshTokensMetaRepViewModel";
-import TRateLimitingRepViewModel from "../rate-limiting/models/RateLimitingRepViewModel";
-import LikeRepViewModel from "../likes/models/LikeRepViewModel";
+import BlogRepViewModel from "../blogs/domain/BlogRepViewModel";
+import PostRepViewModel from "../posts/domain/PostRepViewModel";
+import CommentRepViewModel from "../comments/domain/CommentRepViewModel";
+import UserAccountRepViewModel from "../users/domain/UserAccountRepViewModel";
+import RefreshTokensMetaRepViewModel from "../security/domain/RefreshTokensMetaRepViewModel";
+import TRateLimitingRepViewModel from "../rate-limiting/domain/RateLimitingRepViewModel";
+import LikeRepViewModel from "../likes/domain/LikeRepViewModel";
 
 const blogSchema = new mongoose.Schema<BlogRepViewModel>({
   name: { type: String, required: true },

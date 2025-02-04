@@ -1,10 +1,10 @@
 import { agent } from "supertest";
 import { SETTINGS } from "../../src/common/settings";
 import app from "../../src/app";
-import TBlogControllerInputModel from "../../src/blogs/models/BlogControllerInputModel";
 import { getEncodedCredentials } from "../../src/common/middlewares/basic-authorization-middleware";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import TBlogControllerInputModel from "../../src/blogs/domain/BlogControllerInputModel";
 
 export const userCredentials = {
   correct: `Basic ${getEncodedCredentials(SETTINGS.ADMIN_CREDENTIALS)}`,

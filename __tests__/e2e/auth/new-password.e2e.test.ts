@@ -1,11 +1,11 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
+import UsersRepository from "../../../src/users/infrastructure/users-repository";
 import {
   correctUserBodyParams,
   req,
   userCredentials,
   testDb,
 } from "../helpers";
-import UsersRepository from "../../../src/users/users-repository";
 
 describe("POST /auth/new-password", () => {
   beforeAll(async () => await testDb.setup());

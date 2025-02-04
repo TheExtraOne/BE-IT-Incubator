@@ -6,12 +6,13 @@ A robust REST API platform for blogging with TypeScript and Express.js. Features
 
 - **Backend Framework**: Node.js/Express.js
 - **Language**: TypeScript
-- **Database**: MongoDB
+- **Database**: MongoDB with Mongoose
 - **Validation**: Express-validator
 - **Authentication**: JWT, bcrypt
 - **Email Service**: Nodemailer
 - **Testing**: Jest, Supertest
 - **Architecture**:
+  - Clean Architecture principles with distinct layers (API, Application, Infrastructure, Domain)
   - Object-Oriented Programming with TypeScript classes
   - Dependency Injection for better testability and maintainability
   - Composition Root pattern for centralized dependency management
@@ -48,213 +49,103 @@ Create a `.env` file in the root directory with:
 
 ```
 src/
-├── app.ts                # Express configuration
-├── index.ts             # Entry point
-├── composition-root.ts  # Centralized dependency injection setup
-├── adapters/            # External service adapters (implemented as classes)
-│   ├── bcrypt-service.ts # Password encryption service
-│   ├── email-service.ts # Email service
-│   ├── jwt-service.ts   # JWT operations service
-│   └── middleware/      # Token verification middleware
-├── auth/                # Authentication
-├── blogs/              # Blog management
-├── comments/           # Comments system
-├── common/             # Shared utilities
-│   ├── middlewares/    # Common middlewares
-│   ├── settings.ts     # Global settings
-│   └── types/          # Shared types
-├── db/                 # Database configuration
-├── managers/           # Business logic managers
-├── posts/              # Posts management
-├── rate-limiting/      # Rate limiting functionality
-├── security/           # Security & session management
-├── testing/            # Testing utilities
-└── users/              # User management
-
-__tests__/
-├── e2e/                # End-to-end tests
-│   ├── auth/          # Authentication tests
-│   ├── blogs/         # Blog-related tests
-│   ├── comments/      # Comment-related tests
-│   ├── posts/         # Post-related tests
-│   ├── sessions/      # Device session tests
-│   ├── users/         # User-related tests
-│   └── helpers.ts     # Test utilities
+├── adapters/            # External service adapters (JWT, Email, etc.)
+├── app.ts              # Express configuration
+├── composition-root.ts  # Dependency injection setup
+├── common/             # Shared utilities and types
+└── [feature]/          # Feature modules (auth, blogs, posts, etc.)
+    ├── api/            # Controllers and routes
+    ├── app/            # Application services
+    ├── domain/         # Domain models and schemas
+    └── infrastructure/ # Repositories and data access
 ```
 
 ## Features
 
-### Core Functionality
+### Authentication & Authorization
 
-- ✅ Complete CRUD operations for blogs, posts, comments, and users
-- ✅ JWT authentication with access and refresh tokens
-- ✅ Email-based registration confirmation
-- ✅ Blog-specific post management
-- ✅ Comments system with authentication
-- ✅ Advanced search and filtering
-- ✅ Pagination and sorting capabilities
-- ✅ Sophisticated rate limiting system
+- JWT-based authentication with access and refresh tokens
+- Basic authentication for admin endpoints
+- Email confirmation for registration
+- Password recovery flow
+- Rate limiting with automatic cleanup (TTL-based)
+- Device session management
 
-### Authentication & Security
+### Content Management
 
-- ✅ Secure password hashing with bcrypt
-- ✅ JWT-based authentication with:
-  - Access tokens for API requests
-  - Refresh tokens for token renewal
-  - Secure HTTP-only cookies
-  - Token blacklisting for logout
-- ✅ Protected endpoints with basic authorization
-- ✅ Email confirmation system
-- ✅ Password recovery system:
-  - Password recovery request
-  - Secure recovery code handling
-  - New password validation
-  - Old password invalidation
-- ✅ Advanced session management:
-  - Multi-device login support
-  - Device-specific session tracking
-  - Active sessions monitoring
-  - Individual session termination
-  - Bulk session management
-  - Last active date tracking
-  - Device identification
+- Blogs CRUD with moderation
+- Posts CRUD with blog association
+- Comments with nested replies
+- Like/Dislike system for comments
 
-### Security Features
+### Security
 
-- ✅ Device session management:
-  - List all active sessions
-  - Terminate specific device sessions
-  - Terminate all sessions except current
-  - Auto session cleanup on logout
-- ✅ Session security measures:
-  - Device fingerprinting
-  - Last active tracking
-  - Unauthorized access prevention
-  - Cross-device session validation
-- ✅ Security endpoints:
-  - GET /security/devices - List all active sessions
-  - DELETE /security/devices/:deviceId - Terminate specific session
-  - DELETE /security/devices - Terminate all other sessions
-- ✅ Rate limiting protection:
-  - Configurable time windows
-  - IP-based tracking
-  - MongoDB persistence
-  - Per-endpoint limits
+- Rate limiting protection to prevent brute-force attacks
+- Session management across devices
+- Secure password hashing
+- CORS protection
 
-### Testing & Quality
+### Data Management
 
-- ✅ Comprehensive E2E tests covering:
-  - Authentication flows:
-    - Login and logout
-    - Registration with email confirmation
-    - Password recovery and reset
-    - Token refresh
-    - Registration email resend
-  - CRUD operations
-  - Error cases and validation
-  - Rate limiting
-  - Comment interactions:
-    - Like/Dislike functionality
-    - Multiple user scenarios
-    - Status updates and counts
-- ✅ Isolated test environment with MongoDB Memory Server
-- ✅ TypeScript type safety
-- ✅ Input validation middleware
-- ✅ Error handling middleware
+- Pagination and filtering for all list endpoints
+- Efficient MongoDB indexes
+- Automatic cleanup of expired rate limit records
+- Input validation and sanitization
 
-## API Features
+## API Documentation
 
-### Security & Sessions
+### Auth Endpoints
 
-- Complete device session management
-- Multi-device authentication tracking
-- Session monitoring and control
-- Device-specific security measures
+- POST /auth/login - User authentication
+- POST /auth/refresh-token - Token refresh
+- POST /auth/registration - New user registration
+- POST /auth/registration-confirmation - Email confirmation
+- POST /auth/registration-email-resending - Resend confirmation email
+- POST /auth/logout - User logout
+- POST /auth/password-recovery - Initiate password recovery
+- POST /auth/new-password - Set new password
 
-### Authentication
+### Blog Endpoints
 
-- User registration with email confirmation
-- Login with JWT token generation
-- Token refresh mechanism
-- Secure logout
-- Registration email resend capability
-- Password recovery and reset functionality
+- GET /blogs - List all blogs
+- POST /blogs - Create new blog (admin only)
+- GET /blogs/:id - Get blog details
+- PUT /blogs/:id - Update blog (admin only)
+- DELETE /blogs/:id - Delete blog (admin only)
+- GET /blogs/:blogId/posts - List blog posts
 
-### Users
+### Post Endpoints
 
-- User creation and management
-- Profile retrieval and updates
-- User search and filtering
-- Secure password handling
+- GET /posts - List all posts
+- POST /posts - Create new post (admin only)
+- GET /posts/:id - Get post details
+- PUT /posts/:id - Update post (admin only)
+- DELETE /posts/:id - Delete post (admin only)
+- POST /posts/:postId/comments - Add comment to post
+- GET /posts/:postId/comments - Get post comments
 
-### Blogs & Posts
+### User Management
 
-- Blog creation and management
-- Post creation within blogs
-- Advanced search and filtering
-- Sorting and pagination
-- Query parameter validation
+- GET /users - List all users (admin only)
+- POST /users - Create user (admin only)
+- DELETE /users/:id - Delete user (admin only)
 
-### Comments
+### Security Endpoints
 
-- Comment creation on posts
-- Comment management (update, delete)
-- Pagination and sorting
-- Authentication-based actions
-- Like/Dislike system:
-  - User-specific like status (Like, Dislike, None)
-  - Like/Dislike counts tracking
-  - Status updates with authentication
-  - Multiple user interaction support
+- GET /security/devices - List all active sessions
+- DELETE /security/devices/:deviceId - Terminate specific session
+- DELETE /security/devices - Terminate all other sessions
 
-### Rate Limiting
+## Testing
 
-- ✅ Advanced request rate limiting system
-- ✅ Configurable time windows and request limits
-- ✅ IP-based rate limiting with MongoDB persistence
-- ✅ Per-endpoint rate limit configuration
-- ✅ Automatic request tracking and limiting
-- ✅ Protection against DDoS and brute-force attacks
+Run tests with:
 
-## Architecture Highlights
+```bash
+yarn test
+```
 
-### Class-Based Architecture
+For e2e tests:
 
-- ✅ Fully implemented using TypeScript classes for better code organization and OOP principles
-- ✅ Clear separation of concerns with Controller, Service, and Repository layers
-- ✅ Domain models implemented as classes with strong typing
-- ✅ Encapsulated business logic within service classes
-
-### Dependency Injection
-
-- ✅ Centralized dependency management in composition-root.ts
-- ✅ Constructor-based dependency injection
-- ✅ Loose coupling between components
-- ✅ Improved testability with easy dependency mocking
-
-### Design Patterns
-
-- ✅ Repository Pattern for data access
-- ✅ Factory Pattern for object creation
-- ✅ Singleton Pattern for shared services
-- ✅ Adapter Pattern for external services
-- ✅ Composition Root Pattern for DI configuration
-
-### Testing Benefits
-
-- ✅ Easy mocking of dependencies in tests
-- ✅ Isolated component testing
-- ✅ Improved test maintainability
-- ✅ Clear test structure following class organization
-
-## Development Scripts
-
-- `yarn watch`: TypeScript compilation in watch mode
-- `yarn dev`: Run development server
-- `yarn test`: Run tests
-- `yarn jest:coverage`: Generate test coverage
-
-## Upcoming Features
-
-- 🔄 API documentation (Swagger/OpenAPI)
-- 🔄 Performance optimizations
+```bash
+yarn test:e2e
+```

@@ -1,78 +1,12 @@
 import mongoose from "mongoose";
-import { LIKE_STATUS, LIKE_TYPE, SETTINGS } from "../common/settings";
-import BlogRepViewModel from "../blogs/domain/BlogRepViewModel";
-import PostRepViewModel from "../posts/domain/PostRepViewModel";
-import CommentRepViewModel from "../comments/domain/CommentRepViewModel";
-import UserAccountRepViewModel from "../users/domain/UserAccountRepViewModel";
-import RefreshTokensMetaRepViewModel from "../security/domain/RefreshTokensMetaRepViewModel";
-import TRateLimitingRepViewModel from "../rate-limiting/domain/RateLimitingRepViewModel";
-import LikeRepViewModel from "../likes/domain/LikeRepViewModel";
-
-const blogSchema = new mongoose.Schema<BlogRepViewModel>({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  websiteUrl: { type: String, required: true },
-  createdAt: { type: String, required: true },
-  isMembership: { type: Boolean, required: true },
-});
-const postSchema = new mongoose.Schema<PostRepViewModel>({
-  title: { type: String, required: true },
-  shortDescription: { type: String, required: true },
-  content: { type: String, required: true },
-  blogId: { type: String, required: true },
-  blogName: { type: String, required: true },
-  createdAt: { type: String, required: true },
-});
-const commentSchema = new mongoose.Schema<CommentRepViewModel>({
-  content: { type: String, required: true },
-  commentatorInfo: {
-    userId: { type: String, required: true },
-    userLogin: { type: String, required: true },
-  },
-  createdAt: { type: String, required: true },
-  postId: { type: String, required: true },
-  likesInfo: {
-    likesCount: { type: Number, required: true },
-    dislikesCount: { type: Number, required: true },
-  },
-});
-const userSchema = new mongoose.Schema<UserAccountRepViewModel>({
-  accountData: {
-    userName: { type: String, required: true },
-    passwordHash: { type: String, required: true },
-    email: { type: String, required: true },
-    createdAt: { type: String, required: true },
-  },
-  emailConfirmation: {
-    confirmationCode: { type: String, required: true },
-    expirationDate: { type: Date, required: true },
-    isConfirmed: { type: Boolean, required: true },
-  },
-  passwordResetConfirmation: {
-    recoveryCode: { type: String, default: null },
-    expirationDate: { type: Date, default: null },
-    isConfirmed: { type: Boolean, default: null },
-  },
-});
-const refreshTokenSchema = new mongoose.Schema<RefreshTokensMetaRepViewModel>({
-  ip: { type: String, required: true },
-  title: { type: String, required: true },
-  lastActiveDate: { type: String, required: true },
-  expirationDate: { type: String, required: true },
-  userId: { type: String, required: true },
-});
-const rateLimitSchema = new mongoose.Schema<TRateLimitingRepViewModel>({
-  ip: { type: String, required: true },
-  URL: { type: String, required: true },
-  date: { type: Date, required: true },
-});
-const likeSchema = new mongoose.Schema<LikeRepViewModel>({
-  status: { type: String, enum: LIKE_STATUS, required: true },
-  authorId: { type: String, required: true },
-  parentId: { type: String, required: true },
-  createdAt: { type: Date, required: true },
-  likeType: { type: String, enum: LIKE_TYPE, required: true },
-});
+import { SETTINGS } from "../common/settings";
+import blogSchema from "../blogs/domain/blog-schema";
+import commentSchema from "../comments/domain/comment-schema";
+import likeSchema from "../likes/domain/like-schema";
+import postSchema from "../posts/domain/post-schema";
+import rateLimitSchema from "../rate-limiting/domain/rate-limit-schema";
+import refreshTokenSchema from "../security/domain/refresh-token-schema";
+import userSchema from "../users/domain/user-schema";
 
 export const BlogModelDb = mongoose.model(
   SETTINGS.COLLECTION_NAMES.BLOGS,

@@ -17,6 +17,14 @@ class LikesRepository {
     return like;
   }
 
+  async getLikesByUserId(userId: string): Promise<LikesRepViewModel[] | null> {
+    const likes: LikesRepViewModel[] | null = await LikeModelDb.find({
+      authorId: userId,
+    }).lean();
+
+    return likes;
+  }
+
   async deleteLike(like: HydratedDocument<LikesRepViewModel>): Promise<void> {
     await like.deleteOne();
   }

@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { SORT_DIRECTION } from "../../common/settings";
+import { LIKE_STATUS, SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
 import { CommentModelDb } from "../../db/db";
 import CommentRepViewModel from "../domain/CommentRepViewModel";
@@ -14,7 +14,11 @@ class CommentsQueryRepository {
       content: comment.content,
       commentatorInfo: comment.commentatorInfo,
       createdAt: comment.createdAt,
-      likesInfo: comment.likesInfo,
+      likesInfo: {
+        myStatus: LIKE_STATUS.NONE,
+        likesCount: comment.likesInfo.likesCount,
+        dislikesCount: comment.likesInfo.dislikesCount,
+      },
     };
   }
 

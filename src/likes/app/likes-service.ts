@@ -129,6 +129,10 @@ class LikesService {
     );
   }
 
+  async getLikesByUserId(userId: string): Promise<LikesRepViewModel[] | null> {
+    return await this.likesRepository.getLikesByUserId(userId);
+  }
+
   async changeLikeStatus({
     userId,
     commentId,

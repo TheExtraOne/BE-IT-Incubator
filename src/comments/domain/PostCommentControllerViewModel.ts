@@ -1,3 +1,4 @@
+import { LIKE_STATUS } from "../../common/settings";
 import { TLikesInfo } from "./CommentRepViewModel";
 
 type TCommentControllerViewModel = {
@@ -20,7 +21,7 @@ type TCommentControllerViewModel = {
   /**
    * Likes information: count, userStatus
    */
-  likesInfo: TLikesInfo;
+  likesInfo: TLikesInfo & { myStatus: LIKE_STATUS };
 };
 
 export default TCommentControllerViewModel;

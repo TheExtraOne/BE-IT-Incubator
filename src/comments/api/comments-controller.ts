@@ -23,6 +23,7 @@ import TPostCommentControllerInputModel from "../domain/PostCommentControllerInp
 import TCommentControllerViewModel from "../domain/PostCommentControllerViewModel";
 import TQueryCommentsModel from "../domain/QueryCommentsModel";
 import CommentsQueryRepository from "../infrastructure/comments-query-repository";
+import LikesRepViewModel from "../../likes/domain/LikeRepViewModel";
 
 class CommentsController {
   constructor(
@@ -83,30 +84,18 @@ class CommentsController {
       postId: req.params.id,
     });
 
-    // TODO: refactor
-    const defaultItemsResponse = comments.items.map((item) => {
-      return {
-        ...item,
-        likesInfo: {
-          ...item.likesInfo,
-          myStatus: LIKE_STATUS.NONE,
-        },
-      };
-    });
     const userId: string | null = req.userId;
-
     if (!userId) {
-      res
-        .status(HTTP_STATUS.OK_200)
-        .json({ ...comments, items: defaultItemsResponse });
+      res.status(HTTP_STATUS.OK_200).json(comments);
       return;
     }
-    // TODO: refactor
-    const itemsResponse = comments.items.map(async (item) => {
-      const like = await this.likesService.getLikeByUserAndCommentId(
-        userId,
-        item.id
-      );
+
+    // Get the likes/dislike for a userId.
+    const likesForUser: LikesRepViewModel[] | null =
+      await this.likesService.getLikesByUserId(userId);
+    const itemsModified = comments.items.map((item) => {
+      // Find in the likes array likes for current commentId, add status
+      const like = likesForUser?.find((like) => like.parentId === item.id);
       return {
         ...item,
         likesInfo: {
@@ -115,9 +104,8 @@ class CommentsController {
         },
       };
     });
-    const test = await Promise.all(itemsResponse);
 
-    res.status(HTTP_STATUS.OK_200).json({ ...comments, items: test });
+    res.status(HTTP_STATUS.OK_200).json({ ...comments, items: itemsModified });
   }
 
   async getCommentById(
@@ -133,20 +121,12 @@ class CommentsController {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-    // TODO: refactor
-    const defaultResponse = {
-      ...comment,
-      likesInfo: {
-        ...comment.likesInfo,
-        myStatus: LIKE_STATUS.NONE,
-      },
-    };
 
     if (!userId) {
-      res.status(HTTP_STATUS.OK_200).json(defaultResponse);
+      res.status(HTTP_STATUS.OK_200).json(comment);
       return;
     }
-
+    // Check if user already liked/disliked the comment and show the status
     const like = await this.likesService.getLikeByUserAndCommentId(
       userId,
       commentId
@@ -159,7 +139,7 @@ class CommentsController {
             myStatus: like.status,
           },
         }
-      : defaultResponse;
+      : comment;
 
     res.status(HTTP_STATUS.OK_200).json(response);
   }

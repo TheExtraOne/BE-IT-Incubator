@@ -4,20 +4,21 @@ import { securityController } from "../../composition-root";
 
 const securityRouter = Router({});
 
-securityRouter.get(
-  "/devices",
-  refreshTokenVerificationMiddleware,
-  securityController.getRefreshTokensMeta.bind(securityController)
-);
+securityRouter
+  .route("/devices")
+  .get(
+    refreshTokenVerificationMiddleware,
+    securityController.getRefreshTokensMeta.bind(securityController)
+  )
+  .delete(
+    refreshTokenVerificationMiddleware,
+    securityController.deleteAllRefreshTokensMeta.bind(securityController)
+  );
+
 securityRouter.delete(
   "/devices/:deviceId",
   refreshTokenVerificationMiddleware,
   securityController.deleteRefreshTokenMetaByDeviceId.bind(securityController)
-);
-securityRouter.delete(
-  "/devices/",
-  refreshTokenVerificationMiddleware,
-  securityController.deleteAllRefreshTokensMeta.bind(securityController)
 );
 
 export default securityRouter;

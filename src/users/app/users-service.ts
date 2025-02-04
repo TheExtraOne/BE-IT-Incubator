@@ -16,7 +16,7 @@ class UsersService {
     private usersRepository: UsersRepository
   ) {}
 
-  private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
+  mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
     return {
       id: user._id.toString(),
       login: user.accountData.userName,
@@ -71,8 +71,9 @@ class UsersService {
     login,
     password,
     email,
-    isConfirmed = false,
-  }: TUserServiceInputModel): Promise<Result<string | null>> {
+  }: TUserServiceInputModel): Promise<
+    Result<HydratedDocument<UserAccountRepViewModel> | null>
+  > {
     const errors: [] | TExtension[] = await this.checkIfFieldIsUnique({
       login,
       email,
@@ -99,8 +100,8 @@ class UsersService {
       },
       {
         confirmationCode: new ObjectId().toString(),
-        expirationDate: add(new Date(), { hours: 1, minutes: 3 }),
-        isConfirmed,
+        expirationDate: add(new Date(), { hours: 1, minutes: 30 }),
+        isConfirmed: false,
       },
       {
         recoveryCode: null,
@@ -114,7 +115,21 @@ class UsersService {
 
     return {
       status: RESULT_STATUS.SUCCESS,
-      data: newUserAccount._id.toString(),
+      data: userAccountInstance,
+      extensions: [],
+    };
+  }
+
+  async confirmUserEmail(
+    user: HydratedDocument<UserAccountRepViewModel>
+  ): Promise<Result> {
+    user.emailConfirmation.isConfirmed = true;
+
+    await this.usersRepository.saveUserAccount(user);
+
+    return {
+      status: RESULT_STATUS.SUCCESS,
+      data: null,
       extensions: [],
     };
   }

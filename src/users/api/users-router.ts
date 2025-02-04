@@ -27,16 +27,17 @@ const createUserMiddleWare = [
   inputCheckErrorsMiddleware,
 ];
 
-usersRouter.get(
-  "/",
-  [...getAllUsersMiddleware],
-  usersController.getUsers.bind(usersController)
-);
-usersRouter.post(
-  "/",
-  [...createUserMiddleWare],
-  usersController.createUser.bind(usersController)
-);
+usersRouter
+  .route("/")
+  .get(
+    [...getAllUsersMiddleware],
+    usersController.getUsers.bind(usersController)
+  )
+  .post(
+    [...createUserMiddleWare],
+    usersController.createUser.bind(usersController)
+  );
+
 usersRouter.delete(
   "/:id",
   basicAuthorizationMiddleware,

@@ -18,6 +18,8 @@ import TUserControllerInputModel from "../domain/UserControllerInputModel";
 import TUserControllerViewModel from "../domain/UserControllerViewModel";
 import TUserServiceViewModel from "../domain/UserServiceViewModel";
 import UsersQueryRepository from "../infrastructure/users-query-repository";
+import UserAccountRepViewModel from "../domain/UserAccountRepViewModel";
+import { HydratedDocument } from "mongoose";
 
 class UsersController {
   constructor(
@@ -55,12 +57,11 @@ class UsersController {
   ) {
     // Validation in middlewares (except check for unique, which is in BLL)
     const { login, email, password } = req.body;
-    const result: Result<string | null> =
+    const result: Result<HydratedDocument<UserAccountRepViewModel> | null> =
       await this.usersService.createUserAccount({
         login,
         email,
         password,
-        isConfirmed: true,
       });
 
     if (result.status !== RESULT_STATUS.SUCCESS) {
@@ -69,9 +70,11 @@ class UsersController {
       });
       return;
     }
+    // Confirming user email
+    await this.usersService.confirmUserEmail(result.data!);
 
     const createdUser: TUserControllerViewModel | null =
-      await this.usersQueryRepository.getUserById(result.data!);
+      this.usersService.mapUser(result.data!);
 
     res.status(HTTP_STATUS.CREATED_201).json(createdUser);
   }

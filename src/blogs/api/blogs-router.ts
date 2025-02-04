@@ -39,36 +39,38 @@ const updateBlogByIdMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 
-blogsRouter.get(
-  "/",
-  [...getAllBlogsMiddleWares],
-  blogController.getBlogs.bind(blogController)
-);
-blogsRouter.get("/:id", blogController.getBlogById.bind(blogController));
-blogsRouter.get(
-  "/:id/posts",
-  [...getAllPostsForBlogIdMiddleware],
-  blogController.getAllPostsForBlogById.bind(blogController)
-);
-blogsRouter.post(
-  "/:id/posts",
-  [...createPostForBlogIdMiddleware],
-  blogController.createPostForBlogById.bind(blogController)
-);
-blogsRouter.post(
-  "/",
-  [...createBlogMiddleware],
-  blogController.createBlog.bind(blogController)
-);
-blogsRouter.put(
-  "/:id",
-  [...updateBlogByIdMiddleware],
-  blogController.updateBlogById.bind(blogController)
-);
-blogsRouter.delete(
-  "/:id",
-  basicAuthorizationMiddleware,
-  blogController.deleteBlogById.bind(blogController)
-);
+blogsRouter
+  .route("/")
+  .get(
+    [...getAllBlogsMiddleWares],
+    blogController.getBlogs.bind(blogController)
+  )
+  .post(
+    [...createBlogMiddleware],
+    blogController.createBlog.bind(blogController)
+  );
+
+blogsRouter
+  .route("/:id")
+  .get(blogController.getBlogById.bind(blogController))
+  .put(
+    [...updateBlogByIdMiddleware],
+    blogController.updateBlogById.bind(blogController)
+  )
+  .delete(
+    basicAuthorizationMiddleware,
+    blogController.deleteBlogById.bind(blogController)
+  );
+
+blogsRouter
+  .route("/:id/posts")
+  .get(
+    [...getAllPostsForBlogIdMiddleware],
+    blogController.getAllPostsForBlogById.bind(blogController)
+  )
+  .post(
+    [...createPostForBlogIdMiddleware],
+    blogController.createPostForBlogById.bind(blogController)
+  );
 
 export default blogsRouter;

@@ -19,25 +19,25 @@ const likeStatusCommentMiddleware = [
   inputCheckErrorsMiddleware,
 ];
 
-commentsRouter.get(
-  "/:id",
-  optionalAccessTokenVerificationMiddleware,
-  commentsController.getCommentById.bind(commentsController)
-);
-commentsRouter.put(
-  "/:id",
-  [...updateCommentMiddleware],
-  commentsController.updateComment.bind(commentsController)
-);
+commentsRouter
+  .route("/:id")
+  .get(
+    optionalAccessTokenVerificationMiddleware,
+    commentsController.getCommentById.bind(commentsController)
+  )
+  .put(
+    [...updateCommentMiddleware],
+    commentsController.updateComment.bind(commentsController)
+  )
+  .delete(
+    accessTokenVerificationMiddleware,
+    commentsController.deleteComment.bind(commentsController)
+  );
+
 commentsRouter.put(
   "/:id/like-status",
   [...likeStatusCommentMiddleware],
   commentsController.changeLikeStatus.bind(commentsController)
-);
-commentsRouter.delete(
-  "/:id",
-  accessTokenVerificationMiddleware,
-  commentsController.deleteComment.bind(commentsController)
 );
 
 export default commentsRouter;

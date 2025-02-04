@@ -28,25 +28,21 @@ class AuthService {
     login: string;
     email: string;
     password: string;
-  }): Promise<Result<string | null>> {
+  }): Promise<Result> {
     // Creating user, check if login and email are unique is inside userService
-    const result: Result<string | null> =
+    const result: Result<HydratedDocument<UserAccountRepViewModel> | null> =
       await this.usersService.createUserAccount({
         login,
         password,
         email,
-        isConfirmed: false,
       });
-    if (result.status !== RESULT_STATUS.SUCCESS) return result;
+    if (result.status !== RESULT_STATUS.SUCCESS) return result as Result<null>;
 
-    const createdUserId: string | null = result.data;
-    const createdUser: HydratedDocument<UserAccountRepViewModel> | null =
-      await this.usersRepository.getUserById(createdUserId!);
-
+    const confirmationCode = result.data?.emailConfirmation.confirmationCode!;
     this.mailManager
       .sendRegistrationMail({
         email,
-        confirmationCode: createdUser?.emailConfirmation.confirmationCode!,
+        confirmationCode: confirmationCode,
       })
       .catch((error) => console.log(error));
 

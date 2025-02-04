@@ -49,36 +49,38 @@ const createCommentForPosyById = [
   inputCheckErrorsMiddleware,
 ];
 
-postsRouter.get(
-  "/",
-  [...getAllPostsMiddleware],
-  postsController.getPosts.bind(postsController)
-);
-postsRouter.get("/:id", postsController.getPostById.bind(postsController));
-postsRouter.get(
-  "/:id/comments",
-  [...getAllCommentsForPostByIdMiddleware],
-  postsController.getAllCommentsForPostById.bind(postsController)
-);
-postsRouter.post(
-  "/:id/comments",
-  [...createCommentForPosyById],
-  postsController.createCommentForPostById.bind(postsController)
-);
-postsRouter.post(
-  "/",
-  [...createPostMiddleware],
-  postsController.createPost.bind(postsController)
-);
-postsRouter.put(
-  "/:id",
-  [...updatePostByIdMiddleware],
-  postsController.updatePostById.bind(postsController)
-);
-postsRouter.delete(
-  "/:id",
-  basicAuthorizationMiddleware,
-  postsController.deletePostById.bind(postsController)
-);
+postsRouter
+  .route("/")
+  .get(
+    [...getAllPostsMiddleware],
+    postsController.getPosts.bind(postsController)
+  )
+  .post(
+    [...createPostMiddleware],
+    postsController.createPost.bind(postsController)
+  );
+
+postsRouter
+  .route("/:id/comments")
+  .get(
+    [...getAllCommentsForPostByIdMiddleware],
+    postsController.getAllCommentsForPostById.bind(postsController)
+  )
+  .post(
+    [...createCommentForPosyById],
+    postsController.createCommentForPostById.bind(postsController)
+  );
+
+postsRouter
+  .route("/:id")
+  .get(postsController.getPostById.bind(postsController))
+  .put(
+    [...updatePostByIdMiddleware],
+    postsController.updatePostById.bind(postsController)
+  )
+  .delete(
+    basicAuthorizationMiddleware,
+    postsController.deletePostById.bind(postsController)
+  );
 
 export default postsRouter;

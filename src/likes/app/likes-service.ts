@@ -226,6 +226,7 @@ class LikesService {
       await this.likesRepository.getLikesByParentIdWithDateSort({
         parentId,
         sortDirection: SORT_DIRECTION.DESC,
+        status: LIKE_STATUS.LIKE,
       });
     if (!likes) {
       return null;

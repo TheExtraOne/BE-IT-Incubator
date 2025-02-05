@@ -112,7 +112,7 @@ class BlogsController {
         ...post,
         extendedLikesInfo: {
           ...post.extendedLikesInfo,
-          newestLikes: has_likes ? latestLikes : null,
+          newestLikes: has_likes ? latestLikes : [],
         },
       };
     });

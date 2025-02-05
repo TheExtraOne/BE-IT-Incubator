@@ -57,7 +57,7 @@ describe("GET /posts", () => {
             dislikesCount: expect.any(Number),
             likesCount: expect.any(Number),
             myStatus: "None",
-            newestLikes: null,
+            newestLikes: [],
           },
         },
       ]);
@@ -119,7 +119,7 @@ describe("GET /posts", () => {
           dislikesCount: expect.any(Number),
           likesCount: expect.any(Number),
           myStatus: "None",
-          newestLikes: null,
+          newestLikes: [],
         },
       });
     });
@@ -167,7 +167,7 @@ describe("GET /posts", () => {
               dislikesCount: expect.any(Number),
               likesCount: expect.any(Number),
               myStatus: "None",
-              newestLikes: null,
+              newestLikes: [],
             },
           },
         ],

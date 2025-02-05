@@ -19,7 +19,7 @@ class PostsQueryRepository {
         likesCount: post.extendedLikesInfo.likesCount,
         dislikesCount: post.extendedLikesInfo.dislikesCount,
         myStatus: LIKE_STATUS.NONE,
-        newestLikes: null,
+        newestLikes: [],
       },
     };
   }

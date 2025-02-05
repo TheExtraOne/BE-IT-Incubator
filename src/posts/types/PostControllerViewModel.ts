@@ -33,7 +33,7 @@ type TPostControllerViewModel = {
     likesCount: number;
     dislikesCount: number;
     myStatus: LIKE_STATUS;
-    newestLikes: null | { addedAt: Date; userId: string; login: string }[];
+    newestLikes: [] | { addedAt: Date; userId: string; login: string }[];
   };
 };
 

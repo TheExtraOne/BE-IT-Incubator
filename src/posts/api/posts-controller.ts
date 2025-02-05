@@ -4,6 +4,7 @@ import {
   HTTP_STATUS,
   RESULT_STATUS,
   LIKE_TYPE,
+  LIKE_STATUS,
 } from "../../common/settings";
 import PostsService from "../app/posts-service";
 import {
@@ -60,13 +61,65 @@ class PostsController {
     req: TRequestWithParams<TPathParamsPostModel>,
     res: Response
   ) {
+    const userId: string | null = req.userId;
+    const postId = req.params.id;
+
     // We are reaching out to postsQueryRepository directly because of CQRS
     const post: TPostControllerViewModel | null =
-      await this.postsQueryRepository.getPostById(req.params.id);
+      await this.postsQueryRepository.getPostById(postId);
 
-    post
-      ? res.status(HTTP_STATUS.OK_200).json(post)
-      : res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+    if (!post) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+    // TODO: refactor logic
+    // Get the latest 3 likes for the post
+    const latestLikes = await this.likesService.getLatestLikesByParentId(
+      postId
+    );
+    const has_likes = !!latestLikes?.length;
+
+    if (!userId) {
+      if (has_likes) {
+        res.status(HTTP_STATUS.OK_200).json({
+          ...post,
+          extendedLikesInfo: {
+            ...post.extendedLikesInfo,
+            newestLikes: latestLikes,
+          },
+        });
+        return;
+      } else {
+        res.status(HTTP_STATUS.OK_200).json(post);
+        return;
+      }
+    } else {
+      const like = await this.likesService.getLikeByUserAndParentId(
+        userId,
+        postId
+      );
+      const myStatus = like?.status ?? LIKE_STATUS.NONE;
+      if (has_likes) {
+        res.status(HTTP_STATUS.OK_200).json({
+          ...post,
+          extendedLikesInfo: {
+            ...post.extendedLikesInfo,
+            myStatus,
+            newestLikes: latestLikes,
+          },
+        });
+        return;
+      } else {
+        res.status(HTTP_STATUS.OK_200).json({
+          ...post,
+          extendedLikesInfo: {
+            ...post.extendedLikesInfo,
+            myStatus,
+          },
+        });
+        return;
+      }
+    }
   }
 
   async getAllCommentsForPostById(

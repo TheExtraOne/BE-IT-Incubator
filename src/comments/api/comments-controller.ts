@@ -127,7 +127,7 @@ class CommentsController {
       return;
     }
     // Check if user already liked/disliked the comment and show the status
-    const like = await this.likesService.getLikeByUserAndCommentId(
+    const like = await this.likesService.getLikeByUserAndParentId(
       userId,
       commentId
     );

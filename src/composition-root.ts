@@ -74,7 +74,8 @@ const likesRepository = new LikesRepository();
 const likesService = new LikesService(
   likesRepository,
   commentsService,
-  postsService
+  postsService,
+  usersService
 );
 
 // Controllers

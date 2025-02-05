@@ -1,5 +1,10 @@
 import { ObjectId } from "mongodb";
-import { LIKE_STATUS, LIKE_TYPE, RESULT_STATUS } from "../../common/settings";
+import {
+  LIKE_STATUS,
+  LIKE_TYPE,
+  RESULT_STATUS,
+  SORT_DIRECTION,
+} from "../../common/settings";
 import LikesRepViewModel from "../types/LikeRepViewModel";
 import { Result } from "../../common/types/types";
 import { HydratedDocument } from "mongoose";
@@ -7,12 +12,15 @@ import CommentsService from "../../comments/app/comments-service";
 import LikesRepository from "../infrastructure/likes-repository";
 import { LikeModelDb } from "../domain/like-model";
 import PostsService from "../../posts/app/posts-service";
+import UsersService from "../../users/app/users-service";
+import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
 
 class LikesService {
   constructor(
     protected likesRepository: LikesRepository,
     protected commentService: CommentsService,
-    protected postsService: PostsService
+    protected postsService: PostsService,
+    protected usersService: UsersService
   ) {}
   async createLike({
     userId,
@@ -32,13 +40,18 @@ class LikesService {
         extensions: [{ field: "likeStatus", message: "Incorrect status" }],
       };
     }
+
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
+      await this.usersService.getUserById(userId);
+
     const newLike = new LikesRepViewModel(
       new ObjectId(),
       likeStatus,
       userId,
       parentId,
       new Date(),
-      likeType
+      likeType,
+      user?.accountData.userName!
     );
     const likeEntity = new LikeModelDb(newLike);
     await this.likesRepository.saveLike(likeEntity);
@@ -159,11 +172,11 @@ class LikesService {
     };
   }
 
-  async getLikeByUserAndCommentId(
+  async getLikeByUserAndParentId(
     userId: string,
     parentId: string
   ): Promise<HydratedDocument<LikesRepViewModel> | null> {
-    return await this.likesRepository.getLikeByUserAndCommentId(
+    return await this.likesRepository.getLikeByUserAndParentId(
       userId,
       parentId
     );
@@ -186,7 +199,7 @@ class LikesService {
   }): Promise<Result> {
     // Check if user already liked/disliked the comment or the post
     const like: HydratedDocument<LikesRepViewModel> | null =
-      await this.getLikeByUserAndCommentId(userId, parentId);
+      await this.getLikeByUserAndParentId(userId, parentId);
 
     if (like) {
       // If user has already liked/disliked the comment or the post, update the like status
@@ -204,6 +217,32 @@ class LikesService {
       likeStatus,
       likeType,
     });
+  }
+
+  async getLatestLikesByParentId(
+    parentId: string
+  ): Promise<{ addedAt: Date; userId: string; login: string }[] | null> {
+    const likes: LikesRepViewModel[] | null =
+      await this.likesRepository.getLikesByParentIdWithDateSort({
+        parentId,
+        sortDirection: SORT_DIRECTION.DESC,
+      });
+    if (!likes) {
+      return null;
+    }
+    // Finding the latest 3 likes
+    const latestLikes: LikesRepViewModel[] = likes.slice(0, 3);
+
+    // Mapping
+    const mappedLikes = latestLikes.map((like) => {
+      return {
+        addedAt: like.createdAt,
+        userId: like.authorId,
+        login: like.login,
+      };
+    });
+
+    return mappedLikes;
   }
 }
 

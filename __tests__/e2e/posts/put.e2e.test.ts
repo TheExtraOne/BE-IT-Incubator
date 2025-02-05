@@ -11,7 +11,7 @@ import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 describe("PUT /posts", () => {
   let id: string;
   let blogName: string;
-  let unchangedResponse: Record<string, string>;
+  let unchangedResponse: Record<string, string | Record<string, string | null>>;
   let newBodyParams: Record<string, string>;
 
   beforeAll(async () => await testDb.setup());
@@ -44,6 +44,12 @@ describe("PUT /posts", () => {
       blogId,
       blogName,
       createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: expect.any(Number),
+        likesCount: expect.any(Number),
+        myStatus: "None",
+        newestLikes: null,
+      },
     };
 
     newBodyParams = {
@@ -115,6 +121,12 @@ describe("PUT /posts", () => {
         id,
         blogName,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: expect.any(Number),
+          likesCount: expect.any(Number),
+          myStatus: "None",
+          newestLikes: null,
+        },
       });
     });
   });

@@ -25,6 +25,14 @@ class UsersService {
     };
   }
 
+  async getUserById(
+    id: string
+  ): Promise<HydratedDocument<UserAccountRepViewModel> | null> {
+    const user: HydratedDocument<UserAccountRepViewModel> | null =
+      await this.usersRepository.getUserById(id);
+    return user;
+  }
+
   async checkIsLoginUnique(login: string): Promise<boolean> {
     return await this.usersRepository.isUniqueInDatabase({
       fieldName: "accountData.userName",
@@ -136,7 +144,7 @@ class UsersService {
 
   async deleteUserById(id: string): Promise<Result> {
     const userAccountInstance: HydratedDocument<UserAccountRepViewModel> | null =
-      await this.usersRepository.getUserById(id);
+      await this.getUserById(id);
     if (!userAccountInstance) {
       return {
         status: RESULT_STATUS.NOT_FOUND,

@@ -8,7 +8,8 @@ class LikesRepViewModel {
     public authorId: string,
     public parentId: string,
     public createdAt: Date,
-    public likeType: LIKE_TYPE
+    public likeType: LIKE_TYPE,
+    public login: string
   ) {}
 }
 

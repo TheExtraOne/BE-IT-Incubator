@@ -68,6 +68,12 @@ describe("POST /posts", () => {
         blogId,
         blogName,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: expect.any(Number),
+          likesCount: expect.any(Number),
+          myStatus: "None",
+          newestLikes: null,
+        },
       });
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);

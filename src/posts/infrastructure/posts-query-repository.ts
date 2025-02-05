@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { SORT_DIRECTION } from "../../common/settings";
+import { LIKE_STATUS, SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
 import TPostControllerViewModel from "../types/PostControllerViewModel";
 import PostRepViewModel from "../types/PostRepViewModel";
@@ -15,6 +15,12 @@ class PostsQueryRepository {
       blogId: post.blogId,
       blogName: post.blogName,
       createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: post.extendedLikesInfo.dislikesCount,
+        myStatus: LIKE_STATUS.NONE,
+        newestLikes: null,
+      },
     };
   }
 

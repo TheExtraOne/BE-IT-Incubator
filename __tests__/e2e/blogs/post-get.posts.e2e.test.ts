@@ -147,6 +147,12 @@ describe("GET /blogs/:id/posts", () => {
         blogName: correctBlogBodyParams.name,
         id: expect.any(String),
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: expect.any(Number),
+          likesCount: expect.any(Number),
+          myStatus: "None",
+          newestLikes: null,
+        },
       });
     });
 
@@ -182,6 +188,12 @@ describe("GET /blogs/:id/posts", () => {
             blogName: correctBlogBodyParams.name,
             id: expect.any(String),
             createdAt: expect.any(String),
+            extendedLikesInfo: {
+              dislikesCount: expect.any(Number),
+              likesCount: expect.any(Number),
+              myStatus: "None",
+              newestLikes: null,
+            },
           },
         ],
         page: 2,

@@ -1,3 +1,5 @@
+import { LIKE_STATUS } from "../../common/settings";
+
 type TPostControllerViewModel = {
   /**
    * id of the post
@@ -27,6 +29,12 @@ type TPostControllerViewModel = {
    * Date of creating in ISO format
    */
   createdAt: string;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: LIKE_STATUS;
+    newestLikes: null | { addedAt: Date; userId: string; login: string }[];
+  };
 };
 
 export default TPostControllerViewModel;

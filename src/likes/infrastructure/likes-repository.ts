@@ -1,13 +1,14 @@
 import { HydratedDocument } from "mongoose";
 import LikesRepViewModel from "../types/LikeRepViewModel";
 import { LikeModelDb } from "../domain/like-model";
+import { SORT_DIRECTION } from "../../common/settings";
 
 class LikesRepository {
   async saveLike(like: HydratedDocument<LikesRepViewModel>): Promise<void> {
     await like.save();
   }
 
-  async getLikeByUserAndCommentId(
+  async getLikeByUserAndParentId(
     userId: string,
     parentId: string
   ): Promise<HydratedDocument<LikesRepViewModel> | null> {
@@ -21,6 +22,22 @@ class LikesRepository {
     const likes: LikesRepViewModel[] | null = await LikeModelDb.find({
       authorId: userId,
     }).lean();
+
+    return likes;
+  }
+
+  async getLikesByParentIdWithDateSort({
+    parentId,
+    sortDirection,
+  }: {
+    parentId: string;
+    sortDirection: SORT_DIRECTION;
+  }): Promise<LikesRepViewModel[] | null> {
+    const likes: LikesRepViewModel[] | null = await LikeModelDb.find({
+      parentId: parentId,
+    })
+      .sort({ createdAt: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
+      .lean();
 
     return likes;
   }

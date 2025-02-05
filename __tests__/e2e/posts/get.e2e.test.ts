@@ -53,6 +53,12 @@ describe("GET /posts", () => {
           blogName,
           id,
           createdAt: expect.any(String),
+          extendedLikesInfo: {
+            dislikesCount: expect.any(Number),
+            likesCount: expect.any(Number),
+            myStatus: "None",
+            newestLikes: null,
+          },
         },
       ]);
     });
@@ -109,6 +115,12 @@ describe("GET /posts", () => {
         blogName,
         id,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: expect.any(Number),
+          likesCount: expect.any(Number),
+          myStatus: "None",
+          newestLikes: null,
+        },
       });
     });
   });
@@ -151,6 +163,12 @@ describe("GET /posts", () => {
             blogName,
             id,
             createdAt: expect.any(String),
+            extendedLikesInfo: {
+              dislikesCount: expect.any(Number),
+              likesCount: expect.any(Number),
+              myStatus: "None",
+              newestLikes: null,
+            },
           },
         ],
         page: 2,

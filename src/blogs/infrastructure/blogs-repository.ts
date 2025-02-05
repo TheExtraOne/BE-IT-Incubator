@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
-import { BlogModelDb } from "../../db/db";
-import BlogRepViewModel from "../domain/BlogRepViewModel";
+import BlogRepViewModel from "../types/BlogRepViewModel";
+import { BlogModelDb } from "../domain/blog-model";
 
 class BlogsRepository {
   async getBlogById(

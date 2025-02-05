@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
-import { BlogModelDb } from "../../db/db";
-import TBlogControllerViewModel from "../domain/BlogControllerViewModel";
-import BlogRepViewModel from "../domain/BlogRepViewModel";
+import TBlogControllerViewModel from "../types/BlogControllerViewModel";
+import BlogRepViewModel from "../types/BlogRepViewModel";
+import { BlogModelDb } from "../domain/blog-model";
 
 class BlogsQueryRepository {
   private mapBlog(blog: BlogRepViewModel): TBlogControllerViewModel {

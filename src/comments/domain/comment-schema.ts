@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import CommentRepViewModel from "./CommentRepViewModel";
+import CommentRepViewModel from "../types/CommentRepViewModel";
 
 const commentSchema = new mongoose.Schema<CommentRepViewModel>({
   content: { type: String, required: true },

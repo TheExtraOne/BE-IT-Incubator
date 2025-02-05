@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
-import { RefreshTokenModelDb } from "../../db/db";
-import RefreshTokensMetaRepViewModel from "../domain/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
+import { RefreshTokenModelDb } from "../domain/refresh-token-model";
 
 class SecurityRepository {
   async saveRefreshTokenMeta(

@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import { RESULT_STATUS } from "../../common/settings";
-import { BlogModelDb } from "../../db/db";
-import BlogRepViewModel from "../domain/BlogRepViewModel";
-import TBlogServiceInputModel from "../domain/BlogServiceInputModel";
+import BlogRepViewModel from "../types/BlogRepViewModel";
+import TBlogServiceInputModel from "../types/BlogServiceInputModel";
 import BlogsRepository from "../infrastructure/blogs-repository";
 import { Result } from "../../common/types/types";
+import { BlogModelDb } from "../domain/blog-model";
 
 class BlogService {
   constructor(protected blogsRepository: BlogsRepository) {}

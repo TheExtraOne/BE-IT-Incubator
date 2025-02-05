@@ -1,14 +1,14 @@
 import { Response, Request } from "express";
-import TAuthLoginControllerInputModel from "../domain/AuthLoginControllerInputModel";
-import TAuthRegistrationControllerInputModel from "../domain/AuthRegistrationControllerInputModel";
+import TAuthLoginControllerInputModel from "../types/AuthLoginControllerInputModel";
+import TAuthRegistrationControllerInputModel from "../types/AuthRegistrationControllerInputModel";
 import AuthService from "../infrastructure/auth-service";
 import { ObjectId } from "mongodb";
-import TAuthNewPasswordControllerInputModel from "../domain/AuthNewPasswordControllerInputModel";
+import TAuthNewPasswordControllerInputModel from "../types/AuthNewPasswordControllerInputModel";
 import JwtService from "../../adapters/jwt-service";
 import { RESULT_STATUS, HTTP_STATUS, TOKEN_TYPE } from "../../common/settings";
 import { Result, TRequestWithBody } from "../../common/types/types";
 import SecurityService from "../../security/app/security-service";
-import TUserControllerViewModel from "../../users/domain/UserControllerViewModel";
+import TUserControllerViewModel from "../../users/types/UserControllerViewModel";
 import UsersService from "../../users/app/users-service";
 import UsersQueryRepository from "../../users/infrastructure/users-query-repository";
 

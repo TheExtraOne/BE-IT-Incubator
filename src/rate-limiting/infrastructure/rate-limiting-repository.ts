@@ -1,8 +1,8 @@
 import { subSeconds } from "date-fns";
 import { HydratedDocument } from "mongoose";
 import { SETTINGS } from "../../common/settings";
-import { RateLimitModelDb } from "../../db/db";
-import RateLimitingRepViewModel from "../domain/RateLimitingRepViewModel";
+import RateLimitingRepViewModel from "../types/RateLimitingRepViewModel";
+import { RateLimitModelDb } from "../domain/rate-limit-model";
 
 class RateLimitingRepository {
   async saveNewRequest(

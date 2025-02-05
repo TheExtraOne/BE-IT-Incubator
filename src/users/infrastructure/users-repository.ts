@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
-import { UserModelDb } from "../../db/db";
-import UserAccountRepViewModel from "../domain/UserAccountRepViewModel";
+import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
+import { UserModelDb } from "../domain/user-model";
 
 class UsersRepository {
   async getUserById(

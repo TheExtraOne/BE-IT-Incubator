@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { LIKE_STATUS, SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
-import { CommentModelDb } from "../../db/db";
-import CommentRepViewModel from "../domain/CommentRepViewModel";
-import TCommentControllerViewModel from "../domain/PostCommentControllerViewModel";
+import CommentRepViewModel from "../types/CommentRepViewModel";
+import TCommentControllerViewModel from "../types/PostCommentControllerViewModel";
+import { CommentModelDb } from "../domain/comment-model";
 
 class CommentsQueryRepository {
   private mapComment(

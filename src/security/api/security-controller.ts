@@ -3,9 +3,9 @@ import JwtService from "../../adapters/jwt-service";
 import { HTTP_STATUS } from "../../common/settings";
 import { Result, TRequestWithParams } from "../../common/types/types";
 import SecurityService from "../app/security-service";
-import TPathParamsRefreshTokenMetaModel from "../domain/PathParamsRefreshTokenMetaModel";
-import TRefreshTokenMetaControllerViewModel from "../domain/RefreshTokenMetaControllerViewModel";
-import RefreshTokensMetaRepViewModel from "../domain/RefreshTokensMetaRepViewModel";
+import TPathParamsRefreshTokenMetaModel from "../types/PathParamsRefreshTokenMetaModel";
+import TRefreshTokenMetaControllerViewModel from "../types/RefreshTokenMetaControllerViewModel";
+import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 import SecurityQueryRepository from "../infrastructure/security-query-repository";
 
 class SecurityController {

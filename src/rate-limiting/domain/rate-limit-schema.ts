@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import RateLimitingRepViewModel from "./RateLimitingRepViewModel";
+import RateLimitingRepViewModel from "../types/RateLimitingRepViewModel";
 
 const rateLimitSchema = new mongoose.Schema<RateLimitingRepViewModel>({
   ip: { type: String, required: true },

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import RefreshTokensMetaRepViewModel from "./RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 
 const refreshTokenSchema = new mongoose.Schema<RefreshTokensMetaRepViewModel>({
   ip: { type: String, required: true },

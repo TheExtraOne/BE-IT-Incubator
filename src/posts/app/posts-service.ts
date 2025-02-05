@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
-import TPostServiceInputModel from "../domain/PostServiceInputModel";
-import PostRepViewModel from "../domain/PostRepViewModel";
+import TPostServiceInputModel from "../types/PostServiceInputModel";
+import PostRepViewModel from "../types/PostRepViewModel";
 import { Result } from "../../common/types/types";
 import { RESULT_STATUS } from "../../common/settings";
-import BlogRepViewModel from "../../blogs/domain/BlogRepViewModel";
-import { PostModelDb } from "../../db/db";
+import BlogRepViewModel from "../../blogs/types/BlogRepViewModel";
+import { PostModelDb } from "../domain/post-model";
 import { HydratedDocument } from "mongoose";
 import BlogsRepository from "../../blogs/infrastructure/blogs-repository";
 import PostsRepository from "../infrastructure/posts-repository";

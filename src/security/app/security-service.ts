@@ -1,11 +1,11 @@
-import RefreshTokensMetaRepViewModel from "../domain/RefreshTokensMetaRepViewModel";
+import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 import { ObjectId } from "mongodb";
 import JwtService from "../../adapters/jwt-service";
 import { Result } from "../../common/types/types";
-import { RefreshTokenModelDb } from "../../db/db";
 import { RESULT_STATUS } from "../../common/settings";
 import { HydratedDocument } from "mongoose";
 import SecurityRepository from "../infrastructure/security-repository";
+import { RefreshTokenModelDb } from "../domain/refresh-token-model";
 
 class SecurityService {
   constructor(

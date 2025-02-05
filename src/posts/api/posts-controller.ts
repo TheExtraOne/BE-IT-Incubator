@@ -14,14 +14,14 @@ import {
   TRequestWithQueryAndParams,
   TResponseWithPagination,
 } from "../../common/types/types";
-import TQueryPostModel from "../domain/QueryPostModel";
-import TPostControllerViewModel from "../domain/PostControllerViewModel";
-import TPathParamsPostModel from "../domain/PathParamsPostModel";
-import TPostControllerInputModel from "../domain/PostControllerInputModel";
-import TPostCommentControllerInputModel from "../../comments/domain/PostCommentControllerInputModel";
-import TQueryCommentsModel from "../../comments/domain/QueryCommentsModel";
+import TQueryPostModel from "../types/QueryPostModel";
+import TPostControllerViewModel from "../types/PostControllerViewModel";
+import TPathParamsPostModel from "../types/PathParamsPostModel";
+import TPostControllerInputModel from "../types/PostControllerInputModel";
 import CommentsController from "../../comments/api/comments-controller";
 import PostsQueryRepository from "../infrastructure/posts-query-repository";
+import TQueryCommentsModel from "../../comments/types/QueryCommentsModel";
+import TPostCommentControllerInputModel from "../../comments/types/PostCommentControllerInputModel";
 
 class PostsController {
   constructor(

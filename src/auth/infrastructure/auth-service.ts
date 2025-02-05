@@ -5,7 +5,7 @@ import MailManager from "../../managers/mail-manager";
 import UserAccountRepViewModel, {
   TEmailConfirmation,
   TPasswordResetConfirmation,
-} from "../../users/domain/UserAccountRepViewModel";
+} from "../../users/types/UserAccountRepViewModel";
 import { add } from "date-fns";
 import { ObjectId } from "mongodb";
 import BcryptService from "../../adapters/bcrypt-service";

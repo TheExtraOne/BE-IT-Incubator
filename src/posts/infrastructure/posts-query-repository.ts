@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
-import { PostModelDb } from "../../db/db";
-import TPostControllerViewModel from "../domain/PostControllerViewModel";
-import PostRepViewModel from "../domain/PostRepViewModel";
+import TPostControllerViewModel from "../types/PostControllerViewModel";
+import PostRepViewModel from "../types/PostRepViewModel";
+import { PostModelDb } from "../domain/post-model";
 
 class PostsQueryRepository {
   private mapPost(post: PostRepViewModel): TPostControllerViewModel {

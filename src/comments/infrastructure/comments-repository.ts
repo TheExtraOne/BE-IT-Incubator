@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
-import CommentRepViewModel from "../domain/CommentRepViewModel";
-import { CommentModelDb } from "../../db/db";
+import { CommentModelDb } from "../domain/comment-model";
+import CommentRepViewModel from "../types/CommentRepViewModel";
 
 class CommentsRepository {
   async saveComment(

@@ -14,16 +14,16 @@ import {
   Result,
 } from "../../common/types/types";
 import LikesService from "../../likes/app/likes-service";
-import TPathParamsPostModel from "../../posts/domain/PathParamsPostModel";
+import TPathParamsPostModel from "../../posts/types/PathParamsPostModel";
 import CommentsService from "../app/comments-service";
-import TCommentsLikeInputModel from "../domain/CommentLikeInputModel";
-import TCommentServiceViewModel from "../domain/CommentServiceViewModel";
-import TPathParamsCommentsModel from "../domain/PathParamsCommentModel";
-import TPostCommentControllerInputModel from "../domain/PostCommentControllerInputModel";
-import TCommentControllerViewModel from "../domain/PostCommentControllerViewModel";
-import TQueryCommentsModel from "../domain/QueryCommentsModel";
 import CommentsQueryRepository from "../infrastructure/comments-query-repository";
-import LikesRepViewModel from "../../likes/domain/LikeRepViewModel";
+import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
+import TCommentsLikeInputModel from "../types/CommentLikeInputModel";
+import TCommentServiceViewModel from "../types/CommentServiceViewModel";
+import TPathParamsCommentsModel from "../types/PathParamsCommentModel";
+import TPostCommentControllerInputModel from "../types/PostCommentControllerInputModel";
+import TCommentControllerViewModel from "../types/PostCommentControllerViewModel";
+import TQueryCommentsModel from "../types/QueryCommentsModel";
 
 class CommentsController {
   constructor(

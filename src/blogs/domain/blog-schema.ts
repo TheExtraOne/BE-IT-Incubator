@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import BlogRepViewModel from "./BlogRepViewModel";
+import BlogRepViewModel from "../types/BlogRepViewModel";
 
 const blogSchema = new mongoose.Schema<BlogRepViewModel>({
   name: { type: String, required: true },

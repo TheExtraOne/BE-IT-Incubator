@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { LIKE_STATUS, LIKE_TYPE } from "../../common/settings";
-import LikeRepViewModel from "./LikeRepViewModel";
+import LikeRepViewModel from "../types/LikeRepViewModel";
 
 const likeSchema = new mongoose.Schema<LikeRepViewModel>({
   status: { type: String, enum: LIKE_STATUS, required: true },

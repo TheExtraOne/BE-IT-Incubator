@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import { LIKE_STATUS, LIKE_TYPE, RESULT_STATUS } from "../../common/settings";
-import LikesRepViewModel from "../domain/LikeRepViewModel";
-import { LikeModelDb } from "../../db/db";
+import LikesRepViewModel from "../types/LikeRepViewModel";
 import { Result } from "../../common/types/types";
 import { HydratedDocument } from "mongoose";
 import CommentsService from "../../comments/app/comments-service";
 import LikesRepository from "../infrastructure/likes-repository";
+import { LikeModelDb } from "../domain/like-model";
 
 class LikesService {
   constructor(

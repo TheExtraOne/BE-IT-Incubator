@@ -1,6 +1,6 @@
 import { HydratedDocument } from "mongoose";
-import LikesRepViewModel from "../domain/LikeRepViewModel";
-import { LikeModelDb } from "../../db/db";
+import LikesRepViewModel from "../types/LikeRepViewModel";
+import { LikeModelDb } from "../domain/like-model";
 
 class LikesRepository {
   async saveLike(like: HydratedDocument<LikesRepViewModel>): Promise<void> {

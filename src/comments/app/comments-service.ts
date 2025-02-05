@@ -2,16 +2,15 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import CommentsRepository from "../infrastructure/comments-repository";
 import { RESULT_STATUS } from "../../common/settings";
-import { CommentModelDb } from "../../db/db";
-import UserAccountRepViewModel from "../../users/domain/UserAccountRepViewModel";
+import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
 import UsersRepository from "../../users/infrastructure/users-repository";
+import { Result } from "../../common/types/types";
+import { CommentModelDb } from "../domain/comment-model";
 import CommentRepViewModel, {
   TCommentatorInfo,
   TLikesInfo,
-} from "../domain/CommentRepViewModel";
-import TCommentsServiceInputModel from "../domain/CommentServiceInputModel";
-import { Result } from "../../common/types/types";
-
+} from "../types/CommentRepViewModel";
+import TCommentsServiceInputModel from "../types/CommentServiceInputModel";
 class CommentsService {
   constructor(
     private commentRepository: CommentsRepository,

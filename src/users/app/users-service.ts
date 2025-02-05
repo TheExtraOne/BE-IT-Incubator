@@ -1,14 +1,14 @@
 import { ObjectId } from "mongodb";
 import { Result, TExtension } from "../../common/types/types";
-import TUserServiceInputModel from "../domain/UserServiceInputModel";
+import TUserServiceInputModel from "../types/UserServiceInputModel";
 import { RESULT_STATUS } from "../../common/settings";
-import UserAccountRepViewModel from "../domain/UserAccountRepViewModel";
-import TUserControllerViewModel from "../domain/UserControllerViewModel";
+import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
+import TUserControllerViewModel from "../types/UserControllerViewModel";
 import { add } from "date-fns";
 import BcryptService from "../../adapters/bcrypt-service";
-import { UserModelDb } from "../../db/db";
 import { HydratedDocument } from "mongoose";
 import UsersRepository from "../infrastructure/users-repository";
+import { UserModelDb } from "../domain/user-model";
 
 class UsersService {
   constructor(

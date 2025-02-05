@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { SORT_DIRECTION } from "../../common/settings";
 import { TResponseWithPagination } from "../../common/types/types";
-import { UserModelDb } from "../../db/db";
-import UserAccountRepViewModel from "../domain/UserAccountRepViewModel";
-import TUserControllerViewModel from "../domain/UserControllerViewModel";
+import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
+import TUserControllerViewModel from "../types/UserControllerViewModel";
+import { UserModelDb } from "../domain/user-model";
 
 class UsersQueryRepository {
   private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {

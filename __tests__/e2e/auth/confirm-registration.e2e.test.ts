@@ -1,7 +1,7 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, testDb } from "../helpers";
-import { UserModelDb } from "../../../src/db/db";
 import UsersRepository from "../../../src/users/infrastructure/users-repository";
+import { UserModelDb } from "../../../src/users/domain/user-model";
 
 const usersRepository = new UsersRepository();
 

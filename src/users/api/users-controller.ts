@@ -12,13 +12,13 @@ import {
   Result,
 } from "../../common/types/types";
 import UsersService from "../app/users-service";
-import TPathParamsUserModel from "../domain/PathParamsUserModel";
-import TQueryUserModel from "../domain/QueryUserModel";
-import TUserControllerInputModel from "../domain/UserControllerInputModel";
-import TUserControllerViewModel from "../domain/UserControllerViewModel";
-import TUserServiceViewModel from "../domain/UserServiceViewModel";
+import TPathParamsUserModel from "../types/PathParamsUserModel";
+import TQueryUserModel from "../types/QueryUserModel";
+import TUserControllerInputModel from "../types/UserControllerInputModel";
+import TUserControllerViewModel from "../types/UserControllerViewModel";
+import TUserServiceViewModel from "../types/UserServiceViewModel";
 import UsersQueryRepository from "../infrastructure/users-query-repository";
-import UserAccountRepViewModel from "../domain/UserAccountRepViewModel";
+import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
 import { HydratedDocument } from "mongoose";
 
 class UsersController {

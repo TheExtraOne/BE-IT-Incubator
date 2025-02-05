@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
-import RateLimitingRepViewModel from "../domain/RateLimitingRepViewModel";
+import RateLimitingRepViewModel from "../types/RateLimitingRepViewModel";
 import { HydratedDocument } from "mongoose";
-import { RateLimitModelDb } from "../../db/db";
 import RateLimitingRepository from "../infrastructure/rate-limiting-repository";
+import { RateLimitModelDb } from "../domain/rate-limit-model";
 
 class RateLimitingService {
   constructor(private rateLimitingRepository: RateLimitingRepository) {}

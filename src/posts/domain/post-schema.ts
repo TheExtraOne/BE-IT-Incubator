@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import PostRepViewModel from "./PostRepViewModel";
+import PostRepViewModel from "../types/PostRepViewModel";
 
 const postSchema = new mongoose.Schema<PostRepViewModel>({
   title: { type: String, required: true },

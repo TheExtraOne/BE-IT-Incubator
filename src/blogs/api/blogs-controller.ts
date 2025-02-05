@@ -13,14 +13,14 @@ import {
   TRequestWithParamsAndBody,
   Result,
 } from "../../common/types/types";
-import TPostControllerViewModel from "../../posts/domain/PostControllerViewModel";
-import TQueryPostModel from "../../posts/domain/QueryPostModel";
+import TPostControllerViewModel from "../../posts/types/PostControllerViewModel";
+import TQueryPostModel from "../../posts/types/QueryPostModel";
 import PostsService from "../../posts/app/posts-service";
 import BlogService from "../app/blogs-service";
-import TBlogControllerInputModel from "../domain/BlogControllerInputModel";
-import TBlogControllerViewModel from "../domain/BlogControllerViewModel";
-import TPathParamsBlogModel from "../domain/PathParamsBlogModel";
-import TQueryBlogModel from "../domain/QueryBlogModel";
+import TBlogControllerInputModel from "../types/BlogControllerInputModel";
+import TBlogControllerViewModel from "../types/BlogControllerViewModel";
+import TPathParamsBlogModel from "../types/PathParamsBlogModel";
+import TQueryBlogModel from "../types/QueryBlogModel";
 import BlogsQueryRepository from "../infrastructure/blogs-query-repository";
 import PostsQueryRepository from "../../posts/infrastructure/posts-query-repository";
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import UserAccountRepViewModel from "./UserAccountRepViewModel";
+import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
 
 const userSchema = new mongoose.Schema<UserAccountRepViewModel>({
   accountData: {

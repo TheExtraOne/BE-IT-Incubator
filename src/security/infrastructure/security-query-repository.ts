@@ -1,6 +1,6 @@
-import { RefreshTokenModelDb } from "../../db/db";
-import TRefreshTokenMetaControllerViewModel from "../domain/RefreshTokenMetaControllerViewModel";
-import RefreshTokensMetaRepViewModel from "../domain/RefreshTokensMetaRepViewModel";
+import { RefreshTokenModelDb } from "../domain/refresh-token-model";
+import TRefreshTokenMetaControllerViewModel from "../types/RefreshTokenMetaControllerViewModel";
+import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 
 class SecurityQueryRepository {
   private mapRefreshTokenMeta(

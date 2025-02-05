@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
-import PostRepViewModel from "../domain/PostRepViewModel";
-import { PostModelDb } from "../../db/db";
+import PostRepViewModel from "../types/PostRepViewModel";
+import { PostModelDb } from "../domain/post-model";
 
 class PostsRepository {
   async savePost(post: HydratedDocument<PostRepViewModel>): Promise<void> {

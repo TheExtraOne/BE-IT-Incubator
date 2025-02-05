@@ -4,11 +4,10 @@ import CommentsRepository from "../infrastructure/comments-repository";
 import { RESULT_STATUS } from "../../common/settings";
 import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
 import UsersRepository from "../../users/infrastructure/users-repository";
-import { Result } from "../../common/types/types";
+import { Result, TLikesInfo } from "../../common/types/types";
 import { CommentModelDb } from "../domain/comment-model";
 import CommentRepViewModel, {
   TCommentatorInfo,
-  TLikesInfo,
 } from "../types/CommentRepViewModel";
 import TCommentsServiceInputModel from "../types/CommentServiceInputModel";
 class CommentsService {

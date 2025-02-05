@@ -1,5 +1,5 @@
 import { LIKE_STATUS } from "../../common/settings";
-import { TLikesInfo } from "./CommentRepViewModel";
+import { TLikesInfo } from "../../common/types/types";
 
 type TCommentControllerViewModel = {
   /**

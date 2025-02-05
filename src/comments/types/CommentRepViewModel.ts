@@ -1,14 +1,9 @@
 import { ObjectId } from "mongodb";
-import { LIKE_STATUS } from "../../common/settings";
+import { TLikesInfo } from "../../common/types/types";
 
 export type TCommentatorInfo = {
   userId: string;
   userLogin: string;
-};
-
-export type TLikesInfo = {
-  likesCount: number;
-  dislikesCount: number;
 };
 // type TCommentRepViewModel = WithId<{
 //   /**

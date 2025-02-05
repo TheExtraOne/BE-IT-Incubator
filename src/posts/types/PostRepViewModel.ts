@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { TLikesInfo } from "../../common/types/types";
 
 // type PostRepViewModel = WithId<{
 //   /**
@@ -35,7 +36,8 @@ class PostRepViewModel {
     public content: string,
     public blogId: string,
     public blogName: string,
-    public createdAt: string
+    public createdAt: string,
+    public extendedLikesInfo: TLikesInfo
   ) {}
 }
 

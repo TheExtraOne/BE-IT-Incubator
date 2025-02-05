@@ -9,6 +9,7 @@ import {
 } from "../../common/middlewares";
 import bodyPostsInputValidator from "../middleware/body-post-input-validation-middleware";
 import { postsController } from "../../composition-root";
+import likeStatusInputValidator from "../../comments/middleware/like-status-input-middleware";
 
 const postsRouter = Router({});
 
@@ -48,6 +49,11 @@ const createCommentForPosyById = [
   bodyPostCommentInputValidator.contentValidation,
   inputCheckErrorsMiddleware,
 ];
+const likeStatusCommentMiddleware = [
+  accessTokenVerificationMiddleware,
+  likeStatusInputValidator.likeStatusValidation,
+  inputCheckErrorsMiddleware,
+];
 
 postsRouter
   .route("/")
@@ -82,5 +88,11 @@ postsRouter
     basicAuthorizationMiddleware,
     postsController.deletePostById.bind(postsController)
   );
+
+postsRouter.put(
+  "/:id/like-status",
+  [...likeStatusCommentMiddleware],
+  postsController.changeLikeStatus.bind(postsController)
+);
 
 export default postsRouter;

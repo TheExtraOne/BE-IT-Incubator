@@ -9,10 +9,10 @@ class LikesRepository {
 
   async getLikeByUserAndCommentId(
     userId: string,
-    commentId: string
+    parentId: string
   ): Promise<HydratedDocument<LikesRepViewModel> | null> {
     const like: HydratedDocument<LikesRepViewModel> | null =
-      await LikeModelDb.findOne({ authorId: userId, parentId: commentId });
+      await LikeModelDb.findOne({ authorId: userId, parentId: parentId });
 
     return like;
   }

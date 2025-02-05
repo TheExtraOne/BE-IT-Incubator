@@ -3,6 +3,7 @@ import {
   SORT_DIRECTION,
   HTTP_STATUS,
   RESULT_STATUS,
+  LIKE_TYPE,
 } from "../../common/settings";
 import PostsService from "../app/posts-service";
 import {
@@ -22,12 +23,15 @@ import CommentsController from "../../comments/api/comments-controller";
 import PostsQueryRepository from "../infrastructure/posts-query-repository";
 import TQueryCommentsModel from "../../comments/types/QueryCommentsModel";
 import TPostCommentControllerInputModel from "../../comments/types/PostCommentControllerInputModel";
+import TPostsLikeInputModel from "../types/PostLikeInputModel";
+import LikesService from "../../likes/app/likes-service";
 
 class PostsController {
   constructor(
     private commentsController: CommentsController,
     private postsQueryRepository: PostsQueryRepository,
-    private postsService: PostsService
+    private postsService: PostsService,
+    private likesService: LikesService
   ) {}
 
   async getPosts(req: TRequestWithQuery<TQueryPostModel>, res: Response) {
@@ -154,6 +158,31 @@ class PostsController {
         ? HTTP_STATUS.NO_CONTENT_204
         : HTTP_STATUS.NOT_FOUND_404
     );
+  }
+
+  async changeLikeStatus(
+    req: TRequestWithParamsAndBody<TPathParamsPostModel, TPostsLikeInputModel>,
+    res: Response
+  ): Promise<void> {
+    // Validation if user authorized and if the inputModel has incorrect values happens in the middleware
+    // Check if post exists
+    const postId = req.params.id;
+    const post: TPostControllerViewModel | null =
+      await this.postsQueryRepository.getPostById(postId);
+    if (!post) {
+      res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
+      return;
+    }
+    // Check and extract userId in the middlewares
+    const userId = req.userId!;
+    const likeStatus = req.body.likeStatus;
+    await this.likesService.changeLikeStatus({
+      userId,
+      parentId: postId,
+      likeStatus,
+      likeType: LIKE_TYPE.POST,
+    });
+    res.sendStatus(HTTP_STATUS.NO_CONTENT_204);
   }
 }
 

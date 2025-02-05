@@ -1,4 +1,4 @@
-import { TLikesInfo } from "./CommentRepViewModel";
+import { TLikesInfo } from "../../common/types/types";
 
 type TCommentServiceViewModel = {
   /**

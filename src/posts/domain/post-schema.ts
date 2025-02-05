@@ -8,6 +8,10 @@ const postSchema = new mongoose.Schema<PostRepViewModel>({
   blogId: { type: String, required: true },
   blogName: { type: String, required: true },
   createdAt: { type: String, required: true },
+  extendedLikesInfo: {
+    likesCount: { type: Number, required: true },
+    dislikesCount: { type: Number, required: true },
+  },
 });
 
 export default postSchema;

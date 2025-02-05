@@ -71,7 +71,11 @@ const authService = new AuthService(
 );
 // Likes
 const likesRepository = new LikesRepository();
-const likesService = new LikesService(likesRepository, commentsService);
+const likesService = new LikesService(
+  likesRepository,
+  commentsService,
+  postsService
+);
 
 // Controllers
 export const blogController = new BlogsController(
@@ -98,7 +102,8 @@ export const commentsController = new CommentsController(
 export const postsController = new PostsController(
   commentsController,
   postsQueryRepository,
-  postsService
+  postsService,
+  likesService
 );
 
 export const securityController = new SecurityController(

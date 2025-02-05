@@ -154,9 +154,8 @@ class CommentsController {
     // Validation if user authorized and if the inputModel has incorrect values happens in the middleware
     // Check if comment exists
     const commentId = req.params.id;
-    const comment = await this.commentsQueryRepository.getCommentById(
-      commentId
-    );
+    const comment: TCommentControllerViewModel | null =
+      await this.commentsQueryRepository.getCommentById(commentId);
     if (!comment) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
@@ -166,7 +165,7 @@ class CommentsController {
     const likeStatus = req.body.likeStatus;
     await this.likesService.changeLikeStatus({
       userId,
-      commentId,
+      parentId: commentId,
       likeStatus,
       likeType: LIKE_TYPE.COMMENT,
     });

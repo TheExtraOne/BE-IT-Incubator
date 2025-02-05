@@ -30,3 +30,8 @@ export type Result<T = null> = {
   extensions: TExtension[];
   data: T;
 };
+
+export type TLikesInfo = {
+  likesCount: number;
+  dislikesCount: number;
+};

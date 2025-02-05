@@ -18,6 +18,7 @@ const getAllPostsMiddleware = [
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
+  optionalAccessTokenVerificationMiddleware,
   inputCheckErrorsMiddleware,
 ];
 const getAllCommentsForPostByIdMiddleware = [
@@ -79,7 +80,10 @@ postsRouter
 
 postsRouter
   .route("/:id")
-  .get(postsController.getPostById.bind(postsController))
+  .get(
+    optionalAccessTokenVerificationMiddleware,
+    postsController.getPostById.bind(postsController)
+  )
   .put(
     [...updatePostByIdMiddleware],
     postsController.updatePostById.bind(postsController)

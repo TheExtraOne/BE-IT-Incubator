@@ -131,15 +131,13 @@ class CommentsController {
       userId,
       commentId
     );
-    const response = like
-      ? {
-          ...comment,
-          likesInfo: {
-            ...comment.likesInfo,
-            myStatus: like.status,
-          },
-        }
-      : comment;
+    const response = {
+      ...comment,
+      likesInfo: {
+        ...comment.likesInfo,
+        myStatus: like?.status ?? LIKE_STATUS.NONE,
+      },
+    };
 
     res.status(HTTP_STATUS.OK_200).json(response);
   }

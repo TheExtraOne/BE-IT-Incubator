@@ -8,6 +8,7 @@ const likeSchema = new mongoose.Schema<LikeRepViewModel>({
   parentId: { type: String, required: true },
   createdAt: { type: Date, required: true },
   likeType: { type: String, enum: LIKE_TYPE, required: true },
+  login: { type: String, required: true },
 });
 
 export default likeSchema;

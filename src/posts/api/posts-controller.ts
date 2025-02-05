@@ -26,6 +26,7 @@ import TQueryCommentsModel from "../../comments/types/QueryCommentsModel";
 import TPostCommentControllerInputModel from "../../comments/types/PostCommentControllerInputModel";
 import TPostsLikeInputModel from "../types/PostLikeInputModel";
 import LikesService from "../../likes/app/likes-service";
+import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
 
 class PostsController {
   constructor(
@@ -54,7 +55,51 @@ class PostsController {
         sortDirection,
       });
 
-    res.status(HTTP_STATUS.OK_200).json(posts);
+    const userId: string | null = req.userId;
+    // TODO: refactor
+    // Adding latest likes info
+    const postsWithLatestLikes = posts.items.map(async (post) => {
+      const latestLikes = await this.likesService.getLatestLikesByParentId(
+        post.id
+      );
+      const has_likes = !!latestLikes?.length;
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          newestLikes: has_likes ? latestLikes : null,
+        },
+      };
+    });
+
+    const postsWithLikes = {
+      ...posts,
+      items: await Promise.all(postsWithLatestLikes),
+    };
+    if (!userId) {
+      res.status(HTTP_STATUS.OK_200).json(postsWithLikes);
+      return;
+    }
+
+    // Get the likes/dislike for a userId.
+    const likesForUser: LikesRepViewModel[] | null =
+      await this.likesService.getLikesByUserId(userId);
+
+    const postsWithUserStatusAndLikes = postsWithLikes.items.map((post) => {
+      // Find in the likes array likes for current commentId, add status
+      const like = likesForUser?.find((like) => like.parentId === post.id);
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          myStatus: like ? like.status : LIKE_STATUS.NONE,
+        },
+      };
+    });
+
+    res
+      .status(HTTP_STATUS.OK_200)
+      .json({ ...posts, items: postsWithUserStatusAndLikes });
   }
 
   async getPostById(

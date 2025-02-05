@@ -7,6 +7,7 @@ import {
 import { blogController } from "../../composition-root";
 import bodyPostsInputValidator from "../../posts/middleware/body-post-input-validation-middleware";
 import bodyBlogInputValidator from "../middlewares/body-blog-input-validation-middleware";
+import optionalAccessTokenVerificationMiddleware from "../../adapters/middleware/optional-access-token-verification-middleware";
 
 const blogsRouter = Router({});
 
@@ -19,6 +20,7 @@ const getAllPostsForBlogIdMiddleware = [
   queryInputValidator.pageSizeValidator,
   queryInputValidator.sortByValidator,
   queryInputValidator.sortDirectionValidator,
+  optionalAccessTokenVerificationMiddleware,
   inputCheckErrorsMiddleware,
 ];
 const createPostForBlogIdMiddleware = [

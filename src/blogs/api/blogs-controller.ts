@@ -3,6 +3,7 @@ import {
   SORT_DIRECTION,
   HTTP_STATUS,
   RESULT_STATUS,
+  LIKE_STATUS,
 } from "../../common/settings";
 import {
   TRequestWithQuery,
@@ -23,13 +24,16 @@ import TPathParamsBlogModel from "../types/PathParamsBlogModel";
 import TQueryBlogModel from "../types/QueryBlogModel";
 import BlogsQueryRepository from "../infrastructure/blogs-query-repository";
 import PostsQueryRepository from "../../posts/infrastructure/posts-query-repository";
+import LikesService from "../../likes/app/likes-service";
+import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
 
 class BlogsController {
   constructor(
     protected blogService: BlogService,
     protected blogsQueryRepository: BlogsQueryRepository,
     protected postsService: PostsService,
-    protected postsQueryRepository: PostsQueryRepository
+    protected postsQueryRepository: PostsQueryRepository,
+    protected likesService: LikesService
   ) {}
 
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
@@ -96,7 +100,51 @@ class BlogsController {
         sortDirection,
       });
 
-    res.status(HTTP_STATUS.OK_200).json(posts);
+    const userId: string | null = req.userId;
+    // TODO: refactor
+    // Adding latest likes info
+    const postsWithLatestLikes = posts.items.map(async (post) => {
+      const latestLikes = await this.likesService.getLatestLikesByParentId(
+        post.id
+      );
+      const has_likes = !!latestLikes?.length;
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          newestLikes: has_likes ? latestLikes : null,
+        },
+      };
+    });
+
+    const postsWithLikes = {
+      ...posts,
+      items: await Promise.all(postsWithLatestLikes),
+    };
+    if (!userId) {
+      res.status(HTTP_STATUS.OK_200).json(postsWithLikes);
+      return;
+    }
+
+    // Get the likes/dislike for a userId.
+    const likesForUser: LikesRepViewModel[] | null =
+      await this.likesService.getLikesByUserId(userId);
+
+    const postsWithUserStatusAndLikes = postsWithLikes.items.map((post) => {
+      // Find in the likes array likes for current commentId, add status
+      const like = likesForUser?.find((like) => like.parentId === post.id);
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          myStatus: like ? like.status : LIKE_STATUS.NONE,
+        },
+      };
+    });
+
+    res
+      .status(HTTP_STATUS.OK_200)
+      .json({ ...posts, items: postsWithUserStatusAndLikes });
   }
 
   async createBlog(

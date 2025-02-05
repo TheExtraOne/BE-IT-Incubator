@@ -83,7 +83,8 @@ export const blogController = new BlogsController(
   blogService,
   blogQueryRepository,
   postsService,
-  postsQueryRepository
+  postsQueryRepository,
+  likesService
 );
 
 export const authController = new AuthController(

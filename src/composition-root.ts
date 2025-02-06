@@ -79,14 +79,6 @@ const likesService = new LikesService(
 );
 
 // Controllers
-export const blogController = new BlogsController(
-  blogService,
-  blogQueryRepository,
-  postsService,
-  postsQueryRepository,
-  likesService
-);
-
 export const authController = new AuthController(
   jwtService,
   authService,
@@ -106,6 +98,15 @@ export const postsController = new PostsController(
   postsQueryRepository,
   postsService,
   likesService
+);
+
+export const blogController = new BlogsController(
+  blogService,
+  blogQueryRepository,
+  postsService,
+  postsQueryRepository,
+  likesService,
+  postsController
 );
 
 export const securityController = new SecurityController(

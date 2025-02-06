@@ -76,7 +76,7 @@ src/
 - Blogs CRUD with moderation
 - Posts CRUD with blog association
 - Comments with nested replies
-- Like/Dislike system for comments
+- Like/Dislike system for posts and comments
 
 ### Security
 
@@ -123,6 +123,27 @@ src/
 - DELETE /posts/:id - Delete post (admin only)
 - POST /posts/:postId/comments - Add comment to post
 - GET /posts/:postId/comments - Get post comments
+- PUT /posts/:postId/like-status - Update post like status (auth required)
+
+### Comment Endpoints
+
+- PUT /comments/:commentId/like-status - Update comment like status (auth required)
+- GET /comments/:id - Get comment by id
+- DELETE /comments/:id - Delete comment
+- PUT /comments/:id - Update comment
+
+### Like Status Operations
+
+The like-status endpoints accept the following status values:
+- "Like" - Add like
+- "Dislike" - Add dislike
+- "None" - Remove like/dislike
+
+Response includes:
+- likesCount - Total number of likes
+- dislikesCount - Total number of dislikes
+- myStatus - Current user's like status
+- newestLikes - Array of latest likes with user details
 
 ### User Management
 

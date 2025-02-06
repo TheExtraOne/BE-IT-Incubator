@@ -13,11 +13,10 @@ import {
   testDb,
 } from "../helpers";
 
-describe("PUT /comments/:commentId/like-status", () => {
+describe("PUT /posts/:postId/like-status", () => {
   let accessToken1: string;
   let accessToken2: string;
   let postId: string;
-  let commentId: string;
   let userId1: string;
   let userId2: string;
 
@@ -87,143 +86,158 @@ describe("PUT /comments/:commentId/like-status", () => {
       .expect(HTTP_STATUS.CREATED_201);
     
     postId = postResponse.body.id;
-
-    // Create a comment
-    const commentResponse = await req
-      .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
-      .auth(accessToken1, { type: "bearer" })
-      .send({ content: "Test comment content" })
-      .expect(HTTP_STATUS.CREATED_201);
-    
-    commentId = commentResponse.body.id;
   });
 
   describe("Authentication and Authorization", () => {
     it("should return 401 if user is not authenticated", async () => {
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
     });
   });
 
   describe("Input Validation", () => {
-    it("should return 404 if comment does not exist", async () => {
+    it("should return 404 if post not found", async () => {
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${incorrectId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${incorrectId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NOT_FOUND_404);
     });
 
-    it("should return 400 if likeStatus is invalid", async () => {
+    it("should return 400 if likeStatus has incorrect value", async () => {
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
-        .send({ likeStatus: "INVALID_STATUS" })
+        .send({ likeStatus: "invalid_status" })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
     });
   });
 
   describe("Basic Like Operations", () => {
-    it("should successfully like a comment", async () => {
+    it("should successfully like the post", async () => {
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      // Verify the like was applied
-      const commentResponse = await req
-        .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+      const response = await req
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
         .auth(accessToken1, { type: "bearer" })
         .expect(HTTP_STATUS.OK_200);
 
-      expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
-      expect(commentResponse.body.likesInfo.likesCount).toBe(1);
-      expect(commentResponse.body.likesInfo.dislikesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.likesCount).toBe(1);
+      expect(response.body.extendedLikesInfo.dislikesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
     });
 
-    it("should successfully dislike a comment", async () => {
+    it("should successfully dislike the post", async () => {
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.DISLIKE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      // Verify the dislike was applied
-      const commentResponse = await req
-        .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+      const response = await req
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
         .auth(accessToken1, { type: "bearer" })
         .expect(HTTP_STATUS.OK_200);
 
-      expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
-      expect(commentResponse.body.likesInfo.likesCount).toBe(0);
-      expect(commentResponse.body.likesInfo.dislikesCount).toBe(1);
+      expect(response.body.extendedLikesInfo.likesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.dislikesCount).toBe(1);
+      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
     });
 
     it("should successfully remove like/dislike status", async () => {
-      // First like the comment
+      // First like the post
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Then remove the like
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.NONE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      // Verify the like was removed
-      const commentResponse = await req
-        .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+      const response = await req
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
         .auth(accessToken1, { type: "bearer" })
         .expect(HTTP_STATUS.OK_200);
 
-      expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.NONE);
-      expect(commentResponse.body.likesInfo.likesCount).toBe(0);
-      expect(commentResponse.body.likesInfo.dislikesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.likesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.dislikesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.NONE);
     });
   });
 
   describe("Multi-User Interactions", () => {
-    it("should handle multiple users liking the same comment", async () => {
-      // First user likes the comment
+    it("should show correct likes info for multiple users", async () => {
+      // First user likes the post
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      // Second user dislikes the comment
+      // Second user dislikes the post
       await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .auth(accessToken2, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.DISLIKE })
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
-      // Verify likes count for first user
+      // Check first user's view
       const response1 = await req
-        .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
         .auth(accessToken1, { type: "bearer" })
         .expect(HTTP_STATUS.OK_200);
 
-      expect(response1.body.likesInfo.likesCount).toBe(1);
-      expect(response1.body.likesInfo.dislikesCount).toBe(1);
-      expect(response1.body.likesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
+      expect(response1.body.extendedLikesInfo.likesCount).toBe(1);
+      expect(response1.body.extendedLikesInfo.dislikesCount).toBe(1);
+      expect(response1.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
 
-      // Verify likes count for second user
+      // Check second user's view
       const response2 = await req
-        .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
         .auth(accessToken2, { type: "bearer" })
         .expect(HTTP_STATUS.OK_200);
 
-      expect(response2.body.likesInfo.likesCount).toBe(1);
-      expect(response2.body.likesInfo.dislikesCount).toBe(1);
-      expect(response2.body.likesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
+      expect(response2.body.extendedLikesInfo.likesCount).toBe(1);
+      expect(response2.body.extendedLikesInfo.dislikesCount).toBe(1);
+      expect(response2.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
+    });
+  });
+
+  describe("Status Changes", () => {
+    it("should update like status when user changes their mind", async () => {
+      // First like the post
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
+        .auth(accessToken1, { type: "bearer" })
+        .send({ likeStatus: LIKE_STATUS.LIKE })
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      // Then change to dislike
+      await req
+        .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
+        .auth(accessToken1, { type: "bearer" })
+        .send({ likeStatus: LIKE_STATUS.DISLIKE })
+        .expect(HTTP_STATUS.NO_CONTENT_204);
+
+      const response = await req
+        .get(`${SETTINGS.PATH.POSTS}/${postId}`)
+        .auth(accessToken1, { type: "bearer" })
+        .expect(HTTP_STATUS.OK_200);
+
+      expect(response.body.extendedLikesInfo.likesCount).toBe(0);
+      expect(response.body.extendedLikesInfo.dislikesCount).toBe(1);
+      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
     });
   });
 });

@@ -36,8 +36,89 @@ class PostsController {
     private likesService: LikesService
   ) {}
 
+  public async enrichPostsWithLatestLikes(
+    posts: TPostControllerViewModel[]
+  ): Promise<TPostControllerViewModel[]> {
+    // Get all latest likes for all posts in one batch
+    const latestLikesPromises = posts.map((post) =>
+      this.likesService.getLatestLikesByParentId(post.id)
+    );
+    const allLatestLikes = await Promise.all(latestLikesPromises);
+
+    // Combine posts with their latest likes
+    return posts.map((post, index) => {
+      const latestLikes = allLatestLikes[index];
+      const hasLikes = !!latestLikes?.length;
+
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          newestLikes: hasLikes ? latestLikes : [],
+        },
+      };
+    });
+  }
+
+  public async enrichPostWithLikes(
+    post: TPostControllerViewModel,
+    userId: string | null
+  ): Promise<TPostControllerViewModel> {
+    // Getting 3 latest likes for the post
+    const latestLikes = await this.likesService.getLatestLikesByParentId(
+      post.id
+    );
+    const hasLikes = !!latestLikes?.length;
+
+    // Base post with latest likes if they exist
+    const enrichedPost = hasLikes
+      ? {
+          ...post,
+          extendedLikesInfo: {
+            ...post.extendedLikesInfo,
+            newestLikes: latestLikes,
+          },
+        }
+      : post;
+
+    // If no user, return post as it
+    if (!userId) {
+      return enrichedPost;
+    }
+
+    // Add user's like status
+    const like = await this.likesService.getLikeByUserAndParentId(
+      userId,
+      post.id
+    );
+    const myStatus = like?.status ?? LIKE_STATUS.NONE;
+
+    return {
+      ...enrichedPost,
+      extendedLikesInfo: {
+        ...enrichedPost.extendedLikesInfo,
+        myStatus,
+      },
+    };
+  }
+
+  public enrichPostsWithUserStatus(
+    posts: TPostControllerViewModel[],
+    likesForUser: LikesRepViewModel[] | null
+  ): TPostControllerViewModel[] {
+    return posts.map((post) => {
+      const like = likesForUser?.find((like) => like.parentId === post.id);
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          myStatus: like?.status ?? LIKE_STATUS.NONE,
+        },
+      };
+    });
+  }
+
   async getPosts(req: TRequestWithQuery<TQueryPostModel>, res: Response) {
-    // Validating in the middleware
     const {
       pageNumber = 1,
       pageSize = 10,
@@ -45,61 +126,39 @@ class PostsController {
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
 
-    // We are reaching out to postsQueryRepository directly because of CQRS
-    const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await this.postsQueryRepository.getAllPosts({
-        blogId: null,
-        pageNumber: +pageNumber,
-        pageSize: +pageSize,
-        sortBy,
-        sortDirection,
-      });
-
     const userId: string | null = req.userId;
-    // TODO: refactor
-    // Adding latest likes info
-    const postsWithLatestLikes = posts.items.map(async (post) => {
-      const latestLikes = await this.likesService.getLatestLikesByParentId(
-        post.id
-      );
-      const has_likes = !!latestLikes?.length;
-      return {
-        ...post,
-        extendedLikesInfo: {
-          ...post.extendedLikesInfo,
-          newestLikes: has_likes ? latestLikes : [],
-        },
-      };
+
+    // Get base posts data
+    const posts = await this.postsQueryRepository.getAllPosts({
+      blogId: null,
+      pageNumber: +pageNumber,
+      pageSize: +pageSize,
+      sortBy,
+      sortDirection,
     });
 
+    // Enrich posts with latest likes
     const postsWithLikes = {
       ...posts,
-      items: await Promise.all(postsWithLatestLikes),
+      items: await this.enrichPostsWithLatestLikes(posts.items),
     };
+
+    // If no user, return posts with likes only
     if (!userId) {
       res.status(HTTP_STATUS.OK_200).json(postsWithLikes);
       return;
     }
 
-    // Get the likes/dislike for a userId.
-    const likesForUser: LikesRepViewModel[] | null =
-      await this.likesService.getLikesByUserId(userId);
+    // Get all likes for the user in one query
+    const likesForUser = await this.likesService.getLikesByUserId(userId);
 
-    const postsWithUserStatusAndLikes = postsWithLikes.items.map((post) => {
-      // Find in the likes array likes for current commentId, add status
-      const like = likesForUser?.find((like) => like.parentId === post.id);
-      return {
-        ...post,
-        extendedLikesInfo: {
-          ...post.extendedLikesInfo,
-          myStatus: like ? like.status : LIKE_STATUS.NONE,
-        },
-      };
-    });
+    // Add user's like status to each post
+    const postsWithUserStatusAndLikes = {
+      ...posts,
+      items: this.enrichPostsWithUserStatus(postsWithLikes.items, likesForUser),
+    };
 
-    res
-      .status(HTTP_STATUS.OK_200)
-      .json({ ...posts, items: postsWithUserStatusAndLikes });
+    res.status(HTTP_STATUS.OK_200).json(postsWithUserStatusAndLikes);
   }
 
   async getPostById(
@@ -117,54 +176,9 @@ class PostsController {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-    // TODO: refactor logic
-    // Get the latest 3 likes for the post
-    const latestLikes = await this.likesService.getLatestLikesByParentId(
-      postId
-    );
-    const has_likes = !!latestLikes?.length;
 
-    if (!userId) {
-      if (has_likes) {
-        res.status(HTTP_STATUS.OK_200).json({
-          ...post,
-          extendedLikesInfo: {
-            ...post.extendedLikesInfo,
-            newestLikes: latestLikes,
-          },
-        });
-        return;
-      } else {
-        res.status(HTTP_STATUS.OK_200).json(post);
-        return;
-      }
-    } else {
-      const like = await this.likesService.getLikeByUserAndParentId(
-        userId,
-        postId
-      );
-      const myStatus = like?.status ?? LIKE_STATUS.NONE;
-      if (has_likes) {
-        res.status(HTTP_STATUS.OK_200).json({
-          ...post,
-          extendedLikesInfo: {
-            ...post.extendedLikesInfo,
-            myStatus,
-            newestLikes: latestLikes,
-          },
-        });
-        return;
-      } else {
-        res.status(HTTP_STATUS.OK_200).json({
-          ...post,
-          extendedLikesInfo: {
-            ...post.extendedLikesInfo,
-            myStatus,
-          },
-        });
-        return;
-      }
-    }
+    const enrichedPost = await this.enrichPostWithLikes(post, userId);
+    res.status(HTTP_STATUS.OK_200).json(enrichedPost);
   }
 
   async getAllCommentsForPostById(

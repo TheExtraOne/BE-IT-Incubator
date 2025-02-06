@@ -10,7 +10,7 @@ import {
 } from "../helpers";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-describe("PUT /comments", () => {
+describe("PUT /comments/:commentId", () => {
   let accessToken: string;
   let postId: string;
   let commentId: string;
@@ -75,54 +75,12 @@ describe("PUT /comments", () => {
     commentId = cId;
   });
 
-  describe("Comment update", () => {
+  describe("Authentication and Authorization", () => {
     it("should return 401 if no authorization token provided", async () => {
       await req
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .send({ content: "Brand new updated content" })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
-
-    it("should return 404 if comment does not exist", async () => {
-      await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
-        .set({ Authorization: `Bearer ${accessToken}` })
-        .send({ content: "Brand new updated content" })
-        .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
-
-    it("should return 400 if content is empty", async () => {
-      const res = await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .set({ Authorization: `Bearer ${accessToken}` })
-        .send({ content: "" })
-        .expect(HTTP_STATUS.BAD_REQUEST_400);
-
-      expect(res.body).toEqual({
-        errorsMessages: [
-          {
-            message: "Content is a required field",
-            field: "content",
-          },
-        ],
-      });
-    });
-
-    it("should return 400 if content is too short", async () => {
-      const res = await req
-        .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-        .set({ Authorization: `Bearer ${accessToken}` })
-        .send({ content: "New content" })
-        .expect(HTTP_STATUS.BAD_REQUEST_400);
-
-      expect(res.body).toEqual({
-        errorsMessages: [
-          {
-            message: "Incorrect length. Min = 20, max = 300",
-            field: "content",
-          },
-        ],
-      });
     });
 
     it("should return 403 if trying to update someone else's comment", async () => {
@@ -153,7 +111,55 @@ describe("PUT /comments", () => {
         .send({ content: "Updated by other user" })
         .expect(HTTP_STATUS.FORBIDDEN_403);
     });
+  });
 
+  describe("Input Validation", () => {
+    it("should return 404 if comment does not exist", async () => {
+      await req
+        .put(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
+        .set({ Authorization: `Bearer ${accessToken}` })
+        .send({ content: "Brand new updated content" })
+        .expect(HTTP_STATUS.NOT_FOUND_404);
+    });
+
+    describe("Content Validation", () => {
+      it("should return 400 if content is empty", async () => {
+        const res = await req
+          .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+          .set({ Authorization: `Bearer ${accessToken}` })
+          .send({ content: "" })
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
+
+        expect(res.body).toEqual({
+          errorsMessages: [
+            {
+              message: "Content is a required field",
+              field: "content",
+            },
+          ],
+        });
+      });
+
+      it("should return 400 if content is too short", async () => {
+        const res = await req
+          .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
+          .set({ Authorization: `Bearer ${accessToken}` })
+          .send({ content: "New content" })
+          .expect(HTTP_STATUS.BAD_REQUEST_400);
+
+        expect(res.body).toEqual({
+          errorsMessages: [
+            {
+              message: "Incorrect length. Min = 20, max = 300",
+              field: "content",
+            },
+          ],
+        });
+      });
+    });
+  });
+
+  describe("Successful Operations", () => {
     it("should return 204 and update comment if input is valid", async () => {
       const newContent = "Updated comment content";
 

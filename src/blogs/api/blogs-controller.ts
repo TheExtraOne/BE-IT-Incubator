@@ -25,7 +25,7 @@ import TQueryBlogModel from "../types/QueryBlogModel";
 import BlogsQueryRepository from "../infrastructure/blogs-query-repository";
 import PostsQueryRepository from "../../posts/infrastructure/posts-query-repository";
 import LikesService from "../../likes/app/likes-service";
-import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
+import PostsController from "../../posts/api/posts-controller";
 
 class BlogsController {
   constructor(
@@ -33,7 +33,8 @@ class BlogsController {
     protected blogsQueryRepository: BlogsQueryRepository,
     protected postsService: PostsService,
     protected postsQueryRepository: PostsQueryRepository,
-    protected likesService: LikesService
+    protected likesService: LikesService,
+    private postsController: PostsController
   ) {}
 
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
@@ -77,74 +78,55 @@ class BlogsController {
     res: Response
   ) {
     // Check if blog exists
-    const blog: TBlogControllerViewModel | null =
-      await this.blogsQueryRepository.getBlogById(req.params.id);
+    const blog = await this.blogsQueryRepository.getBlogById(req.params.id);
     if (!blog) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
-    // Query validation is in the middleware
+
     const {
       pageNumber = 1,
       pageSize = 10,
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-    // We are reaching out to postsQueryRepository directly because of CQRS
-    const posts: TResponseWithPagination<TPostControllerViewModel[] | []> =
-      await this.postsQueryRepository.getAllPosts({
-        blogId: req.params.id,
-        pageNumber: +pageNumber,
-        pageSize: +pageSize,
-        sortBy,
-        sortDirection,
-      });
 
     const userId: string | null = req.userId;
-    // TODO: refactor
-    // Adding latest likes info
-    const postsWithLatestLikes = posts.items.map(async (post) => {
-      const latestLikes = await this.likesService.getLatestLikesByParentId(
-        post.id
-      );
-      const has_likes = !!latestLikes?.length;
-      return {
-        ...post,
-        extendedLikesInfo: {
-          ...post.extendedLikesInfo,
-          newestLikes: has_likes ? latestLikes : [],
-        },
-      };
+
+    // Get base posts data
+    const posts = await this.postsQueryRepository.getAllPosts({
+      blogId: req.params.id,
+      pageNumber: +pageNumber,
+      pageSize: +pageSize,
+      sortBy,
+      sortDirection,
     });
 
+    // Reuse PostsController's enrichment methods
     const postsWithLikes = {
       ...posts,
-      items: await Promise.all(postsWithLatestLikes),
+      items: await this.postsController.enrichPostsWithLatestLikes(posts.items),
     };
+
+    // If no user, return posts with likes only
     if (!userId) {
       res.status(HTTP_STATUS.OK_200).json(postsWithLikes);
       return;
     }
 
-    // Get the likes/dislike for a userId.
-    const likesForUser: LikesRepViewModel[] | null =
-      await this.likesService.getLikesByUserId(userId);
+    // Get all likes for the user in one query
+    const likesForUser = await this.likesService.getLikesByUserId(userId);
 
-    const postsWithUserStatusAndLikes = postsWithLikes.items.map((post) => {
-      // Find in the likes array likes for current commentId, add status
-      const like = likesForUser?.find((like) => like.parentId === post.id);
-      return {
-        ...post,
-        extendedLikesInfo: {
-          ...post.extendedLikesInfo,
-          myStatus: like ? like.status : LIKE_STATUS.NONE,
-        },
-      };
-    });
+    // Add user's like status to each post
+    const postsWithUserStatusAndLikes = {
+      ...posts,
+      items: this.postsController.enrichPostsWithUserStatus(
+        postsWithLikes.items,
+        likesForUser
+      ),
+    };
 
-    res
-      .status(HTTP_STATUS.OK_200)
-      .json({ ...posts, items: postsWithUserStatusAndLikes });
+    res.status(HTTP_STATUS.OK_200).json(postsWithUserStatusAndLikes);
   }
 
   async createBlog(

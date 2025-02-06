@@ -11,11 +11,13 @@ A robust REST API platform for blogging with TypeScript and Express.js. Features
 - **Authentication**: JWT, bcrypt
 - **Email Service**: Nodemailer
 - **Testing**: Jest, Supertest
+- **Dependency Injection**: InversifyJS
 - **Architecture**:
   - Clean Architecture principles with distinct layers (API, Application, Infrastructure, Domain)
   - Object-Oriented Programming with TypeScript classes
-  - Dependency Injection for better testability and maintainability
+  - Dependency Injection using InversifyJS for better testability and maintainability
   - Composition Root pattern for centralized dependency management
+  - Decorators for automatic dependency injection
 
 ## Development Setup
 
@@ -51,13 +53,13 @@ Create a `.env` file in the root directory with:
 src/
 ├── adapters/            # External service adapters (JWT, Email, etc.)
 ├── app.ts              # Express configuration
-├── composition-root.ts  # Dependency injection setup
+├── composition-root.ts  # Dependency injection container setup
 ├── common/             # Shared utilities and types
 └── [feature]/          # Feature modules (auth, blogs, posts, etc.)
-    ├── api/            # Controllers and routes
-    ├── app/            # Application services
+    ├── api/            # Controllers and routes with @injectable decorators
+    ├── app/            # Application services with @injectable decorators
     ├── domain/         # Domain models and schemas
-    └── infrastructure/ # Repositories and data access
+    └── infrastructure/ # Repositories with @injectable decorators
 ```
 
 ## Features
@@ -135,11 +137,13 @@ src/
 ### Like Status Operations
 
 The like-status endpoints accept the following status values:
+
 - "Like" - Add like
 - "Dislike" - Add dislike
 - "None" - Remove like/dislike
 
 Response includes:
+
 - likesCount - Total number of likes
 - dislikesCount - Total number of dislikes
 - myStatus - Current user's like status

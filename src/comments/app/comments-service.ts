@@ -10,10 +10,13 @@ import CommentRepViewModel, {
   TCommentatorInfo,
 } from "../types/CommentRepViewModel";
 import TCommentsServiceInputModel from "../types/CommentServiceInputModel";
+import { inject, injectable } from "inversify";
+
+@injectable()
 class CommentsService {
   constructor(
-    private commentRepository: CommentsRepository,
-    private usersRepository: UsersRepository
+    @inject("CommentsRepository") private commentRepository: CommentsRepository,
+    @inject("UsersRepository") private usersRepository: UsersRepository
   ) {}
 
   async createComment({

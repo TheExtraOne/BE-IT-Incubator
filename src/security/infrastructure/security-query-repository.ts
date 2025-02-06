@@ -1,7 +1,9 @@
 import { RefreshTokenModelDb } from "../domain/refresh-token-model";
 import TRefreshTokenMetaControllerViewModel from "../types/RefreshTokenMetaControllerViewModel";
 import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
+import { injectable } from "inversify";
 
+@injectable()
 class SecurityQueryRepository {
   private mapRefreshTokenMeta(
     refreshTokenMeta: RefreshTokensMetaRepViewModel

@@ -4,7 +4,9 @@ import { TResponseWithPagination } from "../../common/types/types";
 import TBlogControllerViewModel from "../types/BlogControllerViewModel";
 import BlogRepViewModel from "../types/BlogRepViewModel";
 import { BlogModelDb } from "../domain/blog-model";
+import { injectable } from "inversify";
 
+@injectable()
 class BlogsQueryRepository {
   private mapBlog(blog: BlogRepViewModel): TBlogControllerViewModel {
     return {

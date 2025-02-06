@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import { Result } from "../../common/types/types";
 import RefreshTokensMetaRepViewModel from "../../security/types/RefreshTokensMetaRepViewModel";
-import { jwtService, securityService } from "../../composition-root";
+import { container } from "../../composition-root";
+import JwtService from "../jwt-service";
+import SecurityService from "../../security/app/security-service";
+
+const jwtService = container.get<JwtService>("JwtService");
+const securityService = container.get<SecurityService>("SecurityService");
 
 const refreshTokenVerificationMiddleware = async (
   req: Request,

@@ -2,7 +2,9 @@ import { HydratedDocument } from "mongoose";
 import LikesRepViewModel from "../types/LikeRepViewModel";
 import { LikeModelDb } from "../domain/like-model";
 import { LIKE_STATUS, SORT_DIRECTION } from "../../common/settings";
+import { injectable } from "inversify";
 
+@injectable()
 class LikesRepository {
   async saveLike(like: HydratedDocument<LikesRepViewModel>): Promise<void> {
     await like.save();

@@ -4,12 +4,14 @@ import {
   inputCheckErrorsMiddleware,
   basicAuthorizationMiddleware,
 } from "../../common/middlewares";
-import { blogController } from "../../composition-root";
 import bodyPostsInputValidator from "../../posts/middleware/body-post-input-validation-middleware";
 import bodyBlogInputValidator from "../middlewares/body-blog-input-validation-middleware";
 import optionalAccessTokenVerificationMiddleware from "../../adapters/middleware/optional-access-token-verification-middleware";
+import { container } from "../../composition-root";
+import BlogsController from "./blogs-controller";
 
 const blogsRouter = Router({});
+const blogController = container.get<BlogsController>("BlogsController");
 
 const getAllBlogsMiddleWares = [
   ...Object.values(queryInputValidator),

@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
 import { UserModelDb } from "../domain/user-model";
+import { injectable } from "inversify";
 
+@injectable()
 class UsersRepository {
   async getUserById(
     id: string

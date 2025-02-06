@@ -20,10 +20,14 @@ import TUserServiceViewModel from "../types/UserServiceViewModel";
 import UsersQueryRepository from "../infrastructure/users-query-repository";
 import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
 import { HydratedDocument } from "mongoose";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class UsersController {
   constructor(
+    @inject("UsersQueryRepository")
     private usersQueryRepository: UsersQueryRepository,
+    @inject("UsersService")
     private usersService: UsersService
   ) {}
 

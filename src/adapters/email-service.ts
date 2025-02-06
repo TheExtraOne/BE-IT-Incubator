@@ -1,7 +1,9 @@
 import { RESULT_STATUS, SETTINGS } from "../common/settings";
 import nodemailer from "nodemailer";
 import { Result } from "../common/types/types";
+import { injectable } from "inversify";
 
+@injectable()
 class EmailService {
   async sendEmail({
     userEmail,

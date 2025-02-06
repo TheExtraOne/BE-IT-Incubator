@@ -6,11 +6,13 @@ import { RESULT_STATUS } from "../../common/settings";
 import { HydratedDocument } from "mongoose";
 import SecurityRepository from "../infrastructure/security-repository";
 import { RefreshTokenModelDb } from "../domain/refresh-token-model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class SecurityService {
   constructor(
-    private jwtService: JwtService,
-    private securityRepository: SecurityRepository
+    @inject("JwtService") private jwtService: JwtService,
+    @inject("SecurityRepository") private securityRepository: SecurityRepository
   ) {}
 
   async createRefreshTokenMeta({

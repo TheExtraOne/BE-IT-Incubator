@@ -5,7 +5,7 @@ import { Result } from "../../common/types/types";
 
 const optionalAccessTokenVerificationMiddleware = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const bearerJWT: string | undefined = req.headers.authorization;

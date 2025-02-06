@@ -3,7 +3,9 @@ import { HydratedDocument } from "mongoose";
 import { SETTINGS } from "../../common/settings";
 import RateLimitingRepViewModel from "../types/RateLimitingRepViewModel";
 import { RateLimitModelDb } from "../domain/rate-limit-model";
+import { injectable } from "inversify";
 
+@injectable()
 class RateLimitingRepository {
   async saveNewRequest(
     newRequest: HydratedDocument<RateLimitingRepViewModel>

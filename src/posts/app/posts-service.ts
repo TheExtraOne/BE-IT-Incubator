@@ -8,11 +8,13 @@ import { PostModelDb } from "../domain/post-model";
 import { HydratedDocument } from "mongoose";
 import BlogsRepository from "../../blogs/infrastructure/blogs-repository";
 import PostsRepository from "../infrastructure/posts-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class PostsService {
   constructor(
-    private blogsRepository: BlogsRepository,
-    private postsRepository: PostsRepository
+    @inject("BlogsRepository") private blogsRepository: BlogsRepository,
+    @inject("PostsRepository") private postsRepository: PostsRepository
   ) {}
 
   async createPost({

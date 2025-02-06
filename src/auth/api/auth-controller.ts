@@ -11,13 +11,20 @@ import SecurityService from "../../security/app/security-service";
 import TUserControllerViewModel from "../../users/types/UserControllerViewModel";
 import UsersService from "../../users/app/users-service";
 import UsersQueryRepository from "../../users/infrastructure/users-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class AuthController {
   constructor(
+    @inject("JwtService")
     private jwtService: JwtService,
+    @inject("AuthService")
     private authService: AuthService,
+    @inject("UsersService")
     private usersService: UsersService,
+    @inject("UsersQueryRepository")
     private usersQueryRepository: UsersQueryRepository,
+    @inject("SecurityService")
     private securityService: SecurityService
   ) {}
 

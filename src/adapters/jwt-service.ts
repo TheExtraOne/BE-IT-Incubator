@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { RESULT_STATUS, SETTINGS, TOKEN_TYPE } from "../common/settings";
 import { Result } from "../common/types/types";
+import { injectable } from "inversify";
 
 export type TCreateJWTResponse = {
   resultCode: number;
@@ -9,6 +10,7 @@ export type TCreateJWTResponse = {
   };
 };
 
+@injectable()
 class JwtService {
   async createToken({
     payload,

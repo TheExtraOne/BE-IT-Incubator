@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import BlogRepViewModel from "../types/BlogRepViewModel";
 import { BlogModelDb } from "../domain/blog-model";
+import { injectable } from "inversify";
 
+@injectable()
 class BlogsRepository {
   async getBlogById(
     id: string

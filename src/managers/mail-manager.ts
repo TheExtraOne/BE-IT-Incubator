@@ -1,8 +1,10 @@
 import EmailService from "../adapters/email-service";
 import { Result } from "../common/types/types";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class MailManager {
-  constructor(private emailService: EmailService) {}
+  constructor(@inject("EmailService") private emailService: EmailService) {}
 
   async sendRegistrationMail({
     email,

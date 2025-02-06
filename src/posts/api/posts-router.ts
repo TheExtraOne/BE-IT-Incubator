@@ -8,10 +8,12 @@ import {
   basicAuthorizationMiddleware,
 } from "../../common/middlewares";
 import bodyPostsInputValidator from "../middleware/body-post-input-validation-middleware";
-import { postsController } from "../../composition-root";
 import likeStatusInputValidator from "../../comments/middleware/like-status-input-middleware";
+import { container } from "../../composition-root";
+import PostsController from "./posts-controller";
 
 const postsRouter = Router({});
+const postsController = container.get<PostsController>("PostsController");
 
 const getAllPostsMiddleware = [
   queryInputValidator.pageNumberValidator,

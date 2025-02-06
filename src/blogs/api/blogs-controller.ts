@@ -26,14 +26,22 @@ import BlogsQueryRepository from "../infrastructure/blogs-query-repository";
 import PostsQueryRepository from "../../posts/infrastructure/posts-query-repository";
 import LikesService from "../../likes/app/likes-service";
 import PostsController from "../../posts/api/posts-controller";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class BlogsController {
   constructor(
+    @inject("BlogService")
     protected blogService: BlogService,
+    @inject("BlogsQueryRepository")
     protected blogsQueryRepository: BlogsQueryRepository,
+    @inject("PostsService")
     protected postsService: PostsService,
+    @inject("PostsQueryRepository")
     protected postsQueryRepository: PostsQueryRepository,
+    @inject("LikesService")
     protected likesService: LikesService,
+    @inject("PostsController")
     private postsController: PostsController
   ) {}
 

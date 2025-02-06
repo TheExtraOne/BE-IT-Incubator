@@ -6,9 +6,13 @@ import TBlogServiceInputModel from "../types/BlogServiceInputModel";
 import BlogsRepository from "../infrastructure/blogs-repository";
 import { Result } from "../../common/types/types";
 import { BlogModelDb } from "../domain/blog-model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class BlogService {
-  constructor(protected blogsRepository: BlogsRepository) {}
+  constructor(
+    @inject("BlogsRepository") protected blogsRepository: BlogsRepository
+  ) {}
 
   async createBlog({
     name,

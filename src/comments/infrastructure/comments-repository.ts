@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import { CommentModelDb } from "../domain/comment-model";
 import CommentRepViewModel from "../types/CommentRepViewModel";
+import { injectable } from "inversify";
 
+@injectable()
 class CommentsRepository {
   async saveComment(
     comment: HydratedDocument<CommentRepViewModel>

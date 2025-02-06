@@ -4,7 +4,9 @@ import { TResponseWithPagination } from "../../common/types/types";
 import TPostControllerViewModel from "../types/PostControllerViewModel";
 import PostRepViewModel from "../types/PostRepViewModel";
 import { PostModelDb } from "../domain/post-model";
+import { injectable } from "inversify";
 
+@injectable()
 class PostsQueryRepository {
   private mapPost(post: PostRepViewModel): TPostControllerViewModel {
     return {

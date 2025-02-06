@@ -3,9 +3,14 @@ import RateLimitingRepViewModel from "../types/RateLimitingRepViewModel";
 import { HydratedDocument } from "mongoose";
 import RateLimitingRepository from "../infrastructure/rate-limiting-repository";
 import { RateLimitModelDb } from "../domain/rate-limit-model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class RateLimitingService {
-  constructor(private rateLimitingRepository: RateLimitingRepository) {}
+  constructor(
+    @inject("RateLimitingRepository")
+    private rateLimitingRepository: RateLimitingRepository
+  ) {}
 
   async createNewRequest({
     ip,

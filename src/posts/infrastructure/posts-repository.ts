@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import PostRepViewModel from "../types/PostRepViewModel";
 import { PostModelDb } from "../domain/post-model";
+import { injectable } from "inversify";
 
+@injectable()
 class PostsRepository {
   async savePost(post: HydratedDocument<PostRepViewModel>): Promise<void> {
     await post.save();

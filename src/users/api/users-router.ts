@@ -5,9 +5,11 @@ import {
   inputCheckErrorsMiddleware,
 } from "../../common/middlewares";
 import bodyUserInputValidator from "../middleware/body-user-input-validation-middleware";
-import { usersController } from "../../composition-root";
+import { container } from "../../composition-root";
+import UsersController from "./users-controller";
 
 const usersRouter = Router({});
+const usersController = container.get<UsersController>("UsersController");
 
 const getAllUsersMiddleware = [
   basicAuthorizationMiddleware,

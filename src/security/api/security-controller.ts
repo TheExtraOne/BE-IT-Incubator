@@ -7,12 +7,15 @@ import TPathParamsRefreshTokenMetaModel from "../types/PathParamsRefreshTokenMet
 import TRefreshTokenMetaControllerViewModel from "../types/RefreshTokenMetaControllerViewModel";
 import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 import SecurityQueryRepository from "../infrastructure/security-query-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class SecurityController {
   constructor(
-    private jwtService: JwtService,
+    @inject("JwtService") private jwtService: JwtService,
+    @inject("SecurityQueryRepository")
     private securityQueryRepository: SecurityQueryRepository,
-    private securityService: SecurityService
+    @inject("SecurityService") private securityService: SecurityService
   ) {}
 
   async getRefreshTokensMeta(req: Request, res: Response) {

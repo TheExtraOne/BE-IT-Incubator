@@ -4,7 +4,9 @@ import { TResponseWithPagination } from "../../common/types/types";
 import CommentRepViewModel from "../types/CommentRepViewModel";
 import TCommentControllerViewModel from "../types/PostCommentControllerViewModel";
 import { CommentModelDb } from "../domain/comment-model";
+import { injectable } from "inversify";
 
+@injectable()
 class CommentsQueryRepository {
   private mapComment(
     comment: CommentRepViewModel

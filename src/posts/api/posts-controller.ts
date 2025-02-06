@@ -27,12 +27,18 @@ import TPostCommentControllerInputModel from "../../comments/types/PostCommentCo
 import TPostsLikeInputModel from "../types/PostLikeInputModel";
 import LikesService from "../../likes/app/likes-service";
 import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class PostsController {
   constructor(
+    @inject("CommentsController")
     private commentsController: CommentsController,
+    @inject("PostsQueryRepository")
     private postsQueryRepository: PostsQueryRepository,
+    @inject("PostsService")
     private postsService: PostsService,
+    @inject("LikesService")
     private likesService: LikesService
   ) {}
 

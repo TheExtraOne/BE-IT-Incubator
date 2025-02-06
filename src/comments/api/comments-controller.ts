@@ -24,11 +24,16 @@ import TPathParamsCommentsModel from "../types/PathParamsCommentModel";
 import TPostCommentControllerInputModel from "../types/PostCommentControllerInputModel";
 import TCommentControllerViewModel from "../types/PostCommentControllerViewModel";
 import TQueryCommentsModel from "../types/QueryCommentsModel";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class CommentsController {
   constructor(
+    @inject("CommentsQueryRepository")
     private commentsQueryRepository: CommentsQueryRepository,
+    @inject("CommentsService")
     private commentsService: CommentsService,
+    @inject("LikesService")
     private likesService: LikesService
   ) {}
 

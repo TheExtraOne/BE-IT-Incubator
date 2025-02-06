@@ -9,11 +9,13 @@ import BcryptService from "../../adapters/bcrypt-service";
 import { HydratedDocument } from "mongoose";
 import UsersRepository from "../infrastructure/users-repository";
 import { UserModelDb } from "../domain/user-model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class UsersService {
   constructor(
-    private bcryptService: BcryptService,
-    private usersRepository: UsersRepository
+    @inject("BcryptService") private bcryptService: BcryptService,
+    @inject("UsersRepository") private usersRepository: UsersRepository
   ) {}
 
   mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {

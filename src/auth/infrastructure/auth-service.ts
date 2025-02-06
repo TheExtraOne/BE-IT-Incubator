@@ -11,12 +11,18 @@ import { ObjectId } from "mongodb";
 import BcryptService from "../../adapters/bcrypt-service";
 import { HydratedDocument } from "mongoose";
 import UsersRepository from "../../users/infrastructure/users-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class AuthService {
   constructor(
+    @inject("BcryptService")
     private bcryptService: BcryptService,
+    @inject("MailManager")
     private mailManager: MailManager,
+    @inject("UsersService")
     private usersService: UsersService,
+    @inject("UsersRepository")
     private usersRepository: UsersRepository
   ) {}
 

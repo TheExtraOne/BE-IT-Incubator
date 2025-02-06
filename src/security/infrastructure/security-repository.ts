@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { HydratedDocument } from "mongoose";
 import RefreshTokensMetaRepViewModel from "../types/RefreshTokensMetaRepViewModel";
 import { RefreshTokenModelDb } from "../domain/refresh-token-model";
+import { injectable } from "inversify";
 
+@injectable()
 class SecurityRepository {
   async saveRefreshTokenMeta(
     refreshTokenMeta: HydratedDocument<RefreshTokensMetaRepViewModel>

@@ -14,13 +14,15 @@ import { LikeModelDb } from "../domain/like-model";
 import PostsService from "../../posts/app/posts-service";
 import UsersService from "../../users/app/users-service";
 import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
+import { inject, injectable } from "inversify";
 
+@injectable()
 class LikesService {
   constructor(
-    protected likesRepository: LikesRepository,
-    protected commentService: CommentsService,
-    protected postsService: PostsService,
-    protected usersService: UsersService
+    @inject("LikesRepository") protected likesRepository: LikesRepository,
+    @inject("CommentsService") protected commentService: CommentsService,
+    @inject("PostsService") protected postsService: PostsService,
+    @inject("UsersService") protected usersService: UsersService
   ) {}
   async createLike({
     userId,

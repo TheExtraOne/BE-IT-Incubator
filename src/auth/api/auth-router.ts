@@ -6,10 +6,12 @@ import bodyAuthRegistrationInputValidator from "../middleware/body-auth-registra
 import bodyAuthConfirmationInputValidator from "../middleware/body-auth-confirmation-input-validation-middleware";
 import refreshTokenVerificationMiddleware from "../../adapters/middleware/refresh-token-verification-middleware";
 import rateLimitingMiddleware from "../../rate-limiting/middleware/rate-limiting-middleware";
-import { authController } from "../../composition-root";
 import bodyAuthNewPasswordInputValidator from "../middleware/body-auth-new-password-input-validation";
+import { container } from "../../composition-root";
+import AuthController from "./auth-controller";
 
 const authRouter = Router({});
+const authController = container.get<AuthController>("AuthController");
 
 const loginMiddleware = [
   rateLimitingMiddleware,

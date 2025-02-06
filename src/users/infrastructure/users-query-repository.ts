@@ -4,7 +4,9 @@ import { TResponseWithPagination } from "../../common/types/types";
 import UserAccountRepViewModel from "../types/UserAccountRepViewModel";
 import TUserControllerViewModel from "../types/UserControllerViewModel";
 import { UserModelDb } from "../domain/user-model";
+import { injectable } from "inversify";
 
+@injectable()
 class UsersQueryRepository {
   private mapUser(user: UserAccountRepViewModel): TUserControllerViewModel {
     return {

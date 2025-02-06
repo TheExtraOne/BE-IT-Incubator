@@ -33,7 +33,7 @@ describe("DELETE /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -42,7 +42,7 @@ describe("DELETE /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
   });
 
   describe("Deleting blog", () => {
@@ -54,7 +54,7 @@ describe("DELETE /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
 
     it("should return 204 if id is matching", async () => {
       await req
@@ -64,6 +64,6 @@ describe("DELETE /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
   });
 });

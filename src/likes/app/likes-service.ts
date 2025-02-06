@@ -6,7 +6,7 @@ import {
   SORT_DIRECTION,
 } from "../../common/settings";
 import LikesRepViewModel from "../types/LikeRepViewModel";
-import { Result } from "../../common/types/types";
+import { Result, TResponseWithPagination } from "../../common/types/types";
 import { HydratedDocument } from "mongoose";
 import CommentsService from "../../comments/app/comments-service";
 import LikesRepository from "../infrastructure/likes-repository";
@@ -15,6 +15,8 @@ import PostsService from "../../posts/app/posts-service";
 import UsersService from "../../users/app/users-service";
 import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
 import { inject, injectable } from "inversify";
+import TPostControllerViewModel from "../../posts/types/PostControllerViewModel";
+import TCommentControllerViewModel from "../../comments/types/PostCommentControllerViewModel";
 
 @injectable()
 class LikesService {
@@ -222,30 +224,180 @@ class LikesService {
   }
 
   async getLatestLikesByParentId(
-    parentId: string
-  ): Promise<{ addedAt: Date; userId: string; login: string }[] | null> {
-    const likes: LikesRepViewModel[] | null =
-      await this.likesRepository.getLikesByParentIdWithDateSort({
-        parentId,
-        sortDirection: SORT_DIRECTION.DESC,
-        status: LIKE_STATUS.LIKE,
-      });
-    if (!likes) {
-      return null;
-    }
-    // Finding the latest 3 likes
-    const latestLikes: LikesRepViewModel[] = likes.slice(0, 3);
-
-    // Mapping
-    const mappedLikes = latestLikes.map((like) => {
-      return {
-        addedAt: like.createdAt,
-        userId: like.authorId,
-        login: like.login,
-      };
+    parentId: string,
+    likesCount = 3
+  ): Promise<
+    | {
+        addedAt: Date;
+        userId: string;
+        login: string;
+      }[]
+    | []
+  > {
+    const likes = await this.likesRepository.getLikesByParentIdWithDateSort({
+      parentId,
+      sortDirection: SORT_DIRECTION.DESC,
+      status: LIKE_STATUS.LIKE,
     });
 
-    return mappedLikes;
+    if (!likes) {
+      return [];
+    }
+
+    // Finding 3 latest likes
+    return likes.slice(0, likesCount).map((like) => ({
+      addedAt: like.createdAt,
+      userId: like.authorId,
+      login: like.login,
+    }));
+  }
+
+  async enrichPostsWithLatestLikes(
+    posts: TPostControllerViewModel[] | []
+  ): Promise<TPostControllerViewModel[] | []> {
+    // Get 3 latest likes for all posts in one batch
+    const latestLikesPromises = posts.map((post) =>
+      this.getLatestLikesByParentId(post.id, 3)
+    );
+    const allLatestLikes = await Promise.all(latestLikesPromises);
+
+    // Combine posts with their latest likes
+    return posts.map((post, index) => {
+      const latestLikes = allLatestLikes[index];
+      const hasLikes = !!latestLikes?.length;
+
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          newestLikes: hasLikes ? latestLikes : [],
+        },
+      };
+    });
+  }
+
+  async enrichPostWithLikesAndStatus(
+    post: TPostControllerViewModel,
+    userId: string | null
+  ): Promise<TPostControllerViewModel> {
+    // Getting 3 latest likes for the post
+    const latestLikes = await this.getLatestLikesByParentId(post.id, 3);
+    const hasLikes = !!latestLikes?.length;
+
+    // Base post with latest likes if they exist
+    const enrichedPost = hasLikes
+      ? {
+          ...post,
+          extendedLikesInfo: {
+            ...post.extendedLikesInfo,
+            newestLikes: latestLikes,
+          },
+        }
+      : post;
+
+    // If no user, return post as it
+    if (!userId) {
+      return enrichedPost;
+    }
+
+    // Add user's like status
+    const like = await this.getLikeByUserAndParentId(userId, post.id);
+    const myStatus = like?.status ?? LIKE_STATUS.NONE;
+
+    return {
+      ...enrichedPost,
+      extendedLikesInfo: {
+        ...enrichedPost.extendedLikesInfo,
+        myStatus,
+      },
+    };
+  }
+
+  enrichPostsWithUserStatus(
+    posts: TPostControllerViewModel[] | [],
+    likesForUser: LikesRepViewModel[] | null
+  ): TPostControllerViewModel[] | [] {
+    return posts.map((post) => {
+      const like = likesForUser?.find((like) => like.parentId === post.id);
+      return {
+        ...post,
+        extendedLikesInfo: {
+          ...post.extendedLikesInfo,
+          myStatus: like?.status ?? LIKE_STATUS.NONE,
+        },
+      };
+    });
+  }
+
+  async enrichPostsWithLikesAndUserStatus(
+    posts: TResponseWithPagination<TPostControllerViewModel[] | []>,
+    userId: string | null
+  ): Promise<TResponseWithPagination<TPostControllerViewModel[] | []>> {
+    // First enrich posts with latest likes
+    const postsWithLikes = {
+      ...posts,
+      items: await this.enrichPostsWithLatestLikes(posts.items),
+    };
+
+    // If no user, return posts with likes only
+    if (!userId) {
+      return postsWithLikes;
+    }
+
+    // Get all likes for the user in one query
+    const likesForUser = await this.getLikesByUserId(userId);
+
+    // Add user's like status to each post
+    return {
+      ...posts,
+      items: this.enrichPostsWithUserStatus(postsWithLikes.items, likesForUser),
+    };
+  }
+
+  async enrichCommentWithLikeStatus(
+    comment: TCommentControllerViewModel,
+    userId: string | null
+  ): Promise<TCommentControllerViewModel> {
+    if (!userId) {
+      return comment;
+    }
+
+    const like = await this.getLikeByUserAndParentId(userId, comment.id);
+
+    return {
+      ...comment,
+      likesInfo: {
+        ...comment.likesInfo,
+        myStatus: like?.status ?? LIKE_STATUS.NONE,
+      },
+    };
+  }
+
+  async enrichCommentsWithLikeStatus(
+    comments: TResponseWithPagination<TCommentControllerViewModel[] | []>,
+    userId: string | null
+  ): Promise<TResponseWithPagination<TCommentControllerViewModel[] | []>> {
+    if (!userId) {
+      return comments;
+    }
+
+    // Get all likes for the user in one query
+    const likesForUser = await this.getLikesByUserId(userId);
+
+    // Add user's like status to each comment
+    return {
+      ...comments,
+      items: comments.items.map((comment) => {
+        const like = likesForUser?.find((like) => like.parentId === comment.id);
+        return {
+          ...comment,
+          likesInfo: {
+            ...comment.likesInfo,
+            myStatus: like?.status ?? LIKE_STATUS.NONE,
+          },
+        };
+      }),
+    };
   }
 }
 

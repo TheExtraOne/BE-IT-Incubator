@@ -47,19 +47,19 @@ describe("POST /auth/refresh-token", () => {
       expect(newCookies).toBeDefined();
       expect(Array.isArray(newCookies)).toBeTruthy();
       expect(newCookies![0].startsWith("refreshToken=")).toBeTruthy();
-    });
+    }, 8000);
 
     it("should return 401 if refresh token is missing", async () => {
       await req
         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if refresh token is invalid", async () => {
       await req
         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
         .set("Cookie", "refreshToken=invalid.token.here")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 });

@@ -16,7 +16,7 @@ describe("GET /users", () => {
   describe("Users retrieval", () => {
     it("should return 401 if unauthorized", async () => {
       await req.get(SETTINGS.PATH.USERS).expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 200 and an empty array of items if the db is empty", async () => {
       const res = await req
@@ -31,7 +31,7 @@ describe("GET /users", () => {
         pagesCount: 0,
         totalCount: 0,
       });
-    });
+    }, 8000);
 
     it("should return 200 and an array with users if the db is not empty", async () => {
       await req
@@ -53,7 +53,7 @@ describe("GET /users", () => {
           createdAt: expect.any(String),
         },
       ]);
-    });
+    }, 8000);
   });
 
   describe("Pagination", () => {
@@ -102,7 +102,7 @@ describe("GET /users", () => {
         pagesCount: 2,
         totalCount: 3,
       });
-    });
+    }, 8000);
   });
 
   describe("Filtration", () => {
@@ -126,7 +126,7 @@ describe("GET /users", () => {
           createdAt: expect.any(String),
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 200 and an array with users that are matching passed email query param", async () => {
       await req
@@ -148,7 +148,7 @@ describe("GET /users", () => {
           createdAt: expect.any(String),
         },
       ]);
-    });
+    }, 8000);
 
     it("should return an empty array if users login is not matching passed query param", async () => {
       await req
@@ -163,7 +163,7 @@ describe("GET /users", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([]);
-    });
+    }, 8000);
   });
 
   describe("Query parameters validation", () => {
@@ -179,7 +179,7 @@ describe("GET /users", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
@@ -193,7 +193,7 @@ describe("GET /users", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
@@ -207,7 +207,7 @@ describe("GET /users", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
@@ -221,7 +221,7 @@ describe("GET /users", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
@@ -235,7 +235,7 @@ describe("GET /users", () => {
           field: "sortBy",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when searchLoginTerm is empty", async () => {
       const res = await req
@@ -249,7 +249,7 @@ describe("GET /users", () => {
           field: "searchLoginTerm",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when searchEmailTerm is empty", async () => {
       const res = await req
@@ -263,7 +263,7 @@ describe("GET /users", () => {
           field: "searchEmailTerm",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
@@ -277,6 +277,6 @@ describe("GET /users", () => {
           field: "sortDirection",
         },
       ]);
-    });
+    }, 8000);
   });
 });

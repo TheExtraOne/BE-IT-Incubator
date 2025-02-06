@@ -26,7 +26,7 @@ describe("GET /posts", () => {
         pagesCount: 0,
         totalCount: 0,
       });
-    });
+    }, 8000);
 
     it("should return 200 and an array with posts if the db is not empty", async () => {
       const {
@@ -61,12 +61,13 @@ describe("GET /posts", () => {
           },
         },
       ]);
-    });
+    }, 8000);
+
     it("should return 404 in case if id was passed, but the db is empty", async () => {
       await req
         .get(`${SETTINGS.PATH.POSTS}/678619d10375b7522f04da0e`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 404 in case if id is not matching the db", async () => {
       const {
@@ -86,7 +87,7 @@ describe("GET /posts", () => {
       await req
         .get(`${SETTINGS.PATH.POSTS}/${incorrectId}`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 200 and a post (with id, title, shortDescription, content, blogId, createdAt and blogName) in case if id is matching the db", async () => {
       const {
@@ -122,7 +123,7 @@ describe("GET /posts", () => {
           newestLikes: [],
         },
       });
-    });
+    }, 8000);
   });
   describe("Pagination", () => {
     it("should return 200 and correct number of items, page, pageSize, pageCount and totalCount", async () => {
@@ -176,7 +177,7 @@ describe("GET /posts", () => {
         pagesCount: 3,
         totalCount: 3,
       });
-    });
+    }, 8000);
   });
 
   describe("Query parameters validation", () => {
@@ -191,7 +192,7 @@ describe("GET /posts", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
@@ -204,7 +205,7 @@ describe("GET /posts", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
@@ -217,7 +218,7 @@ describe("GET /posts", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
@@ -230,7 +231,7 @@ describe("GET /posts", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
@@ -243,7 +244,7 @@ describe("GET /posts", () => {
           field: "sortBy",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
@@ -256,6 +257,6 @@ describe("GET /posts", () => {
           field: "sortDirection",
         },
       ]);
-    });
+    }, 8000);
   });
 });

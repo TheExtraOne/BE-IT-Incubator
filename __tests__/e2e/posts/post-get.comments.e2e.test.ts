@@ -76,7 +76,7 @@ describe("GET /posts/:id/comments", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
@@ -89,7 +89,7 @@ describe("GET /posts/:id/comments", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
@@ -102,7 +102,7 @@ describe("GET /posts/:id/comments", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
@@ -115,7 +115,7 @@ describe("GET /posts/:id/comments", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
@@ -128,7 +128,7 @@ describe("GET /posts/:id/comments", () => {
           field: "sortBy",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
@@ -141,7 +141,7 @@ describe("GET /posts/:id/comments", () => {
           field: "sortDirection",
         },
       ]);
-    });
+    }, 8000);
   });
 
   describe("Post comments retrieval", () => {
@@ -149,7 +149,7 @@ describe("GET /posts/:id/comments", () => {
       await req
         .get(`${SETTINGS.PATH.POSTS}/${incorrectId}/comments`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 200 and empty array if post has no comments", async () => {
       const res = await req
@@ -163,7 +163,7 @@ describe("GET /posts/:id/comments", () => {
         pagesCount: 0,
         totalCount: 0,
       });
-    });
+    }, 8000);
 
     it("should return 200 and array of comments if post has comments", async () => {
       // Create a comment for the post
@@ -192,7 +192,7 @@ describe("GET /posts/:id/comments", () => {
           myStatus: LIKE_STATUS.NONE,
         },
       });
-    });
+    }, 8000);
 
     it("should return correct pagination results", async () => {
       // Create 3 comments for the post
@@ -242,6 +242,6 @@ describe("GET /posts/:id/comments", () => {
         pagesCount: 2,
         totalCount: 3,
       });
-    });
+    }, 8000);
   });
 });

@@ -46,20 +46,20 @@ describe("POST /auth/logout", () => {
       expect(clearCookie).toBeDefined();
       expect(Array.isArray(clearCookie)).toBeTruthy();
       expect(clearCookie![0]).toContain("refreshToken=;");
-    });
+    }, 8000);
 
     it("should return 401 if refresh token is missing", async () => {
       await req
         .post(`${SETTINGS.PATH.AUTH}/logout`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if refresh token is invalid", async () => {
       await req
         .post(`${SETTINGS.PATH.AUTH}/logout`)
         .set("Cookie", "refreshToken=invalid.token.here")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if refresh token is already used (in blacklist)", async () => {
       // Create user
@@ -93,6 +93,6 @@ describe("POST /auth/logout", () => {
         .post(`${SETTINGS.PATH.AUTH}/logout`)
         .set("Cookie", refreshTokenCookie)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 });

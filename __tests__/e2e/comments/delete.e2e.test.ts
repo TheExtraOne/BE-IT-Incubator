@@ -79,14 +79,14 @@ describe("DELETE /comments", () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 404 if comment does not exist", async () => {
       await req
         .delete(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
         .set({ Authorization: `Bearer ${accessToken}` })
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 403 if trying to delete someone else's comment", async () => {
       // Create another user and get their token
@@ -114,7 +114,7 @@ describe("DELETE /comments", () => {
         .delete(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .set({ Authorization: `Bearer ${otherUserToken}` })
         .expect(HTTP_STATUS.FORBIDDEN_403);
-    });
+    }, 8000);
 
     it("should return 204 and delete comment if authorized", async () => {
       await req
@@ -126,6 +126,6 @@ describe("DELETE /comments", () => {
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
   });
 });

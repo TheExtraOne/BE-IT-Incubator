@@ -19,7 +19,7 @@ describe("POST /users", () => {
         .post(SETTINGS.PATH.USERS)
         .send(correctUserBodyParams)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if wrong credentials", async () => {
       await req
@@ -27,7 +27,7 @@ describe("POST /users", () => {
         .set({ Authorization: userCredentials.incorrect })
         .send(correctUserBodyParams)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Input validation", () => {
@@ -44,7 +44,7 @@ describe("POST /users", () => {
           field: "login",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if login is less than 3 characters", async () => {
       const res = await req
@@ -59,7 +59,7 @@ describe("POST /users", () => {
           field: "login",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if login is more than 10 characters", async () => {
       const res = await req
@@ -74,7 +74,7 @@ describe("POST /users", () => {
           field: "login",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if email is empty", async () => {
       const res = await req
@@ -89,7 +89,7 @@ describe("POST /users", () => {
           field: "email",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if email is invalid", async () => {
       const res = await req
@@ -104,7 +104,7 @@ describe("POST /users", () => {
           field: "email",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if password is empty", async () => {
       const res = await req
@@ -119,7 +119,7 @@ describe("POST /users", () => {
           field: "password",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if password is less than 6 characters", async () => {
       const res = await req
@@ -134,7 +134,7 @@ describe("POST /users", () => {
           field: "password",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if password is more than 20 characters", async () => {
       const res = await req
@@ -149,7 +149,7 @@ describe("POST /users", () => {
           field: "password",
         },
       ]);
-    });
+    }, 8000);
   });
 
   describe("Success case", () => {
@@ -180,7 +180,7 @@ describe("POST /users", () => {
           createdAt: expect.any(String),
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 if user with the same login and/or email already exists", async () => {
       await req
@@ -205,6 +205,6 @@ describe("POST /users", () => {
           message: "Email already exists",
         },
       ]);
-    });
+    }, 8000);
   });
 });

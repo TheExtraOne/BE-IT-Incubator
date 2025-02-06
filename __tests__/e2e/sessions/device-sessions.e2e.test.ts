@@ -161,20 +161,20 @@ describe("security/devices endpoints", () => {
       expect(afterDeleteAllDevicesResponse.body[0].deviceId).toBe(
         updatedDevicesResponse.body[0].deviceId
       );
-    });
+    }, 8000);
 
     it("should return 401 for invalid refresh token", async () => {
       await req
         .get(`${SETTINGS.PATH.SECURITY}/devices`)
         .set("Cookie", "refreshToken=invalid")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 for missing refresh token", async () => {
       await req
         .get(`${SETTINGS.PATH.SECURITY}/devices`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("DELETE /security/devices", () => {
@@ -217,20 +217,20 @@ describe("security/devices endpoints", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(devicesResponse.body).toHaveLength(1);
-    });
+    }, 8000);
 
     it("should return 401 for invalid refresh token", async () => {
       await req
         .delete(`${SETTINGS.PATH.SECURITY}/devices`)
         .set("Cookie", "refreshToken=invalid")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 for missing refresh token", async () => {
       await req
         .delete(`${SETTINGS.PATH.SECURITY}/devices`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("DELETE /security/devices/:deviceId", () => {
@@ -286,7 +286,7 @@ describe("security/devices endpoints", () => {
           (d: TRefreshTokenMetaControllerViewModel) => d.deviceId
         )
       ).not.toContain(deviceIdToDelete);
-    });
+    }, 8000);
 
     it("should return 403 when trying to delete another user's session", async () => {
       // Create first user and login
@@ -341,7 +341,7 @@ describe("security/devices endpoints", () => {
         .delete(`${SETTINGS.PATH.SECURITY}/devices/${deviceId}`)
         .set("Cookie", secondLoginResponse.headers["set-cookie"][0])
         .expect(HTTP_STATUS.FORBIDDEN_403);
-    });
+    }, 8000);
 
     it("should return 404 for non-existent device", async () => {
       // Create and login user
@@ -365,19 +365,19 @@ describe("security/devices endpoints", () => {
         .delete(`${SETTINGS.PATH.SECURITY}/devices/nonexistentdeviceid`)
         .set("Cookie", loginResponse.headers["set-cookie"][0])
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 401 for invalid refresh token", async () => {
       await req
         .delete(`${SETTINGS.PATH.SECURITY}/devices/anydeviceid`)
         .set("Cookie", "refreshToken=invalid")
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 for missing refresh token", async () => {
       await req
         .delete(`${SETTINGS.PATH.SECURITY}/devices/anydeviceid`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 });

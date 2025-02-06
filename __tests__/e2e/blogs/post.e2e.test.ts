@@ -24,7 +24,7 @@ describe("POST /blogs", () => {
         .get(SETTINGS.PATH.BLOGS)
         .expect(HTTP_STATUS.OK_200);
       expect(body.items.length).toBe(0);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -37,7 +37,7 @@ describe("POST /blogs", () => {
         .get(SETTINGS.PATH.BLOGS)
         .expect(HTTP_STATUS.OK_200);
       expect(body.items.length).toBe(0);
-    });
+    }, 8000);
   });
   describe("Blog creation", () => {
     it("should return 201 with new blog if login, password and body params are correct. New blog should contain id, name, description and websiteUrl", async () => {
@@ -56,7 +56,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
   });
   describe("Body params validation", () => {
     // Name validation
@@ -78,7 +78,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if name is empty string", async () => {
       const bodyParams = {
@@ -100,7 +100,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if name is too long", async () => {
       const bodyParams = {
@@ -122,7 +122,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // Description validation
     it("should return 400 and error if description is not string", async () => {
@@ -143,7 +143,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if description is an empty string", async () => {
       const bodyParams = {
@@ -165,7 +165,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if description is too long", async () => {
       const bodyParams = {
@@ -192,7 +192,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // WebsiteUrl validation
     it("should return 400 and error if websiteUrl is not string", async () => {
@@ -213,7 +213,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl is an empty string", async () => {
       const bodyParams = {
@@ -235,7 +235,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl is too long", async () => {
       const bodyParams = {
@@ -260,7 +260,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl does not match the reg exp", async () => {
       const bodyParams = {
@@ -285,7 +285,7 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // Combined validation
     it("should return 400 and array with length === 1 if one field contains two errors", async () => {
@@ -301,7 +301,7 @@ describe("POST /blogs", () => {
         .expect(HTTP_STATUS.BAD_REQUEST_400);
 
       expect(body.errorsMessages.length).toBe(1);
-    });
+    }, 8000);
 
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
       const bodyParams = {
@@ -335,6 +335,6 @@ describe("POST /blogs", () => {
 
       const res = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
   });
 });

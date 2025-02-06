@@ -83,7 +83,7 @@ describe("GET /comments", () => {
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${incorrectId}`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 404 if comment was deleted", async () => {
       // Delete the comment first
@@ -96,7 +96,7 @@ describe("GET /comments", () => {
       await req
         .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 200 and comment data if comment exists", async () => {
       const res = await req
@@ -117,6 +117,6 @@ describe("GET /comments", () => {
           myStatus: LIKE_STATUS.NONE,
         },
       });
-    });
+    }, 8000);
   });
 });

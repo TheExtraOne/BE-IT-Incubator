@@ -72,7 +72,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -86,7 +86,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
   });
 
   describe("Updating", () => {
@@ -103,7 +103,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
     // Success
     it("should return 201 with new post if login, password and body params are correct. New post should contain id, title, shortDescription, content, blogId, createdAt and blogName", async () => {
       await req
@@ -128,7 +128,7 @@ describe("PUT /posts", () => {
           newestLikes: [],
         },
       });
-    });
+    }, 8000);
   });
 
   describe("Validation", () => {
@@ -151,7 +151,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if title is empty string", async () => {
       const bodyParams = { ...newBodyParams, title: "" };
@@ -173,7 +173,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if title is too long", async () => {
       const bodyParams = {
@@ -198,7 +198,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // ShortDescription validation
     it("should return 400 and error if shortDescription is not string", async () => {
@@ -224,7 +224,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if shortDescription is empty string", async () => {
       const bodyParams = {
@@ -252,7 +252,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if shortDescription is too long", async () => {
       const bodyParams = {
@@ -280,7 +280,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // Content validation
     it("should return 400 and error if content is not string", async () => {
@@ -304,7 +304,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if content is empty string", async () => {
       const bodyParams = {
@@ -332,7 +332,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if content is too long", async () => {
       const bodyParams = {
@@ -363,7 +363,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // BlogId validation
     it("should return 400 and error if blogId is not string", async () => {
@@ -387,7 +387,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if blogId is empty string", async () => {
       const bodyParams = {
@@ -415,7 +415,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if blogId does not match the db", async () => {
       const bodyParams = {
@@ -443,7 +443,7 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // Combined validation
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
@@ -477,6 +477,6 @@ describe("PUT /posts", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
   });
 });

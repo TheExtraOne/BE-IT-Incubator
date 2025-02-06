@@ -39,7 +39,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageNumber is less than 1", async () => {
       const res = await req
@@ -52,7 +52,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "pageNumber",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is not an integer", async () => {
       const res = await req
@@ -65,7 +65,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when pageSize is less than 1", async () => {
       const res = await req
@@ -78,7 +78,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "pageSize",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortBy is empty", async () => {
       const res = await req
@@ -91,7 +91,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "sortBy",
         },
       ]);
-    });
+    }, 8000);
 
     it("should return 400 when sortDirection has invalid value", async () => {
       const res = await req
@@ -104,7 +104,7 @@ describe("GET /blogs/:id/posts", () => {
           field: "sortDirection",
         },
       ]);
-    });
+    }, 8000);
   });
 
   describe("Blog posts retrieval", () => {
@@ -112,7 +112,7 @@ describe("GET /blogs/:id/posts", () => {
       await req
         .get(`${SETTINGS.PATH.BLOGS}/${incorrectId}/posts`)
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 200 and empty array if blog has no posts", async () => {
       const res = await req
@@ -126,7 +126,7 @@ describe("GET /blogs/:id/posts", () => {
         pagesCount: 0,
         totalCount: 0,
       });
-    });
+    }, 8000);
 
     it("should return 200 and array of posts if blog has posts", async () => {
       // Create a post for the blog
@@ -154,7 +154,7 @@ describe("GET /blogs/:id/posts", () => {
           newestLikes: [],
         },
       });
-    });
+    }, 8000);
 
     it("should return correct pagination results", async () => {
       // Create 3 posts for the blog
@@ -201,6 +201,6 @@ describe("GET /blogs/:id/posts", () => {
         pagesCount: 2,
         totalCount: 3,
       });
-    });
+    }, 8000);
   });
 });

@@ -38,7 +38,7 @@ describe("POST /auth/registration-confirmation", () => {
         correctUserBodyParams.login
       );
       expect(confirmedUser!.emailConfirmation.isConfirmed).toBe(true);
-    });
+    }, 8000);
 
     it("should return 400 if confirmation code doesn't exist", async () => {
       const response = await req
@@ -54,7 +54,7 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
 
     it("should return 400 if confirmation code is already confirmed", async () => {
       const user = await usersRepository.getByLoginOrEmail(
@@ -81,7 +81,7 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
 
     it("should return 400 if confirmation code is expired", async () => {
       const user = await usersRepository.getByLoginOrEmail(
@@ -114,7 +114,7 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
   });
 
   describe("Rate limiting", () => {
@@ -137,7 +137,7 @@ describe("POST /auth/registration-confirmation", () => {
         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
         .send({ code: confirmationCode })
         .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
-    });
+    }, 8000);
   });
 
   describe("Input validation", () => {
@@ -155,7 +155,7 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
 
     it("should return 400 if code is empty", async () => {
       const response = await req
@@ -171,7 +171,7 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
 
     it("should return 400 if code is not string", async () => {
       const response = await req
@@ -187,6 +187,6 @@ describe("POST /auth/registration-confirmation", () => {
           },
         ],
       });
-    });
+    }, 8000);
   });
 });

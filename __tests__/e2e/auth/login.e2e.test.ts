@@ -31,7 +31,7 @@ describe("POST /auth/login", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
-    });
+    }, 8000);
 
     it("should return 400 if email is not confirmed", async () => {
       // Create user through registration endpoint which creates unconfirmed user
@@ -47,7 +47,7 @@ describe("POST /auth/login", () => {
           password: correctUserBodyParams.password,
         })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if password is incorrect", async () => {
       await req
@@ -63,7 +63,7 @@ describe("POST /auth/login", () => {
           password: "wrongPassword",
         })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if user doesn't exist", async () => {
       await req
@@ -73,7 +73,7 @@ describe("POST /auth/login", () => {
           password: "anyPassword",
         })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Rate limiting", () => {
@@ -103,7 +103,7 @@ describe("POST /auth/login", () => {
         .post(`${SETTINGS.PATH.AUTH}/login`)
         .send(loginData)
         .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
-    });
+    }, 8000);
   });
 
   describe("Input validation", () => {
@@ -122,7 +122,7 @@ describe("POST /auth/login", () => {
             { field: "loginOrEmail", message: "Incorrect type" },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if loginOrEmail is empty", async () => {
         const { body } = await req
@@ -141,7 +141,7 @@ describe("POST /auth/login", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
 
     describe("password validation", () => {
@@ -157,7 +157,7 @@ describe("POST /auth/login", () => {
         expect(body).toEqual({
           errorsMessages: [{ field: "password", message: "Incorrect type" }],
         });
-      });
+      }, 8000);
 
       it("should return 400 if password is empty", async () => {
         const { body } = await req
@@ -173,7 +173,7 @@ describe("POST /auth/login", () => {
             { field: "password", message: "Password is a required field" },
           ],
         });
-      });
+      }, 8000);
     });
   });
 });

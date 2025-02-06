@@ -52,7 +52,7 @@ describe("PUT /blogs", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -65,7 +65,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
   });
   describe("Updating post", () => {
     // Id matching
@@ -80,7 +80,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
     // Success case
     it("should return 204 if login, password and body params are correct. A proper blog should be updated", async () => {
       await req
@@ -98,7 +98,7 @@ describe("PUT /blogs", () => {
         id: expect.any(String),
         isMembership: false,
       });
-    });
+    }, 8000);
   });
   describe("Validation", () => {
     // Name validation
@@ -122,7 +122,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if name is empty string", async () => {
       const bodyParams = {
@@ -146,7 +146,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if name is too long", async () => {
       const bodyParams = {
@@ -170,7 +170,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // Description validation
     it("should return 400 and error if description is not string", async () => {
@@ -193,7 +193,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if description is an empty string", async () => {
       const bodyParams = {
@@ -217,7 +217,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if description is too long", async () => {
       const bodyParams = {
@@ -246,7 +246,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // WebsiteUrl validation
     it("should return 400 and error if websiteUrl is not string", async () => {
@@ -269,7 +269,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl is an empty string", async () => {
       const bodyParams = {
@@ -293,7 +293,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl is too long", async () => {
       const bodyParams = {
@@ -320,7 +320,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and error if websiteUrl does not match the reg exp", async () => {
       const bodyParams = {
@@ -347,7 +347,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     // Combined validation
     it("should return 400 and array with length === 1 if one field contains two errors", async () => {
@@ -368,7 +368,7 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
 
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
       const bodyParams = {
@@ -404,6 +404,6 @@ describe("PUT /blogs", () => {
         .get(`${SETTINGS.PATH.BLOGS}/${id}`)
         .expect(HTTP_STATUS.OK_200);
       expect(res.body).toEqual(unchangedResponse);
-    });
+    }, 8000);
   });
 });

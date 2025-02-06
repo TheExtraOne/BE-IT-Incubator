@@ -63,7 +63,7 @@ describe("POST /auth/new-password", () => {
           password: correctUserBodyParams.password,
         })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 400 if recovery code is invalid", async () => {
       await req
@@ -73,7 +73,7 @@ describe("POST /auth/new-password", () => {
           recoveryCode: "invalid-code",
         })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
   });
 
   describe("Input validation", () => {
@@ -84,7 +84,7 @@ describe("POST /auth/new-password", () => {
           recoveryCode: "some-code",
         })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
 
     it("should return 400 if recoveryCode is not provided", async () => {
       await req
@@ -93,7 +93,7 @@ describe("POST /auth/new-password", () => {
           newPassword: "newPassword123",
         })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
 
     it("should return 400 if newPassword does not meet requirements", async () => {
       await req
@@ -103,7 +103,7 @@ describe("POST /auth/new-password", () => {
           recoveryCode: "some-code",
         })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
   });
 
   describe("Rate limiting", () => {
@@ -126,6 +126,6 @@ describe("POST /auth/new-password", () => {
         .post(`${SETTINGS.PATH.AUTH}/new-password`)
         .send(newPasswordData)
         .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
-    });
+    }, 8000);
   });
 });

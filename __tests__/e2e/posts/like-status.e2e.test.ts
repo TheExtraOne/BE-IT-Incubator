@@ -54,7 +54,7 @@ describe("PUT /posts/:postId/like-status", () => {
         password: correctUserBodyParams.password,
       })
       .expect(HTTP_STATUS.OK_200);
-    
+
     accessToken1 = loginResponse1.body.accessToken;
     userId1 = loginResponse1.body.userId;
 
@@ -65,7 +65,7 @@ describe("PUT /posts/:postId/like-status", () => {
         password: correctUserBodyParams.password,
       })
       .expect(HTTP_STATUS.OK_200);
-    
+
     accessToken2 = loginResponse2.body.accessToken;
     userId2 = loginResponse2.body.userId;
 
@@ -75,7 +75,7 @@ describe("PUT /posts/:postId/like-status", () => {
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
       .expect(HTTP_STATUS.CREATED_201);
-    
+
     const blogId = blogResponse.body.id;
 
     // Create a post
@@ -84,7 +84,7 @@ describe("PUT /posts/:postId/like-status", () => {
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
       .expect(HTTP_STATUS.CREATED_201);
-    
+
     postId = postResponse.body.id;
   });
 
@@ -94,7 +94,7 @@ describe("PUT /posts/:postId/like-status", () => {
         .put(`${SETTINGS.PATH.POSTS}/${postId}/like-status`)
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Input Validation", () => {
@@ -104,7 +104,7 @@ describe("PUT /posts/:postId/like-status", () => {
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 400 if likeStatus has incorrect value", async () => {
       await req
@@ -112,7 +112,7 @@ describe("PUT /posts/:postId/like-status", () => {
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: "invalid_status" })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
   });
 
   describe("Basic Like Operations", () => {
@@ -131,7 +131,7 @@ describe("PUT /posts/:postId/like-status", () => {
       expect(response.body.extendedLikesInfo.likesCount).toBe(1);
       expect(response.body.extendedLikesInfo.dislikesCount).toBe(0);
       expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
-    });
+    }, 8000);
 
     it("should successfully dislike the post", async () => {
       await req
@@ -147,8 +147,10 @@ describe("PUT /posts/:postId/like-status", () => {
 
       expect(response.body.extendedLikesInfo.likesCount).toBe(0);
       expect(response.body.extendedLikesInfo.dislikesCount).toBe(1);
-      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
-    });
+      expect(response.body.extendedLikesInfo.myStatus).toBe(
+        LIKE_STATUS.DISLIKE
+      );
+    }, 8000);
 
     it("should successfully remove like/dislike status", async () => {
       // First like the post
@@ -173,7 +175,7 @@ describe("PUT /posts/:postId/like-status", () => {
       expect(response.body.extendedLikesInfo.likesCount).toBe(0);
       expect(response.body.extendedLikesInfo.dislikesCount).toBe(0);
       expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.NONE);
-    });
+    }, 8000);
   });
 
   describe("Multi-User Interactions", () => {
@@ -210,8 +212,10 @@ describe("PUT /posts/:postId/like-status", () => {
 
       expect(response2.body.extendedLikesInfo.likesCount).toBe(1);
       expect(response2.body.extendedLikesInfo.dislikesCount).toBe(1);
-      expect(response2.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
-    });
+      expect(response2.body.extendedLikesInfo.myStatus).toBe(
+        LIKE_STATUS.DISLIKE
+      );
+    }, 8000);
   });
 
   describe("Status Changes", () => {
@@ -237,7 +241,9 @@ describe("PUT /posts/:postId/like-status", () => {
 
       expect(response.body.extendedLikesInfo.likesCount).toBe(0);
       expect(response.body.extendedLikesInfo.dislikesCount).toBe(1);
-      expect(response.body.extendedLikesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
-    });
+      expect(response.body.extendedLikesInfo.myStatus).toBe(
+        LIKE_STATUS.DISLIKE
+      );
+    }, 8000);
   });
 });

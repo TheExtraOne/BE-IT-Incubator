@@ -2,7 +2,6 @@ import { Response } from "express";
 import {
   RESULT_STATUS,
   HTTP_STATUS,
-  LIKE_STATUS,
   SORT_DIRECTION,
   LIKE_TYPE,
 } from "../../common/settings";
@@ -17,7 +16,6 @@ import LikesService from "../../likes/app/likes-service";
 import TPathParamsPostModel from "../../posts/types/PathParamsPostModel";
 import CommentsService from "../app/comments-service";
 import CommentsQueryRepository from "../infrastructure/comments-query-repository";
-import LikesRepViewModel from "../../likes/types/LikeRepViewModel";
 import TCommentsLikeInputModel from "../types/CommentLikeInputModel";
 import TCommentServiceViewModel from "../types/CommentServiceViewModel";
 import TPathParamsCommentsModel from "../types/PathParamsCommentModel";
@@ -26,6 +24,7 @@ import TCommentControllerViewModel from "../types/PostCommentControllerViewModel
 import TQueryCommentsModel from "../types/QueryCommentsModel";
 import { inject, injectable } from "inversify";
 
+// TODO: add dto
 @injectable()
 class CommentsController {
   constructor(
@@ -60,17 +59,13 @@ class CommentsController {
     const createdComment: TCommentControllerViewModel | null =
       await this.commentsQueryRepository.getCommentById(commentId);
 
-    res.status(HTTP_STATUS.CREATED_201).json({
-      ...createdComment,
-      likesInfo: { ...createdComment?.likesInfo, myStatus: LIKE_STATUS.NONE },
-    });
+    res.status(HTTP_STATUS.CREATED_201).json(createdComment);
   }
 
   async getAllCommentsForPostId(
     req: TRequestWithQueryAndParams<TQueryCommentsModel, TPathParamsPostModel>,
     res: Response
   ): Promise<void> {
-    // Validating query in the middleware
     const {
       pageNumber = 1,
       pageSize = 10,
@@ -78,7 +73,6 @@ class CommentsController {
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
 
-    // We are reaching out to commentsQueryRepository directly because of CQRS
     const comments: TResponseWithPagination<
       TCommentControllerViewModel[] | []
     > = await this.commentsQueryRepository.getAllCommentsForPostId({
@@ -90,27 +84,11 @@ class CommentsController {
     });
 
     const userId: string | null = req.userId;
-    if (!userId) {
-      res.status(HTTP_STATUS.OK_200).json(comments);
-      return;
-    }
 
-    // Get the likes/dislike for a userId.
-    const likesForUser: LikesRepViewModel[] | null =
-      await this.likesService.getLikesByUserId(userId);
-    const itemsModified = comments.items.map((item) => {
-      // Find in the likes array likes for current commentId, add status
-      const like = likesForUser?.find((like) => like.parentId === item.id);
-      return {
-        ...item,
-        likesInfo: {
-          ...item.likesInfo,
-          myStatus: like ? like.status : LIKE_STATUS.NONE,
-        },
-      };
-    });
-
-    res.status(HTTP_STATUS.OK_200).json({ ...comments, items: itemsModified });
+    // Enrich comments with like status
+    const enrichedComments =
+      await this.likesService.enrichCommentsWithLikeStatus(comments, userId);
+    res.status(HTTP_STATUS.OK_200).json(enrichedComments);
   }
 
   async getCommentById(
@@ -120,31 +98,17 @@ class CommentsController {
     const userId: string | null = req.userId;
     const commentId = req.params.id;
 
-    const comment: TCommentServiceViewModel | null =
+    const comment: TCommentControllerViewModel | null =
       await this.commentsQueryRepository.getCommentById(commentId);
     if (!comment) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND_404);
       return;
     }
 
-    if (!userId) {
-      res.status(HTTP_STATUS.OK_200).json(comment);
-      return;
-    }
-    // Check if user already liked/disliked the comment and show the status
-    const like = await this.likesService.getLikeByUserAndParentId(
-      userId,
-      commentId
-    );
-    const response = {
-      ...comment,
-      likesInfo: {
-        ...comment.likesInfo,
-        myStatus: like?.status ?? LIKE_STATUS.NONE,
-      },
-    };
-
-    res.status(HTTP_STATUS.OK_200).json(response);
+    // Enrich comment with like status
+    const enrichedComment: TCommentControllerViewModel =
+      await this.likesService.enrichCommentWithLikeStatus(comment, userId);
+    res.status(HTTP_STATUS.OK_200).json(enrichedComment);
   }
 
   async changeLikeStatus(

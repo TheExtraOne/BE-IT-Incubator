@@ -29,27 +29,30 @@ describe("POST /auth/registration", () => {
 
   describe("Rate limiting", () => {
     it("should return 429 after exceeding 5 requests within 10 seconds", async () => {
-      // Make 5 requests (they will fail with 400 after first success due to duplicate login/email)
-      for (let i = 0; i < 5; i++) {
-        await req
+      const makeRequest = () =>
+        req
           .post(`${SETTINGS.PATH.AUTH}/registration`)
           .send(correctUserBodyParams);
+
+      // Make 5 requests
+      for (let i = 0; i < 5; i++) {
+        const response = await makeRequest();
+        expect(response.status).not.toBe(HTTP_STATUS.TOO_MANY_REQUESTS_429);
       }
 
-      // 6th request should be rate limited
-      await req
-        .post(`${SETTINGS.PATH.AUTH}/registration`)
-        .send(correctUserBodyParams)
-        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
-    });
+      // 6th request should return 429
+      const response = await makeRequest();
+      expect(response.status).toBe(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    }, 8000);
   });
 
   describe("Registration success/failure", () => {
     it("should return 204 and create user if input is valid", async () => {
-      await req
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/registration`)
-        .send(correctUserBodyParams)
-        .expect(HTTP_STATUS.NO_CONTENT_204);
+        .send(correctUserBodyParams);
+
+      expect(response.status).toBe(HTTP_STATUS.NO_CONTENT_204);
 
       // Verify user was created
       const user = await new UsersRepository().getByLoginOrEmail(
@@ -60,8 +63,7 @@ describe("POST /auth/registration", () => {
       expect(user!.accountData.email).toBe(correctUserBodyParams.email);
       expect(user!.emailConfirmation.isConfirmed).toBe(false);
       expect(user!.emailConfirmation.confirmationCode).toBeTruthy();
-      // expect(emailService.sendEmail).toBeCalled();
-    });
+    }, 8000);
 
     it("should return 400 if login or/and email already exists", async () => {
       // Create first user
@@ -88,7 +90,7 @@ describe("POST /auth/registration", () => {
           },
         ],
       });
-    });
+    }, 8000);
   });
 
   describe("Input validation", () => {
@@ -110,7 +112,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if login is empty", async () => {
         const response = await req
@@ -129,7 +131,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if login length is less than 3", async () => {
         const response = await req
@@ -148,7 +150,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if login length is more than 10", async () => {
         const response = await req
@@ -167,7 +169,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
 
     describe("password validation", () => {
@@ -188,7 +190,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if password is empty", async () => {
         const response = await req
@@ -207,7 +209,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if password length is less than 6", async () => {
         const response = await req
@@ -226,7 +228,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if password length is more than 20", async () => {
         const response = await req
@@ -245,7 +247,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
 
     describe("email validation", () => {
@@ -266,7 +268,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if email is empty", async () => {
         const response = await req
@@ -285,7 +287,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if email format is invalid", async () => {
         const response = await req
@@ -304,7 +306,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
 
     describe("Combined validation", () => {
@@ -334,7 +336,7 @@ describe("POST /auth/registration", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
   });
 });

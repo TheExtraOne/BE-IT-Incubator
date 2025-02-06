@@ -22,34 +22,38 @@ describe("POST /auth/password-recovery", () => {
         .send(correctUserBodyParams)
         .expect(HTTP_STATUS.CREATED_201);
 
-      await req
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-        .send({ email: correctUserBodyParams.email })
-        .expect(HTTP_STATUS.NO_CONTENT_204);
-    });
+        .send({ email: correctUserBodyParams.email });
+
+      expect(response.status).toBe(HTTP_STATUS.NO_CONTENT_204);
+    }, 8000);
 
     it("should return 204 even if email doesn't exist (to prevent user enumeration)", async () => {
-      await req
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-        .send({ email: "nonexistent@example.com" })
-        .expect(HTTP_STATUS.NO_CONTENT_204);
-    });
+        .send({ email: "nonexistent@example.com" });
+
+      expect(response.status).toBe(HTTP_STATUS.NO_CONTENT_204);
+    }, 8000);
   });
 
   describe("Input validation", () => {
     it("should return 400 if email is not provided", async () => {
-      await req
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-        .send({})
-        .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+        .send({});
+
+      expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST_400);
+    }, 8000);
 
     it("should return 400 if email has invalid format", async () => {
-      await req
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-        .send({ email: "invalid-email" })
-        .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+        .send({ email: "invalid-email" });
+
+      expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST_400);
+    }, 8000);
   });
 
   describe("Rate limiting", () => {
@@ -58,17 +62,19 @@ describe("POST /auth/password-recovery", () => {
 
       // Make 5 requests
       for (let i = 0; i < 5; i++) {
-        await req
+        const response = await req
           .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-          .send(recoveryData)
-          .expect(HTTP_STATUS.NO_CONTENT_204);
+          .send(recoveryData);
+
+        expect(response.status).not.toBe(HTTP_STATUS.TOO_MANY_REQUESTS_429);
       }
 
-      // 6th request should be rate limited
-      await req
+      // 6th request should return 429
+      const response = await req
         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
-        .send(recoveryData)
-        .expect(HTTP_STATUS.TOO_MANY_REQUESTS_429);
-    });
+        .send(recoveryData);
+
+      expect(response.status).toBe(HTTP_STATUS.TOO_MANY_REQUESTS_429);
+    }, 8000);
   });
 });

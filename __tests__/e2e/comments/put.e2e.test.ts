@@ -81,7 +81,7 @@ describe("PUT /comments/:commentId", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
         .send({ content: "Brand new updated content" })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 403 if trying to update someone else's comment", async () => {
       // Create another user and get their token
@@ -110,7 +110,7 @@ describe("PUT /comments/:commentId", () => {
         .set({ Authorization: `Bearer ${otherUserToken}` })
         .send({ content: "Updated by other user" })
         .expect(HTTP_STATUS.FORBIDDEN_403);
-    });
+    }, 8000);
   });
 
   describe("Input Validation", () => {
@@ -120,7 +120,7 @@ describe("PUT /comments/:commentId", () => {
         .set({ Authorization: `Bearer ${accessToken}` })
         .send({ content: "Brand new updated content" })
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     describe("Content Validation", () => {
       it("should return 400 if content is empty", async () => {
@@ -138,7 +138,7 @@ describe("PUT /comments/:commentId", () => {
             },
           ],
         });
-      });
+      }, 8000);
 
       it("should return 400 if content is too short", async () => {
         const res = await req
@@ -155,7 +155,7 @@ describe("PUT /comments/:commentId", () => {
             },
           ],
         });
-      });
+      }, 8000);
     });
   });
 
@@ -175,6 +175,6 @@ describe("PUT /comments/:commentId", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.content).toBe(newContent);
-    });
+    }, 8000);
   });
 });

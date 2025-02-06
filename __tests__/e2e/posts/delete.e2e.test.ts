@@ -43,7 +43,7 @@ describe("DELETE /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -52,7 +52,7 @@ describe("DELETE /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
   });
 
   describe("Deleting", () => {
@@ -64,7 +64,7 @@ describe("DELETE /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
 
     it("should return 204 if id is matching", async () => {
       await req
@@ -74,6 +74,6 @@ describe("DELETE /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
   });
 });

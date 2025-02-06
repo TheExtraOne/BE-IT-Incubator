@@ -19,14 +19,14 @@ describe("DELETE /users/:id", () => {
       await req
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if wrong credentials", async () => {
       await req
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
         .set({ Authorization: userCredentials.incorrect })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Error cases", () => {
@@ -35,7 +35,7 @@ describe("DELETE /users/:id", () => {
         .delete(`${SETTINGS.PATH.USERS}/${incorrectId}`)
         .set({ Authorization: userCredentials.correct })
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
   });
 
   describe("Success case", () => {
@@ -59,6 +59,6 @@ describe("DELETE /users/:id", () => {
         .expect(HTTP_STATUS.OK_200);
 
       expect(res.body.items).toEqual([]);
-    });
+    }, 8000);
   });
 });

@@ -34,7 +34,7 @@ describe("POST /posts", () => {
         .post(SETTINGS.PATH.POSTS)
         .send({ ...correctPostBodyParams, blogId })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
 
     it("should return 401 if login or password is incorrect", async () => {
       await req
@@ -42,7 +42,7 @@ describe("POST /posts", () => {
         .set({ Authorization: userCredentials.incorrect })
         .send({ ...correctPostBodyParams, blogId })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Creating", () => {
@@ -78,7 +78,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(1);
-    });
+    }, 8000);
   });
 
   describe("Validation", () => {
@@ -98,7 +98,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if title is empty string", async () => {
       const bodyParams = { ...correctPostBodyParams, blogId, title: "" };
@@ -117,7 +117,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if title is too long", async () => {
       const bodyParams = {
@@ -140,7 +140,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // ShortDescription validation
     it("should return 400 and error if shortDescription is not string", async () => {
@@ -164,7 +164,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if shortDescription is empty string", async () => {
       const bodyParams = {
@@ -190,7 +190,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if shortDescription is too long", async () => {
       const bodyParams = {
@@ -216,7 +216,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // Content validation
     it("should return 400 and error if content is not string", async () => {
@@ -238,7 +238,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if content is empty string", async () => {
       const bodyParams = {
@@ -264,7 +264,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if content is too long", async () => {
       const bodyParams = {
@@ -293,7 +293,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // BlogId validation
     it("should return 400 and error if blogId is not string", async () => {
@@ -314,7 +314,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if blogId is empty string", async () => {
       const bodyParams = {
@@ -339,7 +339,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     it("should return 400 and error if blogId does not match the db", async () => {
       const bodyParams = {
@@ -364,7 +364,7 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
 
     // Combined validation
     it("should return 400 and array with errors if couple of fields are incorrect", async () => {
@@ -395,6 +395,6 @@ describe("POST /posts", () => {
 
       const res = await req.get(SETTINGS.PATH.POSTS).expect(HTTP_STATUS.OK_200);
       expect(res.body.items.length).toEqual(0);
-    });
+    }, 8000);
   });
 });

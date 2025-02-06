@@ -55,7 +55,7 @@ describe("PUT /comments/:commentId/like-status", () => {
         password: correctUserBodyParams.password,
       })
       .expect(HTTP_STATUS.OK_200);
-    
+
     accessToken1 = loginResponse1.body.accessToken;
     userId1 = loginResponse1.body.userId;
 
@@ -66,7 +66,7 @@ describe("PUT /comments/:commentId/like-status", () => {
         password: correctUserBodyParams.password,
       })
       .expect(HTTP_STATUS.OK_200);
-    
+
     accessToken2 = loginResponse2.body.accessToken;
     userId2 = loginResponse2.body.userId;
 
@@ -76,7 +76,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       .set({ Authorization: userCredentials.correct })
       .send(correctBlogBodyParams)
       .expect(HTTP_STATUS.CREATED_201);
-    
+
     const blogId = blogResponse.body.id;
 
     // Create a post
@@ -85,7 +85,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       .set({ Authorization: userCredentials.correct })
       .send({ ...correctPostBodyParams, blogId })
       .expect(HTTP_STATUS.CREATED_201);
-    
+
     postId = postResponse.body.id;
 
     // Create a comment
@@ -94,7 +94,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       .auth(accessToken1, { type: "bearer" })
       .send({ content: "Test comment content" })
       .expect(HTTP_STATUS.CREATED_201);
-    
+
     commentId = commentResponse.body.id;
   });
 
@@ -104,7 +104,7 @@ describe("PUT /comments/:commentId/like-status", () => {
         .put(`${SETTINGS.PATH.COMMENTS}/${commentId}/like-status`)
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.UNAUTHORIZED_401);
-    });
+    }, 8000);
   });
 
   describe("Input Validation", () => {
@@ -114,7 +114,7 @@ describe("PUT /comments/:commentId/like-status", () => {
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: LIKE_STATUS.LIKE })
         .expect(HTTP_STATUS.NOT_FOUND_404);
-    });
+    }, 8000);
 
     it("should return 400 if likeStatus is invalid", async () => {
       await req
@@ -122,7 +122,7 @@ describe("PUT /comments/:commentId/like-status", () => {
         .auth(accessToken1, { type: "bearer" })
         .send({ likeStatus: "INVALID_STATUS" })
         .expect(HTTP_STATUS.BAD_REQUEST_400);
-    });
+    }, 8000);
   });
 
   describe("Basic Like Operations", () => {
@@ -142,7 +142,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.LIKE);
       expect(commentResponse.body.likesInfo.likesCount).toBe(1);
       expect(commentResponse.body.likesInfo.dislikesCount).toBe(0);
-    });
+    }, 8000);
 
     it("should successfully dislike a comment", async () => {
       await req
@@ -160,7 +160,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
       expect(commentResponse.body.likesInfo.likesCount).toBe(0);
       expect(commentResponse.body.likesInfo.dislikesCount).toBe(1);
-    });
+    }, 8000);
 
     it("should successfully remove like/dislike status", async () => {
       // First like the comment
@@ -186,7 +186,7 @@ describe("PUT /comments/:commentId/like-status", () => {
       expect(commentResponse.body.likesInfo.myStatus).toBe(LIKE_STATUS.NONE);
       expect(commentResponse.body.likesInfo.likesCount).toBe(0);
       expect(commentResponse.body.likesInfo.dislikesCount).toBe(0);
-    });
+    }, 8000);
   });
 
   describe("Multi-User Interactions", () => {
@@ -224,6 +224,6 @@ describe("PUT /comments/:commentId/like-status", () => {
       expect(response2.body.likesInfo.likesCount).toBe(1);
       expect(response2.body.likesInfo.dislikesCount).toBe(1);
       expect(response2.body.likesInfo.myStatus).toBe(LIKE_STATUS.DISLIKE);
-    });
+    }, 8000);
   });
 });

@@ -3,7 +3,6 @@ import {
   SORT_DIRECTION,
   HTTP_STATUS,
   RESULT_STATUS,
-  LIKE_STATUS,
 } from "../../common/settings";
 import {
   TRequestWithQuery,
@@ -25,7 +24,6 @@ import TQueryBlogModel from "../types/QueryBlogModel";
 import BlogsQueryRepository from "../infrastructure/blogs-query-repository";
 import PostsQueryRepository from "../../posts/infrastructure/posts-query-repository";
 import LikesService from "../../likes/app/likes-service";
-import PostsController from "../../posts/api/posts-controller";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -40,9 +38,7 @@ class BlogsController {
     @inject("PostsQueryRepository")
     protected postsQueryRepository: PostsQueryRepository,
     @inject("LikesService")
-    protected likesService: LikesService,
-    @inject("PostsController")
-    private postsController: PostsController
+    protected likesService: LikesService
   ) {}
 
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {
@@ -98,10 +94,6 @@ class BlogsController {
       sortBy = "createdAt",
       sortDirection = SORT_DIRECTION.DESC,
     } = req.query;
-
-    const userId: string | null = req.userId;
-
-    // Get base posts data
     const posts = await this.postsQueryRepository.getAllPosts({
       blogId: req.params.id,
       pageNumber: +pageNumber,
@@ -110,31 +102,11 @@ class BlogsController {
       sortDirection,
     });
 
-    // Reuse PostsController's enrichment methods
-    const postsWithLikes = {
-      ...posts,
-      items: await this.postsController.enrichPostsWithLatestLikes(posts.items),
-    };
-
-    // If no user, return posts with likes only
-    if (!userId) {
-      res.status(HTTP_STATUS.OK_200).json(postsWithLikes);
-      return;
-    }
-
-    // Get all likes for the user in one query
-    const likesForUser = await this.likesService.getLikesByUserId(userId);
-
-    // Add user's like status to each post
-    const postsWithUserStatusAndLikes = {
-      ...posts,
-      items: this.postsController.enrichPostsWithUserStatus(
-        postsWithLikes.items,
-        likesForUser
-      ),
-    };
-
-    res.status(HTTP_STATUS.OK_200).json(postsWithUserStatusAndLikes);
+    // Enrich posts with likes and user status
+    const userId: string | null = req.userId;
+    const enrichedPosts =
+      await this.likesService.enrichPostsWithLikesAndUserStatus(posts, userId);
+    res.status(HTTP_STATUS.OK_200).json(enrichedPosts);
   }
 
   async createBlog(

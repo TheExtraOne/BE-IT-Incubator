@@ -1,4 +1,4 @@
-import TBlogControllerInputModel from "../../../src/blogs/types/BlogControllerInputModel";
+import TBlogControllerInputModel from "../../../src/features/blogs/types/BlogControllerInputModel";
 import { SETTINGS, HTTP_STATUS } from "../../../src/common/settings";
 import {
   correctBlogBodyParams,

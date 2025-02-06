@@ -4,9 +4,12 @@ import {
   RESULT_STATUS,
   SETTINGS,
 } from "../../../src/common/settings";
-import UsersRepository from "../../../src/users/infrastructure/users-repository";
+import UsersRepository from "../../../src/features/users/infrastructure/users-repository";
 import { correctUserBodyParams, req, testDb } from "../helpers";
 
+import { container } from "../../../src/composition-root";
+
+const usersRepository = container.get<UsersRepository>("UsersRepository");
 describe("POST /auth/registration", () => {
   beforeAll(async () => await testDb.setup());
 
@@ -55,7 +58,7 @@ describe("POST /auth/registration", () => {
       expect(response.status).toBe(HTTP_STATUS.NO_CONTENT_204);
 
       // Verify user was created
-      const user = await new UsersRepository().getByLoginOrEmail(
+      const user = await usersRepository.getByLoginOrEmail(
         correctUserBodyParams.login
       );
       expect(user).toBeTruthy();

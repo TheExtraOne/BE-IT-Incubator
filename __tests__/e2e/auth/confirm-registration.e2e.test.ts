@@ -1,9 +1,10 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
 import { correctUserBodyParams, req, testDb } from "../helpers";
-import UsersRepository from "../../../src/users/infrastructure/users-repository";
-import { UserModelDb } from "../../../src/users/domain/user-model";
+import { container } from "../../../src/composition-root";
+import UsersRepository from "../../../src/features/users/infrastructure/users-repository";
+import { UserModelDb } from "../../../src/features/users/domain/user-model";
 
-const usersRepository = new UsersRepository();
+const usersRepository = container.get<UsersRepository>("UsersRepository");
 
 describe("POST /auth/registration-confirmation", () => {
   beforeAll(async () => await testDb.setup());

@@ -8,7 +8,6 @@ import {
   correctBlogBodyParams,
   testDb,
 } from "../helpers";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe("PUT /comments/:commentId", () => {
   let accessToken: string;

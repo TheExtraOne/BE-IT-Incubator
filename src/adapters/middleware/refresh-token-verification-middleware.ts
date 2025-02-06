@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS, RESULT_STATUS, TOKEN_TYPE } from "../../common/settings";
 import { Result } from "../../common/types/types";
-import RefreshTokensMetaRepViewModel from "../../security/types/RefreshTokensMetaRepViewModel";
 import { container } from "../../composition-root";
 import JwtService from "../jwt-service";
-import SecurityService from "../../security/app/security-service";
+import SecurityService from "../../features/security/app/security-service";
+import RefreshTokensMetaRepViewModel from "../../features/security/types/RefreshTokensMetaRepViewModel";
 
 const jwtService = container.get<JwtService>("JwtService");
 const securityService = container.get<SecurityService>("SecurityService");

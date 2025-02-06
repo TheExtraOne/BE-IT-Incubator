@@ -1,14 +1,14 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { SETTINGS, HTTP_STATUS } from "./common/settings";
-import commentsRouter from "./comments/api/comments-router";
+import commentsRouter from "./features/comments/api/comments-router";
 import cookieParser from "cookie-parser";
-import authRouter from "./auth/api/auth-router";
-import blogsRouter from "./blogs/api/blogs-router";
-import postsRouter from "./posts/api/posts-router";
-import securityRouter from "./security/api/security-router";
+import authRouter from "./features/auth/api/auth-router";
+import blogsRouter from "./features/blogs/api/blogs-router";
+import postsRouter from "./features/posts/api/posts-router";
+import securityRouter from "./features/security/api/security-router";
 import testingRouter from "./testing/api/testing-router";
-import usersRouter from "./users/api/users-router";
+import usersRouter from "./features/users/api/users-router";
 
 const app = express();
 app.set("trust proxy", true);

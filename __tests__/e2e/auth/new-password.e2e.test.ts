@@ -1,11 +1,14 @@
 import { HTTP_STATUS, SETTINGS } from "../../../src/common/settings";
-import UsersRepository from "../../../src/users/infrastructure/users-repository";
+import UsersRepository from "../../../src/features/users/infrastructure/users-repository";
 import {
   correctUserBodyParams,
   req,
-  userCredentials,
   testDb,
+  userCredentials,
 } from "../helpers";
+import { container } from "../../../src/composition-root";
+
+const usersRepository = container.get<UsersRepository>("UsersRepository");
 
 describe("POST /auth/new-password", () => {
   beforeAll(async () => await testDb.setup());
@@ -30,7 +33,7 @@ describe("POST /auth/new-password", () => {
         .expect(HTTP_STATUS.NO_CONTENT_204);
 
       // Get user with recovery code
-      const user = await new UsersRepository().getByLoginOrEmail(
+      const user = await usersRepository.getByLoginOrEmail(
         correctUserBodyParams.email
       );
       expect(user).not.toBeNull();

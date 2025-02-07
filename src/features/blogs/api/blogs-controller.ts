@@ -30,15 +30,15 @@ import {
 class BlogsController {
   constructor(
     @inject("BlogService")
-    protected blogService: BlogService,
+    private blogService: BlogService,
     @inject("BlogsQueryRepository")
-    protected blogsQueryRepository: BlogsQueryRepository,
+    private blogsQueryRepository: BlogsQueryRepository,
     @inject("PostsService")
-    protected postsService: PostsService,
+    private postsService: PostsService,
     @inject("PostsQueryRepository")
-    protected postsQueryRepository: PostsQueryRepository,
+    private postsQueryRepository: PostsQueryRepository,
     @inject("LikesService")
-    protected likesService: LikesService
+    private likesService: LikesService
   ) {}
 
   async getBlogs(req: TRequestWithQuery<TQueryBlogModel>, res: Response) {

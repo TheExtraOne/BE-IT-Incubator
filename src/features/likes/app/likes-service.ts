@@ -21,10 +21,10 @@ import UserAccountRepViewModel from "../../users/types/UserAccountRepViewModel";
 @injectable()
 class LikesService {
   constructor(
-    @inject("LikesRepository") protected likesRepository: LikesRepository,
-    @inject("CommentsService") protected commentService: CommentsService,
-    @inject("PostsService") protected postsService: PostsService,
-    @inject("UsersService") protected usersService: UsersService
+    @inject("LikesRepository") private likesRepository: LikesRepository,
+    @inject("CommentsService") private commentService: CommentsService,
+    @inject("PostsService") private postsService: PostsService,
+    @inject("UsersService") private usersService: UsersService
   ) {}
   async createLike({
     userId,

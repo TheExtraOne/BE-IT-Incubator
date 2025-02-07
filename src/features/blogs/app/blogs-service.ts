@@ -11,7 +11,7 @@ import { RESULT_STATUS } from "../../../common/settings";
 @injectable()
 class BlogService {
   constructor(
-    @inject("BlogsRepository") protected blogsRepository: BlogsRepository
+    @inject("BlogsRepository") private blogsRepository: BlogsRepository
   ) {}
 
   async createBlog({
